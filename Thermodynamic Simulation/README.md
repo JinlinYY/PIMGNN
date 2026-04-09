@@ -34,17 +34,3 @@ This repository contains two main Python scripts designed for generating liquid-
     The code reserves placeholder matrices for NRTL model interaction parameters ($g_{ij}$ and $\alpha_{ij}$). This allows users to easily compare experimental regressed parameters with UNIFAC predictions under identical conditions.
 3.  **Broad Phase Envelope Generation via Continuation Method**
     Through the `generate_broad_phase_envelope` module, the code automatically scans the solute concentration starting from extremely low fractions. By using the converged result of the previous point as the initial guess for the next point, it significantly improves the convergence rate of complex LLE calculations, allowing for smooth scanning up to the vicinity of the Plait Point.
-
----
-
-## 3. Dependencies & Quick Start 🚀
-
-### Prerequisites
-Please ensure the following libraries are installed in your Python environment:
-* `numpy`
-* `pandas`
-* `phasepy`
-
-You can install them quickly via pip:
-```bash
-pip install numpy pandas phasepy
