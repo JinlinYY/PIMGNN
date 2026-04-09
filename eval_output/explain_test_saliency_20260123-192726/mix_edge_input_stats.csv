@@ -1,0 +1,17 @@
+﻿name,mean_abs,std,near_zero_ratio
+Aromatic Rings Product,0.6109083040500991,0.02525223625737745,0.0
+Fraction SP3 Product,0.3738466243084986,0.031748331219549175,0.0
+Δ Lipophilicity,9.999999747378752e-05,0.0,0.0
+Δ TPSA,9.999999747378752e-05,0.0,0.0
+Δ Molar Mass,1.0000000116860974e-07,0.0,0.0
+Δ Aromatic Rings,1.0000000116860974e-07,0.0,0.0
+Δ Fraction SP3,1.0000000116860974e-07,0.0,0.0
+Molar Mass Product,1.0000000116860974e-07,0.0,0.0
+Δ H-Bond Donors,0.0,0.0,1.0
+Δ H-Bond Acceptors,0.0,0.0,1.0
+Δ Ring Count,0.0,0.0,1.0
+Lipophilicity Product,0.0,0.0,1.0
+TPSA Product,0.0,0.0,1.0
+H-Bond Donors Product,0.0,0.0,1.0
+H-Bond Acceptors Product,0.0,0.0,1.0
+Ring Count Product,0.0,0.0,1.0

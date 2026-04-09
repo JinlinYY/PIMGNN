@@ -1,0 +1,9 @@
+应用案例测试报告
+==================================================
+
+Excel 文件: ./data_update/应用案例1.xlsx
+模型检查点: ./lle_run_混合物图-Cross-s3-tf-纯数据驱动test2/best_model.pt
+数据点数: 9
+输出目录: ./results
+
+预测结果已保存到: ./results\application_case_predictions.csv

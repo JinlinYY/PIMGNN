@@ -1,0 +1,68 @@
+Best epoch: 43
+
+============================================================
+Validation Metrics:
+============================================================
+  mse: 0.006767
+  rmse: 0.082261
+  r2: 0.940570
+  mae: 0.042430
+  rmse_E: 0.059973
+  rmse_R: 0.099685
+  r2_E: 0.964790
+  r2_R: 0.920868
+  mae_E: 0.037827
+  mae_R: 0.047033
+  sum_err_E: 0.000000
+  sum_err_R: 0.000000
+  sum_err_95: 0.000000
+  neg_frac: 0.000000
+  param_cov: 1.000000
+  mu_res_mae: 0.654036
+  mu_res_rmse: 1.016830
+  mu_res_max: 7.291502
+  gd_penalty_mean: 0.000000
+  gd_penalty_p95: 0.000000
+  gd_res_mae: 0.000000
+  tpd_viol_rate: 0.209763
+  tpd_viol_mean: 0.000330
+
+============================================================
+Test Metrics:
+============================================================
+
+Standard Metrics:
+  mse: 0.003474
+  mae: 0.038845
+  rmse: 0.058938
+  r2: 0.970387
+  mae_E: 0.040523
+  mae_R: 0.037168
+  rmse_E: 0.058694
+  rmse_R: 0.059180
+  r2_E: 0.964591
+  r2_R: 0.974493
+
+Physics Consistency Metrics:
+  sum_err_E: 0.000000
+  sum_err_R: 0.000000
+  sum_err_95: 0.000000
+  neg_frac: 0.000000
+  param_cov: 1.000000
+  mu_res_mae: 0.595178
+  mu_res_rmse: 0.845440
+  gd_penalty_mean: 0.000000
+  gd_penalty_p95: 0.000000
+  tpd_viol_rate: 0.252179
+  tpd_viol_mean: 0.000343
+
+============================================================
+
+Metric Descriptions:
+  sum_err_E/R: Sum-to-one constraint error (Extract/Raffinate)
+  sum_err_95: 95th percentile of sum-to-one error
+  neg_frac: Fraction of negative predictions
+  param_cov: Coverage rate of NRTL parameters
+  mu_res_*: Chemical potential equilibrium residual
+  gd_penalty_*: Gibbs-Duhem consistency violation
+  tpd_viol_*: Tangent-plane distance stability violation

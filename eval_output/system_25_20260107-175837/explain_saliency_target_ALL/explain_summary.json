@@ -1,0 +1,7 @@
+{
+  "n_points": 12,
+  "explain": "saliency",
+  "target": "ALL",
+  "objective": "loss",
+  "has_rdkit": false
+}
