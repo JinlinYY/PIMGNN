@@ -2,7 +2,6 @@
 
 This project is intended to be run from the project root.
 
-Chinese documentation is available in [README-Chinese.md](README-Chinese.md).
 
 PowerShell:
 
