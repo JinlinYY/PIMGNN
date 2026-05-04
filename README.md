@@ -1,3 +1,12 @@
+# PIMGNN
+
+
+This repository contains the code and datasets used in the manuscript:
+
+> **Physics-informed framework of liquid–liquid phase diagrams for extraction process design**.
+
+![image](https://github.com/JinlinYY/PIMGNN/blob/main/Method.png).
+
 # Commands & Script Overview
 
 This project is intended to be run from the project root.
