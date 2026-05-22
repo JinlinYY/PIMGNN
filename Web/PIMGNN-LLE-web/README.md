@@ -1,4 +1,5 @@
 # PIMGNN-LLE — Ternary Liquid–Liquid Equilibrium Prediction
+![image](https://github.com/JinlinYY/PIMGNN/blob/main/web.png).
 
 Physics-informed molecular graph neural network (PIMGNN) web application for predicting **ternary liquid–liquid equilibrium (LLE)** from SMILES strings and generating ternary phase diagrams.
 
