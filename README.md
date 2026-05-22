@@ -6,7 +6,7 @@ This repository contains the code and datasets used in the manuscript:
 > **Physics-informed framework of liquid–liquid phase diagrams for extraction process design**.
 
 ![image](https://github.com/JinlinYY/PIMGNN/blob/main/Method.png).
-![image](https://github.com/JinlinYY/PIMGNN/blob/main/web.png).
+
 
 # Commands & Script Overview
 
