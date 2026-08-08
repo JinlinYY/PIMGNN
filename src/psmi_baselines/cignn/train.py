@@ -311,7 +311,7 @@ def save_results(args, history, train_pred, train_true, val_pred, val_true,
         """Run the format metrics txt baseline operation."""
         lines = []
         if "mse" in metrics_dict:
-            lines.append(f"{prefix}【平均指标】")
+            lines.append(f"{prefix}[ mean metrics ]")
             lines.append(f"  MSE:  {metrics_dict['mse']:.6f}")
             lines.append(f"  RMSE: {metrics_dict['rmse']:.6f} ± {metrics_dict.get('rmse_std', 0):.4f}")
             lines.append(f"  MAE:  {metrics_dict['mae']:.6f} ± {metrics_dict.get('mae_std', 0):.4f}")
@@ -319,7 +319,7 @@ def save_results(args, history, train_pred, train_true, val_pred, val_true,
             lines.append("")
         
         if "mse_e" in metrics_dict:
-            lines.append(f"{prefix}【E相指标】")
+            lines.append(f"{prefix}[E phase metrics ]")
             lines.append(f"  MSE:  {metrics_dict['mse_e']:.6f}")
             lines.append(f"  RMSE: {metrics_dict['rmse_e']:.6f} ± {metrics_dict.get('rmse_e_std', 0):.4f}")
             lines.append(f"  MAE:  {metrics_dict['mae_e']:.6f} ± {metrics_dict.get('mae_e_std', 0):.4f}")
@@ -327,7 +327,7 @@ def save_results(args, history, train_pred, train_true, val_pred, val_true,
             lines.append("")
         
         if "mse_r" in metrics_dict:
-            lines.append(f"{prefix}【R相指标】")
+            lines.append(f"{prefix}[R phase metrics ]")
             lines.append(f"  MSE:  {metrics_dict['mse_r']:.6f}")
             lines.append(f"  RMSE: {metrics_dict['rmse_r']:.6f} ± {metrics_dict.get('rmse_r_std', 0):.4f}")
             lines.append(f"  MAE:  {metrics_dict['mae_r']:.6f} ± {metrics_dict.get('mae_r_std', 0):.4f}")
@@ -339,26 +339,26 @@ def save_results(args, history, train_pred, train_true, val_pred, val_true,
     # Save the generated artifacts.
     txt_lines = []
     txt_lines.append("=" * 100)
-    txt_lines.append("最佳模型指标")
+    txt_lines.append(" best-model metrics ")
     txt_lines.append("=" * 100)
     txt_lines.append("")
     
     # Baseline workflow step.
-    txt_lines.append("【训练信息】")
-    txt_lines.append(f"  最佳epoch: {best_epoch}")
-    txt_lines.append(f"  最佳验证MSE: {best_val_mse:.6f}")
-    txt_lines.append(f"  总训练轮数: {len(history)}")
-    txt_lines.append(f"  总训练时间: {total_time:.2f} 秒 ({total_time/60:.2f} 分钟)")
-    txt_lines.append(f"  平均每轮时间: {avg_time_per_epoch:.2f} 秒")
+    txt_lines.append("[ training information ]")
+    txt_lines.append(f" best epoch: {best_epoch}")
+    txt_lines.append(f" best validation MSE: {best_val_mse:.6f}")
+    txt_lines.append(f" total training epochs : {len(history)}")
+    txt_lines.append(f" total training time : {total_time:.2f} seconds ({total_time/60:.2f} minutes )")
+    txt_lines.append(f" mean time per epoch : {avg_time_per_epoch:.2f} seconds ")
     txt_lines.append("")
     
     # Evaluate the validation subset.
-    txt_lines.append("【验证集指标】")
+    txt_lines.append("[ validation metrics ]")
     txt_lines.append(format_metrics_txt(val_metrics))
     
     # Evaluate the test subset.
     if test_metrics is not None:
-        txt_lines.append("【测试集指标】")
+        txt_lines.append("[ test metrics ]")
         txt_lines.append(format_metrics_txt(test_metrics))
     
     txt_lines.append("=" * 100)
@@ -369,25 +369,25 @@ def save_results(args, history, train_pred, train_true, val_pred, val_true,
     # Save the generated artifacts.
     with open(os.path.join(args.results_dir, 'training_metrics.txt'), 'w', encoding='utf-8') as f:
         f.write("=" * 100 + "\n")
-        f.write("训练指标总结\n")
+        f.write(" training-metric summary \n")
         f.write("=" * 100 + "\n\n")
         
-        f.write(f"最佳模型在epoch {best_epoch}\n")
-        f.write(f"最佳验证集MSE: {best_val_mse:.6f}\n\n")
+        f.write(f" best model at epoch {best_epoch}\n")
+        f.write(f" best validation MSE: {best_val_mse:.6f}\n\n")
         
-        f.write("【最佳验证集指标】\n")
-        f.write(f"  【平均指标】 MAE={val_metrics['mae']:.6f}±{val_metrics['mae_std']:.4f}  RMSE={val_metrics['rmse']:.6f}±{val_metrics['rmse_std']:.4f}  R²={val_metrics['r2']:.6f}\n")
-        f.write(f"  【E相指标】  MAE={val_metrics['mae_e']:.6f}±{val_metrics['mae_e_std']:.4f}  RMSE={val_metrics['rmse_e']:.6f}±{val_metrics['rmse_e_std']:.4f}  R²={val_metrics['r2_e']:.6f}\n")
-        f.write(f"  【R相指标】  MAE={val_metrics['mae_r']:.6f}±{val_metrics['mae_r_std']:.4f}  RMSE={val_metrics['rmse_r']:.6f}±{val_metrics['rmse_r_std']:.4f}  R²={val_metrics['r2_r']:.6f}\n\n")
+        f.write("[ best validation metrics ]\n")
+        f.write(f" [ mean metrics ] MAE={val_metrics['mae']:.6f}±{val_metrics['mae_std']:.4f} RMSE={val_metrics['rmse']:.6f}±{val_metrics['rmse_std']:.4f} R²={val_metrics['r2']:.6f}\n")
+        f.write(f" [E phase metrics ] MAE={val_metrics['mae_e']:.6f}±{val_metrics['mae_e_std']:.4f} RMSE={val_metrics['rmse_e']:.6f}±{val_metrics['rmse_e_std']:.4f} R²={val_metrics['r2_e']:.6f}\n")
+        f.write(f" [R phase metrics ] MAE={val_metrics['mae_r']:.6f}±{val_metrics['mae_r_std']:.4f} RMSE={val_metrics['rmse_r']:.6f}±{val_metrics['rmse_r_std']:.4f} R²={val_metrics['r2_r']:.6f}\n\n")
         
         if test_metrics is not None:
-            f.write("【测试集指标】\n")
-            f.write(f"  【平均指标】 MAE={test_metrics['mae']:.6f}±{test_metrics['mae_std']:.4f}  RMSE={test_metrics['rmse']:.6f}±{test_metrics['rmse_std']:.4f}  R²={test_metrics['r2']:.6f}\n")
-            f.write(f"  【E相指标】  MAE={test_metrics['mae_e']:.6f}±{test_metrics['mae_e_std']:.4f}  RMSE={test_metrics['rmse_e']:.6f}±{test_metrics['rmse_e_std']:.4f}  R²={test_metrics['r2_e']:.6f}\n")
-            f.write(f"  【R相指标】  MAE={test_metrics['mae_r']:.6f}±{test_metrics['mae_r_std']:.4f}  RMSE={test_metrics['rmse_r']:.6f}±{test_metrics['rmse_r_std']:.4f}  R²={test_metrics['r2_r']:.6f}\n\n")
+            f.write("[ test metrics ]\n")
+            f.write(f" [ mean metrics ] MAE={test_metrics['mae']:.6f}±{test_metrics['mae_std']:.4f} RMSE={test_metrics['rmse']:.6f}±{test_metrics['rmse_std']:.4f} R²={test_metrics['r2']:.6f}\n")
+            f.write(f" [E phase metrics ] MAE={test_metrics['mae_e']:.6f}±{test_metrics['mae_e_std']:.4f} RMSE={test_metrics['rmse_e']:.6f}±{test_metrics['rmse_e_std']:.4f} R²={test_metrics['r2_e']:.6f}\n")
+            f.write(f" [R phase metrics ] MAE={test_metrics['mae_r']:.6f}±{test_metrics['mae_r_std']:.4f} RMSE={test_metrics['rmse_r']:.6f}±{test_metrics['rmse_r_std']:.4f} R²={test_metrics['r2_r']:.6f}\n\n")
         
-        f.write(f"总训练时间: {total_time:.2f}秒 ({total_time/60:.2f}分钟)\n")
-        f.write(f"平均每轮时间: {avg_time_per_epoch:.2f}秒\n")
+        f.write(f" total training time : {total_time:.2f} seconds ({total_time/60:.2f} minutes )\n")
+        f.write(f" mean time per epoch : {avg_time_per_epoch:.2f} seconds \n")
         f.write("=" * 100 + "\n")
 
 
@@ -413,55 +413,55 @@ def load_csv_data(csv_path):
 def print_config_info(args, train_size, val_size, test_size, device_info):
     """Run the print config info baseline operation."""
     print("=" * 100)
-    print("【训练配置参数】")
+    print("[ training configuration ]")
     print("=" * 100)
     print()
-    print("【数据集信息】")
-    print(f"  训练集样本数: {train_size}")
-    print(f"  验证集样本数: {val_size}")
-    print(f"  测试集样本数: {test_size}")
+    print("[ dataset information ]")
+    print(f" number of training samples : {train_size}")
+    print(f" number of validation samples : {val_size}")
+    print(f" number of test samples : {test_size}")
     print()
-    print("【设备配置】")
-    print(f"  设备: {device_info['device']}")
+    print("[ Device configuration ]")
+    print(f" device : {device_info['device']}")
     if device_info['device'] == 'cuda':
-        print(f"  GPU名称: {device_info['gpu_name']}")
-        print(f"  CUDA版本: {device_info['cuda_version']}")
-        print(f"  GPU内存: {device_info['gpu_memory']:.2f} GB")
+        print(f" GPU name : {device_info['gpu_name']}")
+        print(f" CUDA version : {device_info['cuda_version']}")
+        print(f" GPU memory : {device_info['gpu_memory']:.2f} GB")
     print()
-    print("【训练参数】")
-    print(f"  随机种子: {args.seed}")
-    print(f"  训练轮数: {args.epochs}")
-    print(f"  批次大小: {args.batch_size}")
-    print(f"  学习率: {args.lr}")
-    print(f"  权重衰减: {args.weight_decay}")
-    print(f"  早停耐心值: {args.patience}")
-    print(f"  早停最小改善: 0.0")
-    print(f"  检查点保存频率: 每 {args.checkpoint_freq} 个epoch")
+    print("[ training parameters ]")
+    print(f" random seed : {args.seed}")
+    print(f" training epochs : {args.epochs}")
+    print(f" batch size : {args.batch_size}")
+    print(f" learning rate : {args.lr}")
+    print(f" weight decay : {args.weight_decay}")
+    print(f" early-stopping patience : {args.patience}")
+    print(f" minimum early-stopping improvement : 0.0")
+    print(f" checkpoint frequency : per {args.checkpoint_freq} epoch")
     if args.rest_freq > 0:
-        print(f"  休息策略: 每 {args.rest_freq} 个epoch休息 {args.rest_duration}秒（{args.rest_duration/60:.1f}分钟）")
+        print(f" rest policy : per {args.rest_freq} epoch Break {args.rest_duration} seconds ({args.rest_duration/60:.1f} minutes )")
     else:
-        print(f"  休息策略: 基于时间（每2小时休息5分钟）")
+        print(f" rest policy : Time-based ( per 2 hours before cooldown 5 minutes )")
     # Handle model checkpoints.
     # Configure repository paths.
     checkpoint_dir = os.path.join(args.output_dir, 'checkpoint')
     latest_checkpoint = find_latest_checkpoint(checkpoint_dir)
     if latest_checkpoint:
-        print(f"  断点续训: 是（从检查点恢复）")
+        print(f" resume training : yes ( resume from checkpoint )")
     else:
-        print(f"  断点续训: 否（从头开始）")
+        print(f" resume training : no ( start from scratch )")
     print()
-    print("【模型超参数】")
-    print(f"  隐藏层维度: {args.hidden_dim}")
-    print(f"  图神经网络层数: {args.num_mp_layers}")
-    print(f"  Set2Set步骤数: 3")
-    print(f"  Dropout率: 0.0")
-    print(f"  输出维度: 6 (LLE任务: Ex1, Ex2, Ex3, Rx1, Rx2, Rx3)")
-    print(f"  使用Set2Set: {'是' if args.use_set2set else '否'}")
-    print(f"  使用温度: {'是' if args.use_temperature else '否'}")
+    print("[ model hyperparameters ]")
+    print(f" hidden-layer dimension : {args.hidden_dim}")
+    print(f" number of graph-neural-network layers : {args.num_mp_layers}")
+    print(f" Set2Set number of steps : 3")
+    print(f" Dropout rate : 0.0")
+    print(f" output dimension : 6 (LLE task : Ex1, Ex2, Ex3, Rx1, Rx2, Rx3)")
+    print(f" use Set2Set: {' yes ' if args.use_set2set else ' no '}")
+    print(f" use temperature : {' yes ' if args.use_temperature else ' no '}")
     print()
-    print("【路径信息】")
-    print(f"  输出目录: {args.output_dir}")
-    print(f"  结果目录: {os.path.join(args.output_dir, 'results')}")
+    print("[ path information ]")
+    print(f" output directory : {args.output_dir}")
+    print(f" result directory : {os.path.join(args.output_dir, 'results')}")
     print()
     print("=" * 100)
     print()
@@ -498,8 +498,8 @@ def find_latest_checkpoint(checkpoint_dir):
 def load_checkpoint(checkpoint_path, model, optimizer, device):
     """Run the load checkpoint baseline operation."""
     print("=" * 100)
-    print(f"发现检查点文件: {checkpoint_path}")
-    print("正在加载检查点以恢复训练...")
+    print(f" Discovery checkpoint file : {checkpoint_path}")
+    print(" True at load checkpoint in resume training ...")
     print("=" * 100)
     
     checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
@@ -526,12 +526,12 @@ def load_checkpoint(checkpoint_path, model, optimizer, device):
         best_epoch = best_epoch_info.get('epoch', start_epoch)
         best_val_mse = best_epoch_info.get('val_mse', best_val_mse)
     
-    print(f"成功加载检查点！")
-    print(f"  - 起始epoch: {start_epoch}")
-    print(f"  - 最佳epoch: {best_epoch}")
-    print(f"  - 最佳验证MSE: {best_val_mse:.6f}")
-    print(f"  - 耐心计数器: {patience_counter}")
-    print(f"  - 历史记录数: {len(history)}")
+    print(f" successful load checkpoint !")
+    print(f" - start epoch: {start_epoch}")
+    print(f" - best epoch: {best_epoch}")
+    print(f" - best validation MSE: {best_val_mse:.6f}")
+    print(f" - Patience Counter : {patience_counter}")
+    print(f" - History count : {len(history)}")
     print("=" * 100)
     print()
     
@@ -634,36 +634,36 @@ def main(args=None):
         else:
             # Configure experiment parameters.
             print("=" * 100)
-            print("CIGIN模型训练 - 使用默认配置（无需命令行参数）")
+            print("CIGIN model training - use default configuration ( No Command Needed rows parameters )")
             print("=" * 100)
             args = get_default_args()
             
             # Baseline workflow step.
-            print("\n训练配置:")
-            print(f"  训练数据: {args.data_path}")
-            print(f"  测试数据: {args.test_data_path}")
-            print(f"  随机种子: {args.seed}")
-            print(f"  训练轮数: {args.epochs}")
-            print(f"  批次大小: {args.batch_size}")
-            print(f"  学习率: {args.lr}")
-            print(f"  隐藏层维度: {args.hidden_dim}")
-            print(f"  消息传递层数: {args.num_mp_layers}")
-            print(f"  使用温度: {args.use_temperature}")
-            print(f"  使用Set2Set: {args.use_set2set}")
-            print(f"  设备: {args.device}")
-            print(f"  输出目录: {args.output_dir}")
+            print("\n training configuration :")
+            print(f" Training data : {args.data_path}")
+            print(f" Test data : {args.test_data_path}")
+            print(f" random seed : {args.seed}")
+            print(f" training epochs : {args.epochs}")
+            print(f" batch size : {args.batch_size}")
+            print(f" learning rate : {args.lr}")
+            print(f" hidden-layer dimension : {args.hidden_dim}")
+            print(f" Messaging number of layers : {args.num_mp_layers}")
+            print(f" use temperature : {args.use_temperature}")
+            print(f" use Set2Set: {args.use_set2set}")
+            print(f" device : {args.device}")
+            print(f" output directory : {args.output_dir}")
             print("=" * 100)
             print()
             
             # Process the experiment data.
             if not os.path.exists(args.data_path):
-                print(f"错误: 训练数据文件不存在: {args.data_path}")
-                print("请检查文件路径是否正确，或使用命令行参数指定数据路径")
+                print(f" error : Training data file does not exist : {args.data_path}")
+                print(" please check file path whether Correct , or use Command rows parameters Designation data path ")
                 sys.exit(1)
             
             if args.test_data_path and not os.path.exists(args.test_data_path):
-                print(f"警告: 测试数据文件不存在: {args.test_data_path}")
-                print("将只使用训练数据进行训练")
+                print(f" warning : Test data file does not exist : {args.test_data_path}")
+                print(" will Only use Training data Into rows Training ")
                 args.test_data_path = None
     
     # Set the random seed.
@@ -682,7 +682,7 @@ def main(args=None):
     print("Loading data from CSV...", flush=True)
     sys.stdout.flush()  # Configure the output artifacts.
     il_smiles, comp2_smiles, comp3_smiles, labels, temperatures = load_csv_data(args.data_path)
-    print(f"数据加载完成，共 {len(labels)} 条样本", flush=True)
+    print(f" data load complete , total {len(labels)} samples ", flush=True)
     
     # Process the experiment data.
     # Run the training step.
@@ -709,7 +709,7 @@ def main(args=None):
             )
         elif args.test_data_path:
             # Load the input data.
-            print("加载单独的测试集文件...", flush=True)
+            print(" load Separate test set file ...", flush=True)
             test_il_smiles, test_comp2_smiles, test_comp3_smiles, test_labels, test_temperatures = load_csv_data(args.test_data_path)
             # Run the training step.
             train_idx, val_idx = train_test_split(
@@ -718,10 +718,10 @@ def main(args=None):
                 random_state=args.seed,
                 shuffle=True
             )
-            print(f"使用sklearn划分: 训练集 {len(train_idx)} 条, 验证集 {len(val_idx)} 条, 测试集 {len(test_labels)} 条", flush=True)
+            print(f" use sklearn Divide : training set {len(train_idx)} bar , validation set {len(val_idx)} bar , test set {len(test_labels)} bar ", flush=True)
         else:
             # Run the training step.
-            print("使用sklearn从总数据集中划分训练集、验证集和测试集...", flush=True)
+            print(" use sklearn from Total dataset in Divide training set , validation set and test set ...", flush=True)
             # Evaluate the test subset.
             train_val_idx, test_idx = train_test_split(
                 np.arange(len(labels)),
@@ -745,12 +745,12 @@ def main(args=None):
             test_labels = labels[test_idx]
             test_temperatures = temperatures[test_idx] if args.use_temperature else None
             
-            print(f"使用sklearn划分完成: 训练集 {len(train_idx)} 条 ({len(train_idx)/len(labels)*100:.1f}%), "
-                  f"验证集 {len(val_idx)} 条 ({len(val_idx)/len(labels)*100:.1f}%), "
-                  f"测试集 {len(test_idx)} 条 ({len(test_idx)/len(labels)*100:.1f}%)", flush=True)
+            print(f" use sklearn split complete : training set {len(train_idx)} bar ({len(train_idx)/len(labels)*100:.1f}%), "
+                  f" validation set {len(val_idx)} bar ({len(val_idx)/len(labels)*100:.1f}%), "
+                  f" test set {len(test_idx)} bar ({len(test_idx)/len(labels)*100:.1f}%)", flush=True)
     except ImportError:
         # Baseline workflow step.
-        print("提示: sklearn不可用，使用numpy实现数据划分（功能相同）", flush=True)
+        print(" hint : sklearn unavailable , use numpy Implementation data Divide ( Features phase same )", flush=True)
         np.random.seed(args.seed)
         indices = np.arange(len(labels))
         np.random.shuffle(indices)
@@ -788,9 +788,9 @@ def main(args=None):
             test_labels = labels[test_idx]
             test_temperatures = temperatures[test_idx] if args.use_temperature else None
             
-            print(f"使用numpy划分完成: 训练集 {len(train_idx)} 条 ({len(train_idx)/len(labels)*100:.1f}%), "
-                  f"验证集 {len(val_idx)} 条 ({len(val_idx)/len(labels)*100:.1f}%), "
-                  f"测试集 {len(test_idx)} 条 ({len(test_idx)/len(labels)*100:.1f}%)", flush=True)
+            print(f" use numpy split complete : training set {len(train_idx)} bar ({len(train_idx)/len(labels)*100:.1f}%), "
+                  f" validation set {len(val_idx)} bar ({len(val_idx)/len(labels)*100:.1f}%), "
+                  f" test set {len(test_idx)} bar ({len(test_idx)/len(labels)*100:.1f}%)", flush=True)
     
     train_size = len(train_idx)
     val_size = len(val_idx)
@@ -887,11 +887,11 @@ def main(args=None):
         best_val_mse = restored_state['best_val_mse']
         best_epoch = restored_state['best_epoch']
         patience_counter = restored_state.get('patience_counter', 0)
-        print(f"已完成的最后一个epoch: {completed_epoch}")
-        print(f"将从epoch {start_epoch + 1} 继续训练到epoch {args.epochs}")
+        print(f" completed most after M epoch: {completed_epoch}")
+        print(f" will load from epoch {start_epoch + 1} continue training to epoch {args.epochs}")
         print()
     else:
-        print("未找到检查点文件，将从epoch 1开始训练")
+        print(" checkpoint file not found , will load from epoch 1 start training ")
         print()
     start_time = time.time()
     
@@ -903,10 +903,10 @@ def main(args=None):
     # Run the training step.
     print("\n" + "="*100, flush=True)
     if start_epoch > 0:
-        print(f"恢复训练（从epoch {start_epoch + 1} 继续）...", flush=True)
+        print(f" resume training ( from epoch {start_epoch + 1} Continue )...", flush=True)
     else:
-        print("开始训练...", flush=True)
-    print(f"休息策略: 每运行 {rest_interval/3600:.1f} 小时休息 {rest_duration/60:.1f} 分钟", flush=True)
+        print(" start training ...", flush=True)
+    print(f" rest policy : per run {rest_interval/3600:.1f} hours before cooldown {rest_duration/60:.1f} minutes ", flush=True)
     print("="*100 + "\n", flush=True)
     sys.stdout.flush()
     
@@ -970,18 +970,18 @@ def main(args=None):
         # Baseline workflow step.
         print("=" * 100)
         best_loss_str = f"{best_val_mse:.6f} (epoch {best_epoch})" if best_val_mse < float('inf') else f"{val_metrics['mse']:.6f} (initial)"
-        print(f"Epoch {epoch+1}/{args.epochs} | 训练时间: {epoch_time:.2f}秒 | Train Loss: {train_loss:.6f}")
+        print(f"Epoch {epoch+1}/{args.epochs} | training time : {epoch_time:.2f} seconds | Train Loss: {train_loss:.6f}")
         print(f"Best Loss: {best_loss_str}")
         print("=" * 100)
-        print("【训练集指标】")
-        print(f"  【平均指标】 MAE={train_metrics['mae']:.6f}±{train_metrics['mae_std']:.4f}  RMSE={train_metrics['rmse']:.6f}±{train_metrics['rmse_std']:.4f}  R²={train_metrics['r2']:.6f}")
-        print(f"  【E相指标】  MAE={train_metrics['mae_e']:.6f}±{train_metrics['mae_e_std']:.4f}  RMSE={train_metrics['rmse_e']:.6f}±{train_metrics['rmse_e_std']:.4f}  R²={train_metrics['r2_e']:.6f}")
-        print(f"  【R相指标】  MAE={train_metrics['mae_r']:.6f}±{train_metrics['mae_r_std']:.4f}  RMSE={train_metrics['rmse_r']:.6f}±{train_metrics['rmse_r_std']:.4f}  R²={train_metrics['r2_r']:.6f}")
+        print("[ Training metrics ]")
+        print(f" [ mean metrics ] MAE={train_metrics['mae']:.6f}±{train_metrics['mae_std']:.4f} RMSE={train_metrics['rmse']:.6f}±{train_metrics['rmse_std']:.4f} R²={train_metrics['r2']:.6f}")
+        print(f" [E phase metrics ] MAE={train_metrics['mae_e']:.6f}±{train_metrics['mae_e_std']:.4f} RMSE={train_metrics['rmse_e']:.6f}±{train_metrics['rmse_e_std']:.4f} R²={train_metrics['r2_e']:.6f}")
+        print(f" [R phase metrics ] MAE={train_metrics['mae_r']:.6f}±{train_metrics['mae_r_std']:.4f} RMSE={train_metrics['rmse_r']:.6f}±{train_metrics['rmse_r_std']:.4f} R²={train_metrics['r2_r']:.6f}")
         print()
-        print("【验证集指标】")
-        print(f"  【平均指标】 MAE={val_metrics['mae']:.6f}±{val_metrics['mae_std']:.4f}  RMSE={val_metrics['rmse']:.6f}±{val_metrics['rmse_std']:.4f}  R²={val_metrics['r2']:.6f}")
-        print(f"  【E相指标】  MAE={val_metrics['mae_e']:.6f}±{val_metrics['mae_e_std']:.4f}  RMSE={val_metrics['rmse_e']:.6f}±{val_metrics['rmse_e_std']:.4f}  R²={val_metrics['r2_e']:.6f}")
-        print(f"  【R相指标】  MAE={val_metrics['mae_r']:.6f}±{val_metrics['mae_r_std']:.4f}  RMSE={val_metrics['rmse_r']:.6f}±{val_metrics['rmse_r_std']:.4f}  R²={val_metrics['r2_r']:.6f}")
+        print("[ validation metrics ]")
+        print(f" [ mean metrics ] MAE={val_metrics['mae']:.6f}±{val_metrics['mae_std']:.4f} RMSE={val_metrics['rmse']:.6f}±{val_metrics['rmse_std']:.4f} R²={val_metrics['r2']:.6f}")
+        print(f" [E phase metrics ] MAE={val_metrics['mae_e']:.6f}±{val_metrics['mae_e_std']:.4f} RMSE={val_metrics['rmse_e']:.6f}±{val_metrics['rmse_e_std']:.4f} R²={val_metrics['r2_e']:.6f}")
+        print(f" [R phase metrics ] MAE={val_metrics['mae_r']:.6f}±{val_metrics['mae_r_std']:.4f} RMSE={val_metrics['rmse_r']:.6f}±{val_metrics['rmse_r_std']:.4f} R²={val_metrics['r2_r']:.6f}")
         print("=" * 100)
         print()
         
@@ -1016,7 +1016,7 @@ def main(args=None):
                 'history': history,
                 'args': vars(args)
             }, checkpoint_path)
-            print(f"检查点已保存: {checkpoint_path}")
+            print(f" checkpoint saved : {checkpoint_path}")
             print()
         
         # Baseline workflow step.
@@ -1027,23 +1027,23 @@ def main(args=None):
             # Baseline workflow step.
             elapsed_hours = elapsed_since_last_rest / 3600
             print("=" * 100)
-            print(f"已运行 {elapsed_hours:.2f} 小时（{elapsed_since_last_rest:.0f} 秒），当前epoch已完成")
-            print(f"休息 {rest_duration/60:.1f} 分钟（{rest_duration} 秒）让CPU/GPU有时间休息...")
+            print(f" Already run {elapsed_hours:.2f} hours ({elapsed_since_last_rest:.0f} seconds ), current epoch completed ")
+            print(f" Break {rest_duration/60:.1f} minutes ({rest_duration} seconds ) allow CPU/GPU to allow a cooldown period ...")
             print("=" * 100)
             print()
             sys.stdout.flush()
             time.sleep(rest_duration)
             last_rest_time = time.time()  # Baseline workflow step.
-            print("休息结束，继续训练...")
+            print(" Break end , continue training ...")
             print()
             sys.stdout.flush()
         
         # Apply early stopping.
         if patience_counter >= args.patience:
             print("=" * 100)
-            print(f"早停触发！在epoch {epoch+1}停止训练。")
-            print(f"最佳模型在epoch {best_epoch}，验证集MSE: {best_val_mse:.6f}")
-            print(f"已等待 {patience_counter}/{args.patience} 个epoch无改善")
+            print(f" early stopping triggered ! at epoch {epoch+1} stop training .")
+            print(f" best model at epoch {best_epoch}, validation set MSE: {best_val_mse:.6f}")
+            print(f" waited {patience_counter}/{args.patience} epoch without improvement ")
             print("=" * 100)
             break
     
@@ -1052,10 +1052,10 @@ def main(args=None):
     avg_time_per_epoch = total_time / len(history)
     
     print("=" * 100)
-    print("训练完成！")
-    print(f"最佳模型在epoch {best_epoch}，验证集MSE: {best_val_mse:.6f}")
-    print(f"总训练时间: {total_time:.2f}秒 ({total_time/60:.2f}分钟)")
-    print(f"平均每轮时间: {avg_time_per_epoch:.2f}秒")
+    print(" training complete !")
+    print(f" best model at epoch {best_epoch}, validation set MSE: {best_val_mse:.6f}")
+    print(f" total training time : {total_time:.2f} seconds ({total_time/60:.2f} minutes )")
+    print(f" mean time per epoch : {avg_time_per_epoch:.2f} seconds ")
     print()
     
     # Load the input data.
@@ -1063,7 +1063,7 @@ def main(args=None):
         checkpoint = torch.load(best_model_path, map_location=args.device, weights_only=False)
         model.load_state_dict(checkpoint['model_state_dict'])
     else:
-        print("警告: 未找到最佳模型文件，使用当前模型进行评估")
+        print(" warning : not found best model file , use current model Into rows Assessment ")
         print()
     
     # Evaluate the test subset.
@@ -1071,10 +1071,10 @@ def main(args=None):
         _, test_metrics, test_pred, test_true = evaluate(
             model, test_loader, criterion, args.device
         )
-        print("【测试集指标】")
-        print(f"  【平均指标】 MAE={test_metrics['mae']:.6f}±{test_metrics['mae_std']:.4f}  RMSE={test_metrics['rmse']:.6f}±{test_metrics['rmse_std']:.4f}  R²={test_metrics['r2']:.6f}")
-        print(f"  【E相指标】  MAE={test_metrics['mae_e']:.6f}±{test_metrics['mae_e_std']:.4f}  RMSE={test_metrics['rmse_e']:.6f}±{test_metrics['rmse_e_std']:.4f}  R²={test_metrics['r2_e']:.6f}")
-        print(f"  【R相指标】  MAE={test_metrics['mae_r']:.6f}±{test_metrics['mae_r_std']:.4f}  RMSE={test_metrics['rmse_r']:.6f}±{test_metrics['rmse_r_std']:.4f}  R²={test_metrics['r2_r']:.6f}")
+        print("[ test metrics ]")
+        print(f" [ mean metrics ] MAE={test_metrics['mae']:.6f}±{test_metrics['mae_std']:.4f} RMSE={test_metrics['rmse']:.6f}±{test_metrics['rmse_std']:.4f} R²={test_metrics['r2']:.6f}")
+        print(f" [E phase metrics ] MAE={test_metrics['mae_e']:.6f}±{test_metrics['mae_e_std']:.4f} RMSE={test_metrics['rmse_e']:.6f}±{test_metrics['rmse_e_std']:.4f} R²={test_metrics['r2_e']:.6f}")
+        print(f" [R phase metrics ] MAE={test_metrics['mae_r']:.6f}±{test_metrics['mae_r_std']:.4f} RMSE={test_metrics['rmse_r']:.6f}±{test_metrics['rmse_r_std']:.4f} R²={test_metrics['r2_r']:.6f}")
         print()
     else:
         test_metrics = None
@@ -1086,15 +1086,15 @@ def main(args=None):
                  test_pred, test_true, best_epoch, best_val_mse, 
                  total_time, avg_time_per_epoch, val_metrics, test_metrics)
     
-    print("结果文件已保存:")
-    print(f"  - 训练历史CSV: {os.path.join(args.results_dir, 'train_history.csv')}")
-    print(f"  - 训练/验证结果CSV: {os.path.join(args.results_dir, 'training_results.csv')}")
+    print(" result file saved :")
+    print(f" - training history CSV: {os.path.join(args.results_dir, 'train_history.csv')}")
+    print(f" - Training / validation results CSV: {os.path.join(args.results_dir, 'training_results.csv')}")
     if test_loader is not None:
-        print(f"  - 测试集结果CSV: {os.path.join(args.results_dir, 'test_results.csv')}")
-    print(f"  - 最佳模型指标TXT: {os.path.join(args.results_dir, 'best_metrics.txt')}")
-    print(f"  - 训练指标TXT: {os.path.join(args.results_dir, 'training_metrics.txt')}")
-    print(f"  - 模型权重: {best_model_path}")
-    print(f"  - 检查点文件夹: {checkpoint_dir}")
+        print(f" - test-set results CSV: {os.path.join(args.results_dir, 'test_results.csv')}")
+    print(f" - best-model metrics TXT: {os.path.join(args.results_dir, 'best_metrics.txt')}")
+    print(f" - training metrics TXT: {os.path.join(args.results_dir, 'training_metrics.txt')}")
+    print(f" - model checkpoint : {best_model_path}")
+    print(f" - checkpoint file clip : {checkpoint_dir}")
     print("=" * 100)
 
 
@@ -1102,10 +1102,10 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
-        print("\n\n训练被用户中断")
+        print("\n\n Trained By User in Broken ")
         sys.exit(0)
     except Exception as e:
-        print(f"\n\n训练过程中出现错误: {e}")
+        print(f"\n\n Training Process in Appearance error : {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)

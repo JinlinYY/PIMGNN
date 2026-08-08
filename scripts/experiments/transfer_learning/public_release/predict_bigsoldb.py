@@ -74,13 +74,13 @@ def main():
     csv_path = str(args.data)
     batch_size = args.batch_size
     
-    print(f"🚀 启动免训练提取模式...")
+    print(f"🚀 launch Training-Free Extraction Mode ...")
     df = pd.read_csv(csv_path)
     g_cache = GraphCache(add_hs=C.GRAPH_ADD_HS, use_gasteiger=C.GRAPH_USE_GASTEIGER, max_atoms=C.GRAPH_MAX_ATOMS)
     
     smiles_all = pd.concat([df["smiles1"], df["smiles2"], df["smiles3"]]).unique()
     smiles_clean = [s for s in smiles_all if pd.notna(s) and str(s) != '-']
-    print("正在重建分子图缓存...")
+    print(" True at Rebuild molecule graph Cache ...")
     g_cache.build_from_smiles(smiles_clean)
     
     full_loader = DataLoader(BigSolDataset(df, g_cache), batch_size=batch_size, shuffle=False, collate_fn=collate_graph_batch)
@@ -91,12 +91,12 @@ def main():
     model_path = str(args.checkpoint)
     if os.path.exists(model_path):
         model.load_state_dict(torch.load(model_path, map_location=C.DEVICE, weights_only=True))
-        print("✅ 成功加载已训练完成的模型权重！跳过训练环节。")
+        print("✅ successful load Already training complete model checkpoint ! skip Training Session .")
     else:
-        print("❌ 找不到权重文件，请确认是否在当前目录下。")
+        print("❌ Not Found weights file , verify whether at current directory down .")
         return
         
-    print("正在扫尾生成结果文件，绝不报错...")
+    print(" True at Sweep Tail generate results file , Never False ...")
     model.eval()
     all_preds, all_trues = [], []
     with torch.no_grad():
@@ -108,7 +108,7 @@ def main():
             
     args.output.parent.mkdir(parents=True, exist_ok=True)
     pd.DataFrame({'y_true': all_trues, 'y_pred': all_preds}).to_csv(args.output, index=False)
-    print("✅ 完美收官！结果已存入 BigSolDB_results_new.csv")
+    print("✅ Perfect Closing ! results Added BigSolDB_results_new.csv")
 
 if __name__ == "__main__":
     main()

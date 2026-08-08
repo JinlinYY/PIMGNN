@@ -79,13 +79,13 @@ def main():
     batch_size = args.batch_size
     base_lr = args.learning_rate
     
-    print(f"🚀 启动 Abraham 专项精调任务 (自动容错模式)...")
+    print(f"🚀 launch Abraham Special Tune task ( Auto Fault Tolerant Mode )...")
     if not os.path.exists(file_path):
-        print(f"❌ 找不到文件 {file_path}")
+        print(f"❌ file not found {file_path}")
         return
 
     df = pd.read_excel(file_path)
-    print(f"📊 当前 Excel 包含的列名有: {df.columns.tolist()}")
+    print(f"📊 current Excel Contains column Famous : {df.columns.tolist()}")
     
     # Legacy public-release workflow step.
     target_col = None
@@ -97,18 +97,18 @@ def main():
             
     # Legacy public-release workflow step.
     if target_col is None:
-        print("⚠️ 无法自动识别要预测的列！请将下方代码中的 `target_col = None` 修改为您想预测的列名 (例如 'L' 或 'S')。")
+        print("⚠️ unable to Automatically identify prediction column ! Please will Below code in `target_col = None` Modified is Do you want to prediction column First Name ( Ex. 'L' or 'S').")
         target_col = df.columns[-1] # Legacy public-release workflow step.
-        print(f"👉 暂时自动使用最后一列 [{target_col}] 作为预测目标。")
+        print(f"👉 Temporarily Auto use most after M column [{target_col}] By is prediction Goal .")
     else:
-        print(f"🎯 成功锁定预测目标列: [{target_col}]")
+        print(f"🎯 successful Locked prediction target column : [{target_col}]")
 
     # Legacy public-release workflow step.
     g_cache = GraphCache(add_hs=C.GRAPH_ADD_HS, use_gasteiger=C.GRAPH_USE_GASTEIGER, max_atoms=C.GRAPH_MAX_ATOMS)
     smiles_all = pd.concat([df["smiles1"], df.get("smiles2", pd.Series()), df.get("smiles3", pd.Series())]).unique()
     smiles_clean = [s for s in smiles_all if pd.notna(s) and str(s).strip().lower() not in ['-', 'smiles', 'nan', '']]
     
-    print(f"正在构建 {len(smiles_clean)} 个分子的图缓存...")
+    print(f" building {len(smiles_clean)} molecule graph Cache ...")
     g_cache.build_from_smiles(smiles_clean)
     
     dataset = AbrahamDataset(df, g_cache, target_col)
@@ -123,7 +123,7 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=base_lr)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
     
-    print("\n🔥 训练正式开始...")
+    print("\n🔥 training started ...")
     model.train()
     for epoch in range(epochs):
         total_loss = 0.0
@@ -149,9 +149,9 @@ def main():
             
         scheduler.step()
         avg_loss = total_loss / max(1, valid_samples)
-        print(f"Epoch {epoch+1:02d}/{epochs} | Masked MSE: {avg_loss:.4f} | 有效样本: {valid_samples}")
+        print(f"Epoch {epoch+1:02d}/{epochs} | Masked MSE: {avg_loss:.4f} | valid sample : {valid_samples}")
 
-    print("\n正在生成最终预测结果...")
+    print("\n generating final predictions ...")
     model.eval()
     all_preds, all_trues = [], []
     with torch.no_grad():
@@ -165,7 +165,7 @@ def main():
             
     args.output.parent.mkdir(parents=True, exist_ok=True)
     pd.DataFrame({'y_true': all_trues, 'y_pred': all_preds}).to_csv(args.output, index=False)
-    print("✅ Abraham 深度训练圆满完成！结果已更新至 Abraham_results_new.csv")
+    print("✅ Abraham In-Depth Training Successful complete ! results Already update to Abraham_results_new.csv")
 
 if __name__ == "__main__":
     main()

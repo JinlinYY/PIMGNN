@@ -113,13 +113,13 @@ def compute_metrics(y_true, y_pred):
     # Baseline workflow step.
     mask = np.isfinite(y_true) & np.isfinite(y_pred)
     if not np.all(mask):
-        print(f"警告：发现 {np.sum(~mask)} 个非有限值，将被忽略")
+        print(f" warning : Discovery {np.sum(~mask)} non-finite values , will be ignored ")
         y_true = y_true[mask.all(axis=1)]
         y_pred = y_pred[mask.all(axis=1)]
     
     # Process the experiment data.
     if len(y_true) == 0:
-        print("错误：有效数据为空")
+        print(" error : valid data is Empty ")
         return {
             'all': {'mae': 0.0, 'rmse': 0.0, 'r2': 0.0},
             'e_phase': {'mae': 0.0, 'rmse': 0.0, 'r2': 0.0},
@@ -129,7 +129,7 @@ def compute_metrics(y_true, y_pred):
     # Generate model predictions.
     pred_std = np.std(y_pred, axis=0)
     if np.any(pred_std < 0.01):
-        print(f"[警告] 预测值方差过小，可能存在饱和问题。预测值标准差: {pred_std}")
+        print(f"[ warning ] prediction Variance too small , Possible at satiety and Question . prediction standard deviation : {pred_std}")
     
     # Configure the output artifacts.
     mae_all = mean_absolute_error(y_true, y_pred)
@@ -204,10 +204,10 @@ def train_epoch(model, dataloader, optimizer, device, beta):
         
         # Generate model predictions.
         if batch_idx == 0 and len(all_predictions) == 0:
-            print(f"\n[调试] 第一个batch的预测值范围: [{pred_np.min():.6f}, {pred_np.max():.6f}]")
-            print(f"[调试] 第一个batch的真实值范围: [{targets_np.min():.6f}, {targets_np.max():.6f}]")
-            print(f"[调试] 第一个batch的预测值均值: {pred_np.mean(axis=0)}")
-            print(f"[调试] 第一个batch的真实值均值: {targets_np.mean(axis=0)}")
+            print(f"\n[ Commissioning ] number M batch prediction range : [{pred_np.min():.6f}, {pred_np.max():.6f}]")
+            print(f"[ Commissioning ] number M batch target range : [{targets_np.min():.6f}, {targets_np.max():.6f}]")
+            print(f"[ Commissioning ] number M batch prediction mean : {pred_np.mean(axis=0)}")
+            print(f"[ Commissioning ] number M batch target mean : {targets_np.mean(axis=0)}")
         
         batch_metric = compute_metrics_batch(targets_np, pred_np)
         
@@ -237,19 +237,19 @@ def train_epoch(model, dataloader, optimizer, device, beta):
         
         # Baseline workflow step.
         if pred_max > 2.0 or pred_min < -1.0:
-            print(f"\n[警告] 预测值范围异常:")
-            print(f"  预测值: [{pred_min:.6f}, {pred_max:.6f}], 均值: {pred_mean}")
-            print(f"  真实值: [{target_min:.6f}, {target_max:.6f}], 均值: {target_mean}")
-            print(f"  建议：确保启用输出约束")
+            print(f"\n[ warning ] prediction range is unusual :")
+            print(f" prediction : [{pred_min:.6f}, {pred_max:.6f}], mean : {pred_mean}")
+            print(f" target : [{target_min:.6f}, {target_max:.6f}], mean : {target_mean}")
+            print(f" recommendation : ensure enabled output approximately beam ")
         
         # Generate model predictions.
         if np.any(pred_std < 0.01):
-            print(f"\n[警告] 预测值可能饱和（标准差过小）:")
-            print(f"  预测值标准差: {pred_std}")
-            print(f"  真实值标准差: {target_std}")
-            print(f"  预测值均值: {pred_mean}")
-            print(f"  真实值均值: {target_mean}")
-            print(f"  建议：检查模型初始化或降低学习率")
+            print(f"\n[ warning ] prediction May be full and ( standard deviation Too small ):")
+            print(f" prediction standard deviation : {pred_std}")
+            print(f" target standard deviation : {target_std}")
+            print(f" prediction mean : {pred_mean}")
+            print(f" target mean : {target_mean}")
+            print(f" recommendation : check model Initialization or Decrease learning rate ")
     
     # Process the experiment data.
     full_metrics = compute_metrics(all_targets, all_predictions)
@@ -343,10 +343,10 @@ def evaluate(model, dataloader, device):
         
         # Baseline workflow step.
         if pred_max > 2.0 or pred_min < -1.0:
-            print(f"\n[警告] 预测值范围异常:")
-            print(f"  预测值: [{pred_min:.6f}, {pred_max:.6f}], 均值: {pred_mean:.6f}")
-            print(f"  真实值: [{target_min:.6f}, {target_max:.6f}], 均值: {target_mean:.6f}")
-            print(f"  建议：确保启用输出约束")
+            print(f"\n[ warning ] prediction range is unusual :")
+            print(f" prediction : [{pred_min:.6f}, {pred_max:.6f}], mean : {pred_mean:.6f}")
+            print(f" target : [{target_min:.6f}, {target_max:.6f}], mean : {target_mean:.6f}")
+            print(f" recommendation : ensure enabled output approximately beam ")
     
     # Process the experiment data.
     full_metrics = compute_metrics(all_targets, all_predictions)
@@ -389,10 +389,10 @@ def print_metrics(metrics, prefix=""):
     print(f"{prefix}【Overall】 MAE: {metrics['all']['mae_mean']:.6f}±{metrics['all']['mae_std']:.6f}, "
           f"RMSE: {metrics['all']['rmse_mean']:.6f}±{metrics['all']['rmse_std']:.6f}, "
           f"R²: {metrics['all']['r2']:.6f}")
-    print(f"{prefix}【E相】 MAE: {metrics['e_phase']['mae_mean']:.6f}±{metrics['e_phase']['mae_std']:.6f}, "
+    print(f"{prefix}[E phase ] MAE: {metrics['e_phase']['mae_mean']:.6f}±{metrics['e_phase']['mae_std']:.6f}, "
           f"RMSE: {metrics['e_phase']['rmse_mean']:.6f}±{metrics['e_phase']['rmse_std']:.6f}, "
           f"R²: {metrics['e_phase']['r2']:.6f}")
-    print(f"{prefix}【R相】 MAE: {metrics['r_phase']['mae_mean']:.6f}±{metrics['r_phase']['mae_std']:.6f}, "
+    print(f"{prefix}[R phase ] MAE: {metrics['r_phase']['mae_mean']:.6f}±{metrics['r_phase']['mae_std']:.6f}, "
           f"RMSE: {metrics['r_phase']['rmse_mean']:.6f}±{metrics['r_phase']['rmse_std']:.6f}, "
           f"R²: {metrics['r_phase']['r2']:.6f}")
 
@@ -435,73 +435,73 @@ def save_metrics_txt(best_epoch, best_val_rmse, total_epochs, total_time, avg_ti
     # Save the generated artifacts.
     with open(os.path.join(results_dir, 'best_metrics.txt'), 'w', encoding='utf-8') as f:
         f.write("=" * 80 + "\n")
-        f.write("最佳模型指标\n")
+        f.write(" best-model metrics \n")
         f.write("=" * 80 + "\n\n")
         
-        f.write("【训练信息】\n")
-        f.write(f"  最佳epoch: {best_epoch}\n")
-        f.write(f"  最佳验证RMSE: {best_val_rmse:.6f}\n")
-        f.write(f"  总训练轮数: {total_epochs}\n")
-        f.write(f"  总训练时间: {total_time:.2f}秒 ({total_time/60:.2f}分钟)\n")
-        f.write(f"  平均每轮时间: {avg_time_per_epoch:.2f}秒\n\n")
+        f.write("[ training information ]\n")
+        f.write(f" best epoch: {best_epoch}\n")
+        f.write(f" best validation RMSE: {best_val_rmse:.6f}\n")
+        f.write(f" total training epochs : {total_epochs}\n")
+        f.write(f" total training time : {total_time:.2f} seconds ({total_time/60:.2f} minutes )\n")
+        f.write(f" mean time per epoch : {avg_time_per_epoch:.2f} seconds \n\n")
         
-        f.write("【验证集指标】\n")
+        f.write("[ validation metrics ]\n")
         f.write(f"  【Overall】 MAE: {val_metrics['all']['mae_mean']:.6f}±{val_metrics['all']['mae_std']:.6f}, "
                 f"RMSE: {val_metrics['all']['rmse_mean']:.6f}±{val_metrics['all']['rmse_std']:.6f}, "
                 f"R²: {val_metrics['all']['r2']:.6f}\n")
-        f.write(f"  【E相】 MAE: {val_metrics['e_phase']['mae_mean']:.6f}±{val_metrics['e_phase']['mae_std']:.6f}, "
+        f.write(f" [E phase ] MAE: {val_metrics['e_phase']['mae_mean']:.6f}±{val_metrics['e_phase']['mae_std']:.6f}, "
                 f"RMSE: {val_metrics['e_phase']['rmse_mean']:.6f}±{val_metrics['e_phase']['rmse_std']:.6f}, "
                 f"R²: {val_metrics['e_phase']['r2']:.6f}\n")
-        f.write(f"  【R相】 MAE: {val_metrics['r_phase']['mae_mean']:.6f}±{val_metrics['r_phase']['mae_std']:.6f}, "
+        f.write(f" [R phase ] MAE: {val_metrics['r_phase']['mae_mean']:.6f}±{val_metrics['r_phase']['mae_std']:.6f}, "
                 f"RMSE: {val_metrics['r_phase']['rmse_mean']:.6f}±{val_metrics['r_phase']['rmse_std']:.6f}, "
                 f"R²: {val_metrics['r_phase']['r2']:.6f}\n\n")
         
         if test_metrics is not None:
-            f.write("【测试集指标】\n")
+            f.write("[ test metrics ]\n")
             f.write(f"  【Overall】 MAE: {test_metrics['all']['mae_mean']:.6f}±{test_metrics['all']['mae_std']:.6f}, "
                     f"RMSE: {test_metrics['all']['rmse_mean']:.6f}±{test_metrics['all']['rmse_std']:.6f}, "
                     f"R²: {test_metrics['all']['r2']:.6f}\n")
-            f.write(f"  【E相】 MAE: {test_metrics['e_phase']['mae_mean']:.6f}±{test_metrics['e_phase']['mae_std']:.6f}, "
+            f.write(f" [E phase ] MAE: {test_metrics['e_phase']['mae_mean']:.6f}±{test_metrics['e_phase']['mae_std']:.6f}, "
                     f"RMSE: {test_metrics['e_phase']['rmse_mean']:.6f}±{test_metrics['e_phase']['rmse_std']:.6f}, "
                     f"R²: {test_metrics['e_phase']['r2']:.6f}\n")
-            f.write(f"  【R相】 MAE: {test_metrics['r_phase']['mae_mean']:.6f}±{test_metrics['r_phase']['mae_std']:.6f}, "
+            f.write(f" [R phase ] MAE: {test_metrics['r_phase']['mae_mean']:.6f}±{test_metrics['r_phase']['mae_std']:.6f}, "
                     f"RMSE: {test_metrics['r_phase']['rmse_mean']:.6f}±{test_metrics['r_phase']['rmse_std']:.6f}, "
                     f"R²: {test_metrics['r_phase']['r2']:.6f}\n")
     
     # Save the generated artifacts.
     with open(os.path.join(results_dir, 'training_metrics.txt'), 'w', encoding='utf-8') as f:
         f.write("=" * 80 + "\n")
-        f.write("训练指标总结\n")
+        f.write(" training-metric summary \n")
         f.write("=" * 80 + "\n\n")
         
-        f.write(f"最佳模型在epoch {best_epoch}\n")
-        f.write(f"最佳验证集RMSE: {best_val_rmse:.6f}\n\n")
+        f.write(f" best model at epoch {best_epoch}\n")
+        f.write(f" best validation RMSE: {best_val_rmse:.6f}\n\n")
         
-        f.write("【最佳验证集指标】\n")
+        f.write("[ best validation metrics ]\n")
         f.write(f"  【Overall】 MAE: {val_metrics['all']['mae_mean']:.6f}±{val_metrics['all']['mae_std']:.6f}, "
                 f"RMSE: {val_metrics['all']['rmse_mean']:.6f}±{val_metrics['all']['rmse_std']:.6f}, "
                 f"R²: {val_metrics['all']['r2']:.6f}\n")
-        f.write(f"  【E相】 MAE: {val_metrics['e_phase']['mae_mean']:.6f}±{val_metrics['e_phase']['mae_std']:.6f}, "
+        f.write(f" [E phase ] MAE: {val_metrics['e_phase']['mae_mean']:.6f}±{val_metrics['e_phase']['mae_std']:.6f}, "
                 f"RMSE: {val_metrics['e_phase']['rmse_mean']:.6f}±{val_metrics['e_phase']['rmse_std']:.6f}, "
                 f"R²: {val_metrics['e_phase']['r2']:.6f}\n")
-        f.write(f"  【R相】 MAE: {val_metrics['r_phase']['mae_mean']:.6f}±{val_metrics['r_phase']['mae_std']:.6f}, "
+        f.write(f" [R phase ] MAE: {val_metrics['r_phase']['mae_mean']:.6f}±{val_metrics['r_phase']['mae_std']:.6f}, "
                 f"RMSE: {val_metrics['r_phase']['rmse_mean']:.6f}±{val_metrics['r_phase']['rmse_std']:.6f}, "
                 f"R²: {val_metrics['r_phase']['r2']:.6f}\n\n")
         
         if test_metrics is not None:
-            f.write("【测试集指标】\n")
+            f.write("[ test metrics ]\n")
             f.write(f"  【Overall】 MAE: {test_metrics['all']['mae_mean']:.6f}±{test_metrics['all']['mae_std']:.6f}, "
                     f"RMSE: {test_metrics['all']['rmse_mean']:.6f}±{test_metrics['all']['rmse_std']:.6f}, "
                     f"R²: {test_metrics['all']['r2']:.6f}\n")
-            f.write(f"  【E相】 MAE: {test_metrics['e_phase']['mae_mean']:.6f}±{test_metrics['e_phase']['mae_std']:.6f}, "
+            f.write(f" [E phase ] MAE: {test_metrics['e_phase']['mae_mean']:.6f}±{test_metrics['e_phase']['mae_std']:.6f}, "
                     f"RMSE: {test_metrics['e_phase']['rmse_mean']:.6f}±{test_metrics['e_phase']['rmse_std']:.6f}, "
                     f"R²: {test_metrics['e_phase']['r2']:.6f}\n")
-            f.write(f"  【R相】 MAE: {test_metrics['r_phase']['mae_mean']:.6f}±{test_metrics['r_phase']['mae_std']:.6f}, "
+            f.write(f" [R phase ] MAE: {test_metrics['r_phase']['mae_mean']:.6f}±{test_metrics['r_phase']['mae_std']:.6f}, "
                     f"RMSE: {test_metrics['r_phase']['rmse_mean']:.6f}±{test_metrics['r_phase']['rmse_std']:.6f}, "
                     f"R²: {test_metrics['r_phase']['r2']:.6f}\n\n")
         
-        f.write(f"总训练时间: {total_time:.2f}秒 ({total_time/60:.2f}分钟)\n")
-        f.write(f"平均每轮时间: {avg_time_per_epoch:.2f}秒\n")
+        f.write(f" total training time : {total_time:.2f} seconds ({total_time/60:.2f} minutes )\n")
+        f.write(f" mean time per epoch : {avg_time_per_epoch:.2f} seconds \n")
 
 
 def train_single_seed(args):
@@ -517,9 +517,9 @@ def train_single_seed(args):
     
     # Baseline workflow step.
     print("=" * 80)
-    print("CGIB模型训练配置")
+    print("CGIB model training configuration ")
     print("=" * 80)
-    print("\n【数据集信息】")
+    print("\n[ dataset information ]")
     
     # Load the input data.
     df = pd.read_csv(args.data_path)
@@ -527,7 +527,7 @@ def train_single_seed(args):
     # Process the experiment data.
     if 'IL (Component 1) full name SMILES' in df.columns:
         # Baseline workflow step.
-        print("  检测到total.csv格式，正在转换...")
+        print(" detected total.csv format , True at convert ...")
         smiles1_list = []
         smiles2_list = []
         
@@ -561,9 +561,9 @@ def train_single_seed(args):
             if targets.ndim == 1:
                 targets = targets.reshape(-1, 1)
         else:
-            raise ValueError("数据文件中必须包含Ex1-Ex3, Rx1-Rx3列或target列")
+            raise ValueError(" data file must contain Ex1-Ex3, Rx1-Rx3 column or target column ")
     else:
-        raise ValueError("数据文件格式不支持。需要包含smiles1/smiles2列或IL/Component列")
+        raise ValueError(" unsupported data-file format . must contain smiles1/smiles2 column or IL/Component column ")
     
     # Process the experiment data.
     dataset = MolecularDataset(smiles1_list, smiles2_list, targets)
@@ -590,41 +590,41 @@ def train_single_seed(args):
             "Use --allow_random_row_split only for explicitly labeled legacy reproduction."
         )
     
-    print(f"  总样本数: {total_size}")
-    print(f"  训练集样本数: {len(train_dataset)} ({len(train_dataset)/total_size*100:.1f}%)")
-    print(f"  验证集样本数: {len(val_dataset)} ({len(val_dataset)/total_size*100:.1f}%)")
-    print(f"  测试集样本数: {len(test_dataset)} ({len(test_dataset)/total_size*100:.1f}%)")
+    print(f" total samples : {total_size}")
+    print(f" number of training samples : {len(train_dataset)} ({len(train_dataset)/total_size*100:.1f}%)")
+    print(f" number of validation samples : {len(val_dataset)} ({len(val_dataset)/total_size*100:.1f}%)")
+    print(f" number of test samples : {len(test_dataset)} ({len(test_dataset)/total_size*100:.1f}%)")
     
-    print("\n【设备配置】")
-    print(f"  设备类型: {args.device}")
+    print("\n[ Device configuration ]")
+    print(f" device type : {args.device}")
     if args.device == 'cuda' and torch.cuda.is_available():
-        print(f"  GPU名称: {torch.cuda.get_device_name(0)}")
-        print(f"  CUDA版本: {torch.version.cuda}")
-        print(f"  GPU内存大小: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.2f} GB")
+        print(f" GPU name : {torch.cuda.get_device_name(0)}")
+        print(f" CUDA version : {torch.version.cuda}")
+        print(f" GPU memory Size : {torch.cuda.get_device_properties(0).total_memory / 1024**3:.2f} GB")
     
-    print("\n【训练参数】")
-    print(f"  随机种子: {args.seed}")
-    print(f"  训练轮数（epochs）: {args.epochs}")
-    print(f"  批次大小（batch_size）: {args.batch_size}")
-    print(f"  学习率: {args.lr}")
-    print(f"  权重衰减: {args.weight_decay}")
-    print(f"  早停耐心值: {args.patience}")
-    print(f"  早停最小改善: {args.min_delta}")
-    print(f"  检查点保存频率: 每{args.checkpoint_freq}个epoch")
-    print(f"  休息策略: 每{args.rest_interval/3600:.1f}小时休息{args.rest_duration/60:.1f}分钟")
+    print("\n[ training parameters ]")
+    print(f" random seed : {args.seed}")
+    print(f" training epochs (epochs): {args.epochs}")
+    print(f" batch size (batch_size): {args.batch_size}")
+    print(f" learning rate : {args.lr}")
+    print(f" weight decay : {args.weight_decay}")
+    print(f" early-stopping patience : {args.patience}")
+    print(f" minimum early-stopping improvement : {args.min_delta}")
+    print(f" checkpoint frequency : per {args.checkpoint_freq} epoch")
+    print(f" rest policy : per {args.rest_interval/3600:.1f} hours before cooldown {args.rest_duration/60:.1f} minutes ")
     
-    print("\n【模型超参数】")
-    print(f"  隐藏层维度（hidden_dim）: {args.hidden_dim}")
-    print(f"  图神经网络层数（num_layers）: {args.num_layers}")
-    print(f"  Set2Set步骤数: {args.set2set_steps}")
-    print(f"  Dropout率: 0.0")
-    print(f"  输出维度: 6 (LLE任务: Ex1, Ex2, Ex3, Rx1, Rx2, Rx3)")
-    print(f"  使用Set2Set: 是")
-    print(f"  使用对比学习: {'是' if args.use_contrastive else '否'}")
+    print("\n[ model hyperparameters ]")
+    print(f" hidden-layer dimension (hidden_dim): {args.hidden_dim}")
+    print(f" number of graph-neural-network layers (num_layers): {args.num_layers}")
+    print(f" Set2Set number of steps : {args.set2set_steps}")
+    print(f" Dropout rate : 0.0")
+    print(f" output dimension : 6 (LLE task : Ex1, Ex2, Ex3, Rx1, Rx2, Rx3)")
+    print(f" use Set2Set: yes ")
+    print(f" use for Better than learning : {' yes ' if args.use_contrastive else ' no '}")
     
-    print("\n【路径信息】")
-    print(f"  输出目录: {output_dir}")
-    print(f"  结果目录: {output_dir}/results")
+    print("\n[ path information ]")
+    print(f" output directory : {output_dir}")
+    print(f" result directory : {output_dir}/results")
     
     # Load the input data.
     def collate_fn(batch):
@@ -647,7 +647,7 @@ def train_single_seed(args):
     constrain_output = getattr(args, 'constrain_output', True)
     if not hasattr(args, 'constrain_output') or args.constrain_output is None:
         constrain_output = True
-    print(f"  输出约束: {'启用' if constrain_output else '禁用'}")
+    print(f" output approximately beam : {' enabled ' if constrain_output else ' Disabled '}")
     
     model = CGIB(
         input_dim=input_dim,
@@ -665,7 +665,7 @@ def train_single_seed(args):
     def init_with_output_dim(m):
         init_weights(m, output_dim=output_dim)
     model.apply(init_with_output_dim)
-    print("  模型权重已初始化（输出层：小权重初始化，其他层：Xavier初始化，gain=0.1）")
+    print(" model checkpoint Initialized ( output Floor : Small weights Initialization , Other Layers :Xavier Initialization ,gain=0.1)")
     
     # Baseline workflow step.
     optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
@@ -687,14 +687,14 @@ def train_single_seed(args):
         best_epoch = checkpoint['best_epoch']
         patience_counter = checkpoint.get('patience_counter', 0)
         history = checkpoint.get('history', [])
-        print(f"\n从检查点恢复训练: epoch {start_epoch}, 最佳RMSE: {best_val_rmse:.6f}")
+        print(f"\n resume training from a checkpoint : epoch {start_epoch}, best RMSE: {best_val_rmse:.6f}")
     
     # Run the training step.
     training_start_time = time.time()
     last_rest_time = time.time()
     
     print("\n" + "=" * 80)
-    print("开始训练")
+    print(" start training ")
     print("=" * 80 + "\n")
     
     # Run the training step.
@@ -746,13 +746,13 @@ def train_single_seed(args):
         })
         
         # Baseline workflow step.
-        print(f"\nEpoch {epoch+1}/{args.epochs} | 训练时间: {epoch_time:.2f}秒 | Train Loss: {train_results['loss']:.6f}")
+        print(f"\nEpoch {epoch+1}/{args.epochs} | training time : {epoch_time:.2f} seconds | Train Loss: {train_results['loss']:.6f}")
         print(f"Best RMSE: {best_val_rmse:.6f} (epoch {best_epoch+1})")
         
-        print("\n【训练集指标】")
+        print("\n[ Training metrics ]")
         print_metrics(train_results['metrics'])
         
-        print("\n【验证集指标】")
+        print("\n[ validation metrics ]")
         print_metrics(val_results['metrics'])
         
         # Baseline workflow step.
@@ -790,13 +790,13 @@ def train_single_seed(args):
                 'history': history,
                 'args': vars(args)
             }, checkpoint_path)
-            print(f"\n检查点已保存: {checkpoint_path}")
+            print(f"\n checkpoint saved : {checkpoint_path}")
         
         # Apply early stopping.
         if patience_counter >= args.patience:
-            print(f"\n早停触发！在epoch {epoch+1}停止训练。")
-            print(f"最佳模型在epoch {best_epoch+1}，验证集RMSE: {best_val_rmse:.6f}")
-            print(f"已等待 {patience_counter}/{args.patience} 个epoch无改善")
+            print(f"\n early stopping triggered ! at epoch {epoch+1} stop training .")
+            print(f" best model at epoch {best_epoch+1}, validation set RMSE: {best_val_rmse:.6f}")
+            print(f" waited {patience_counter}/{args.patience} epoch without improvement ")
             break
         
         # Baseline workflow step.
@@ -805,8 +805,8 @@ def train_single_seed(args):
         if elapsed_since_rest >= args.rest_interval:
             elapsed_hours = elapsed_since_rest / 3600
             rest_minutes = args.rest_duration / 60
-            print(f"\n已运行 {elapsed_hours:.2f} 小时（{elapsed_since_rest:.0f} 秒），当前epoch已完成")
-            print(f"休息 {rest_minutes:.1f} 分钟（{args.rest_duration:.0f} 秒）让CPU/GPU有时间休息...")
+            print(f"\n Already run {elapsed_hours:.2f} hours ({elapsed_since_rest:.0f} seconds ), current epoch completed ")
+            print(f" Break {rest_minutes:.1f} minutes ({args.rest_duration:.0f} seconds ) allow CPU/GPU to allow a cooldown period ...")
             time.sleep(args.rest_duration)
             last_rest_time = time.time()
     
@@ -815,11 +815,11 @@ def train_single_seed(args):
     avg_time_per_epoch = total_time / (epoch + 1 - start_epoch) if epoch + 1 > start_epoch else 0
     
     print("\n" + "=" * 80)
-    print("训练完成！")
+    print(" training complete !")
     print("=" * 80)
-    print(f"最佳模型在epoch {best_epoch+1}，验证集RMSE: {best_val_rmse:.6f}")
-    print(f"总训练时间: {total_time:.2f}秒 ({total_time/60:.2f}分钟)")
-    print(f"平均每轮时间: {avg_time_per_epoch:.2f}秒")
+    print(f" best model at epoch {best_epoch+1}, validation set RMSE: {best_val_rmse:.6f}")
+    print(f" total training time : {total_time:.2f} seconds ({total_time/60:.2f} minutes )")
+    print(f" mean time per epoch : {avg_time_per_epoch:.2f} seconds ")
     
     # Load the input data.
     best_model_path = os.path.join(output_dir, f'seed_{args.seed}_best.pt')
@@ -828,19 +828,19 @@ def train_single_seed(args):
         model.load_state_dict(checkpoint['model_state_dict'])
     
     # Baseline workflow step.
-    print("\n【最终验证集指标】")
+    print("\n[ Final validation metrics ]")
     final_val_results = evaluate(model, val_loader, args.device)
     print_metrics(final_val_results['metrics'])
     
     # Evaluate the test subset.
     print("\n" + "=" * 80)
-    print("开始测试集评估")
+    print(" starting test-set evaluation ")
     print("=" * 80)
-    print(f"测试集样本数: {len(test_dataset)}")
+    print(f" number of test samples : {len(test_dataset)}")
     
     test_results = evaluate(model, test_loader, args.device)
     
-    print("\n【测试集指标】")
+    print("\n[ test metrics ]")
     print_metrics(test_results['metrics'])
     
     # Save the generated artifacts.
@@ -848,7 +848,7 @@ def train_single_seed(args):
                  os.path.join(output_dir, 'results'))
     
     # Save the generated artifacts.
-    print("\n保存结果文件...")
+    print("\n save results file ...")
     
     # Save the generated artifacts.
     history_df = pd.DataFrame(history)
@@ -865,11 +865,11 @@ def train_single_seed(args):
     save_metrics_txt(best_epoch, best_val_rmse, epoch + 1, total_time, avg_time_per_epoch,
                      final_val_results['metrics'], test_results['metrics'] if test_results else None, output_dir)
     
-    print("所有文件已保存完成！")
+    print(" all file saved complete !")
 
 
 def main():
-    parser = argparse.ArgumentParser(description='CGIB Training - 支持单个seed或批量训练所有seed')
+    parser = argparse.ArgumentParser(description='CGIB Training - supports Single seed or Batch Training all seed')
     parser.add_argument('--data_path', type=str, default=str(TOTAL_CSV), help='Input comparison CSV.')
     parser.add_argument(
         '--allow_random_row_split',
@@ -882,26 +882,26 @@ def main():
         default=str(EXPERIMENT_ROOT / 'runs' / 'cgib'),
         help='Directory for seed-specific CGIB run artifacts.',
     )
-    parser.add_argument('--seed', type=int, default=None, choices=[42, 123, 456, 789, 2024, None], help='随机种子（如果指定则只训练该seed）')
-    parser.add_argument('--all_seeds', action='store_true', help='按顺序训练所有5个seed（42, 123, 456, 789, 2024）')
-    parser.add_argument('--hidden_dim', type=int, default=256, help='隐藏层维度')
-    parser.add_argument('--num_layers', type=int, default=3, help='GNN层数')
-    parser.add_argument('--set2set_steps', type=int, default=3, help='Set2Set步骤数')
-    parser.add_argument('--beta', type=float, default=1e-3, help='信息瓶颈平衡参数')
-    parser.add_argument('--lr', type=float, default=5e-4, help='学习率（默认: 5e-4，已降低以防止预测值饱和）')
-    parser.add_argument('--weight_decay', type=float, default=0.0, help='权重衰减')
-    parser.add_argument('--batch_size', type=int, default=64, help='批次大小')
-    parser.add_argument('--epochs', type=int, default=400, help='训练轮数')
-    parser.add_argument('--patience', type=int, default=80, help='早停耐心值')
-    parser.add_argument('--min_delta', type=float, default=0.0, help='早停最小改善')
-    parser.add_argument('--checkpoint_freq', type=int, default=10, help='检查点保存频率（每N个epoch）')
-    parser.add_argument('--rest_interval', type=float, default=7200, help='休息间隔（秒），默认2小时')
-    parser.add_argument('--rest_duration', type=float, default=300, help='休息时长（秒），默认5分钟')
-    parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', help='设备')
-    parser.add_argument('--gnn_type', type=str, default='mpnn', choices=['mpnn', 'gin'], help='GNN类型')
-    parser.add_argument('--use_contrastive', action='store_true', help='使用对比学习')
-    parser.add_argument('--no_constrain_output', dest='constrain_output', action='store_false', default=True, help='禁用输出约束（默认启用输出约束）')
-    parser.add_argument('--resume', type=str, default=None, help='从检查点恢复训练')
+    parser.add_argument('--seed', type=int, default=None, choices=[42, 123, 456, 789, 2024, None], help=' random seed ( if The designation only trains the seed)')
+    parser.add_argument('--all_seeds', action='store_true', help=' by Sequential Training all 5 seed(42, 123, 456, 789, 2024)')
+    parser.add_argument('--hidden_dim', type=int, default=256, help=' hidden-layer dimension ')
+    parser.add_argument('--num_layers', type=int, default=3, help='GNN number of layers ')
+    parser.add_argument('--set2set_steps', type=int, default=3, help='Set2Set number of steps ')
+    parser.add_argument('--beta', type=float, default=1e-3, help=' information Bottleneck Balance parameters ')
+    parser.add_argument('--lr', type=float, default=5e-4, help=' learning rate ( default : 5e-4, Reduced to prevent prediction satiety and )')
+    parser.add_argument('--weight_decay', type=float, default=0.0, help=' weight decay ')
+    parser.add_argument('--batch_size', type=int, default=64, help=' batch size ')
+    parser.add_argument('--epochs', type=int, default=400, help=' training epochs ')
+    parser.add_argument('--patience', type=int, default=80, help=' early-stopping patience ')
+    parser.add_argument('--min_delta', type=float, default=0.0, help=' minimum early-stopping improvement ')
+    parser.add_argument('--checkpoint_freq', type=int, default=10, help=' checkpoint frequency ( per N epoch)')
+    parser.add_argument('--rest_interval', type=float, default=7200, help=' rest interval ( seconds ), default 2 hours ')
+    parser.add_argument('--rest_duration', type=float, default=300, help=' rest duration ( seconds ), default 5 minutes ')
+    parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', help=' device ')
+    parser.add_argument('--gnn_type', type=str, default='mpnn', choices=['mpnn', 'gin'], help='GNN type ')
+    parser.add_argument('--use_contrastive', action='store_true', help=' use for Better than learning ')
+    parser.add_argument('--no_constrain_output', dest='constrain_output', action='store_false', default=True, help=' Disabled output approximately beam ( default enabled output approximately beam )')
+    parser.add_argument('--resume', type=str, default=None, help=' resume training from a checkpoint ')
     
     args = parser.parse_args()
     
@@ -914,15 +914,15 @@ def main():
         # Run the training step.
         seeds = [42, 123, 456, 789, 2024]
         print("=" * 80)
-        print("开始运行所有seed的训练")
+        print(" start run all seed Training ")
         print("=" * 80)
-        print(f"数据路径: {args.data_path}")
+        print(f" data path : {args.data_path}")
         print(f"Seeds: {seeds}")
         print("=" * 80 + "\n")
         
         for i, seed in enumerate(seeds, 1):
             print(f"\n{'='*80}")
-            print(f"训练 Seed {seed} ({i}/{len(seeds)})")
+            print(f" Training Seed {seed} ({i}/{len(seeds)})")
             print(f"{'='*80}\n")
             
             # Baseline workflow step.
@@ -931,21 +931,21 @@ def main():
             
             try:
                 train_single_seed(seed_args)
-                print(f"\nSeed {seed} 训练完成！\n")
+                print(f"\nSeed {seed} training complete !\n")
             except Exception as e:
-                print(f"\nSeed {seed} 训练失败，错误: {str(e)}\n")
-                print("是否继续下一个seed？(y/n): ", end='')
+                print(f"\nSeed {seed} training failed , error : {str(e)}\n")
+                print(" whether Continue Next seed?(y/n): ", end='')
                 try:
                     response = input().strip().lower()
                     if response != 'y':
-                        print("终止训练")
+                        print(" terminate training ")
                         return
                 except:
-                    print("终止训练")
+                    print(" terminate training ")
                     return
         
         print("\n" + "=" * 80)
-        print("所有seed的训练已完成！")
+        print(" all seed Training completed !")
         print("=" * 80)
     else:
         # Run the training step.

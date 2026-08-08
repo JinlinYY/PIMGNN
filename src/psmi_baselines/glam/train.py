@@ -184,15 +184,15 @@ def evaluate(model, dataloader, criterion, device):
     
     # Generate model predictions.
     if not hasattr(evaluate, '_debug_printed'):
-        print(f"\n[调试] 预测值范围: min={all_preds.min():.6f}, max={all_preds.max():.6f}, mean={all_preds.mean():.6f}")
-        print(f"[调试] 真实值范围: min={all_labels.min():.6f}, max={all_labels.max():.6f}, mean={all_labels.mean():.6f}")
-        print(f"[调试] 预测值各维度均值: {all_preds.mean(axis=0)}")
-        print(f"[调试] 真实值各维度均值: {all_labels.mean(axis=0)}")
-        print(f"[调试] 预测值各维度标准差: {all_preds.std(axis=0)}")
-        print(f"[调试] 真实值各维度标准差: {all_labels.std(axis=0)}")
+        print(f"\n[ Commissioning ] prediction range : min={all_preds.min():.6f}, max={all_preds.max():.6f}, mean={all_preds.mean():.6f}")
+        print(f"[ Commissioning ] target range : min={all_labels.min():.6f}, max={all_labels.max():.6f}, mean={all_labels.mean():.6f}")
+        print(f"[ Commissioning ] prediction Each dimension mean : {all_preds.mean(axis=0)}")
+        print(f"[ Commissioning ] target Each dimension mean : {all_labels.mean(axis=0)}")
+        print(f"[ Commissioning ] prediction Each dimension standard deviation : {all_preds.std(axis=0)}")
+        print(f"[ Commissioning ] target Each dimension standard deviation : {all_labels.std(axis=0)}")
         # Baseline workflow step.
-        print(f"[调试] R相真实值方差: {np.var(all_labels[:, 3:], axis=0)}")
-        print(f"[调试] R相预测值方差: {np.var(all_preds[:, 3:], axis=0)}")
+        print(f"[ Commissioning ] R phase target Variance : {np.var(all_labels[:, 3:], axis=0)}")
+        print(f"[ Commissioning ] R phase prediction Variance : {np.var(all_preds[:, 3:], axis=0)}")
         evaluate._debug_printed = True
     
     # Compute evaluation metrics.
@@ -370,9 +370,9 @@ def find_latest_checkpoint(checkpoint_dir):
 def load_checkpoint(checkpoint_path, model, optimizer, scheduler, device):
     """Run the load checkpoint baseline operation."""
     if not os.path.exists(checkpoint_path):
-        raise FileNotFoundError(f"检查点文件不存在: {checkpoint_path}")
+        raise FileNotFoundError(f" checkpoint file does not exist : {checkpoint_path}")
     
-    print(f"加载检查点: {checkpoint_path}")
+    print(f" load checkpoint : {checkpoint_path}")
     checkpoint = torch.load(checkpoint_path, map_location=device)
     
     # Load the input data.
@@ -387,7 +387,7 @@ def load_checkpoint(checkpoint_path, model, optimizer, scheduler, device):
         try:
             scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
         except:
-            print("警告: 无法加载调度器状态，将使用当前调度器状态")
+            print(" warning : unable to load Scheduler Status , will use current Scheduler Status ")
     
     # Run the training step.
     resume_info = {
@@ -423,7 +423,7 @@ def save_checkpoint(model, optimizer, scheduler, epoch, val_loss, config, filepa
         except:
             pass
     torch.save(checkpoint, filepath)
-    print(f"检查点已保存: {filepath}")
+    print(f" checkpoint saved : {filepath}")
 
 
 def save_results_csv(train_history, train_preds, train_labels, val_preds, val_labels, 
@@ -472,19 +472,19 @@ def save_metrics_txt(best_epoch, best_val_mse, best_val_metrics, best_test_metri
     """Run the save metrics txt baseline operation."""
     with open(os.path.join(result_dir, 'training_metrics.txt'), 'w', encoding='utf-8') as f:
         f.write("=" * 100 + "\n")
-        f.write("训练指标总结\n")
+        f.write(" training-metric summary \n")
         f.write("=" * 100 + "\n\n")
-        f.write(f"最佳模型在epoch {best_epoch}，验证集MSE: {best_val_mse:.6f}\n\n")
-        f.write("最佳验证集指标:\n")
-        f.write(f"  【平均指标】 MAE={best_val_metrics['mae_mean']:.6f}±{best_val_metrics['mae_std']:.6f}  RMSE={best_val_metrics['rmse_mean']:.6f}±{best_val_metrics['rmse_std']:.6f}  R²={best_val_metrics['r2']:.6f}\n")
-        f.write(f"  【E相指标】  MAE={best_val_metrics['mae_E_mean']:.6f}±{best_val_metrics['mae_E_std']:.6f}  RMSE={best_val_metrics['rmse_E_mean']:.6f}±{best_val_metrics['rmse_E_std']:.6f}  R²={best_val_metrics['r2_E']:.6f}\n")
-        f.write(f"  【R相指标】  MAE={best_val_metrics['mae_R_mean']:.6f}±{best_val_metrics['mae_R_std']:.6f}  RMSE={best_val_metrics['rmse_R_mean']:.6f}±{best_val_metrics['rmse_R_std']:.6f}  R²={best_val_metrics['r2_R']:.6f}\n\n")
-        f.write("测试集指标:\n")
-        f.write(f"  【平均指标】 MAE={best_test_metrics['mae_mean']:.6f}±{best_test_metrics['mae_std']:.6f}  RMSE={best_test_metrics['rmse_mean']:.6f}±{best_test_metrics['rmse_std']:.6f}  R²={best_test_metrics['r2']:.6f}\n")
-        f.write(f"  【E相指标】  MAE={best_test_metrics['mae_E_mean']:.6f}±{best_test_metrics['mae_E_std']:.6f}  RMSE={best_test_metrics['rmse_E_mean']:.6f}±{best_test_metrics['rmse_E_std']:.6f}  R²={best_test_metrics['r2_E']:.6f}\n")
-        f.write(f"  【R相指标】  MAE={best_test_metrics['mae_R_mean']:.6f}±{best_test_metrics['mae_R_std']:.6f}  RMSE={best_test_metrics['rmse_R_mean']:.6f}±{best_test_metrics['rmse_R_std']:.6f}  R²={best_test_metrics['r2_R']:.6f}\n\n")
-        f.write(f"总训练时间: {total_time:.2f}秒 ({total_time/60:.2f}分钟)\n")
-        f.write(f"平均每轮时间: {avg_time_per_epoch:.2f}秒\n")
+        f.write(f" best model at epoch {best_epoch}, validation set MSE: {best_val_mse:.6f}\n\n")
+        f.write(" best validation metrics :\n")
+        f.write(f" [ mean metrics ] MAE={best_val_metrics['mae_mean']:.6f}±{best_val_metrics['mae_std']:.6f} RMSE={best_val_metrics['rmse_mean']:.6f}±{best_val_metrics['rmse_std']:.6f} R²={best_val_metrics['r2']:.6f}\n")
+        f.write(f" [E phase metrics ] MAE={best_val_metrics['mae_E_mean']:.6f}±{best_val_metrics['mae_E_std']:.6f} RMSE={best_val_metrics['rmse_E_mean']:.6f}±{best_val_metrics['rmse_E_std']:.6f} R²={best_val_metrics['r2_E']:.6f}\n")
+        f.write(f" [R phase metrics ] MAE={best_val_metrics['mae_R_mean']:.6f}±{best_val_metrics['mae_R_std']:.6f} RMSE={best_val_metrics['rmse_R_mean']:.6f}±{best_val_metrics['rmse_R_std']:.6f} R²={best_val_metrics['r2_R']:.6f}\n\n")
+        f.write(" test metrics :\n")
+        f.write(f" [ mean metrics ] MAE={best_test_metrics['mae_mean']:.6f}±{best_test_metrics['mae_std']:.6f} RMSE={best_test_metrics['rmse_mean']:.6f}±{best_test_metrics['rmse_std']:.6f} R²={best_test_metrics['r2']:.6f}\n")
+        f.write(f" [E phase metrics ] MAE={best_test_metrics['mae_E_mean']:.6f}±{best_test_metrics['mae_E_std']:.6f} RMSE={best_test_metrics['rmse_E_mean']:.6f}±{best_test_metrics['rmse_E_std']:.6f} R²={best_test_metrics['r2_E']:.6f}\n")
+        f.write(f" [R phase metrics ] MAE={best_test_metrics['mae_R_mean']:.6f}±{best_test_metrics['mae_R_std']:.6f} RMSE={best_test_metrics['rmse_R_mean']:.6f}±{best_test_metrics['rmse_R_std']:.6f} R²={best_test_metrics['r2_R']:.6f}\n\n")
+        f.write(f" total training time : {total_time:.2f} seconds ({total_time/60:.2f} minutes )\n")
+        f.write(f" mean time per epoch : {avg_time_per_epoch:.2f} seconds \n")
 
 
 def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, auto_resume=False):
@@ -523,7 +523,7 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
     if resume_checkpoint:
         # Handle model checkpoints.
         if not os.path.exists(resume_checkpoint):
-            raise FileNotFoundError(f"指定的检查点文件不存在: {resume_checkpoint}")
+            raise FileNotFoundError(f" specified checkpoint does not exist : {resume_checkpoint}")
         checkpoint_path = resume_checkpoint
         is_resuming = True
     elif auto_resume:
@@ -531,9 +531,9 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
         checkpoint_path = find_latest_checkpoint(config.model_save_dir)
         if checkpoint_path:
             is_resuming = True
-            print(f"\n自动找到最新检查点: {checkpoint_path}")
+            print(f"\n automatically selected the latest checkpoint : {checkpoint_path}")
         else:
-            print("\n未找到检查点，从头开始训练")
+            print("\n not found checkpoint , train from scratch ")
     
     # Set the random seed.
     if not is_resuming:
@@ -541,7 +541,7 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
     
     # Configure the runtime device.
     if config.device == 'cuda' and not torch.cuda.is_available():
-        print("CUDA不可用，使用CPU")
+        print("CUDA unavailable , use CPU")
         device = torch.device('cpu')
     else:
         device = torch.device(config.device)
@@ -549,11 +549,11 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
     device_info = get_device_info(device)
     
     print("=" * 100)
-    print("【训练配置参数】")
+    print("[ training configuration ]")
     print("=" * 100)
     
     # Load the input data.
-    print("\n【数据集信息】")
+    print("\n[ dataset information ]")
     datasets = load_LLE_dataset(
         config.data.csv_path,
         test_size=config.data.test_size,
@@ -569,62 +569,62 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
     val_systems = count_unique_systems(val_data_list)
     test_systems = count_unique_systems(test_data_list)
     
-    print(f"  训练集样本数: {len(train_data_list)}")
-    print(f"  验证集样本数: {len(val_data_list)}")
-    print(f"  测试集样本数: {len(test_data_list)}")
-    print(f"  训练集体系数: {train_systems}")
-    print(f"  验证集体系数: {val_systems}")
-    print(f"  测试集体系数: {test_systems}")
+    print(f" number of training samples : {len(train_data_list)}")
+    print(f" number of validation samples : {len(val_data_list)}")
+    print(f" number of test samples : {len(test_data_list)}")
+    print(f" number of training systems : {train_systems}")
+    print(f" number of validation systems : {val_systems}")
+    print(f" number of test systems : {test_systems}")
     
     # Configure the runtime device.
-    print("\n【设备配置】")
-    print(f"  设备: {device_info['device']}")
-    print(f"  GPU名称: {device_info['gpu_name']}")
-    print(f"  CUDA版本: {device_info['cuda_version']}")
-    print(f"  GPU内存: {device_info['gpu_memory_gb']} GB")
+    print("\n[ Device configuration ]")
+    print(f" device : {device_info['device']}")
+    print(f" GPU name : {device_info['gpu_name']}")
+    print(f" CUDA version : {device_info['cuda_version']}")
+    print(f" GPU memory : {device_info['gpu_memory_gb']} GB")
     
     # Run the training step.
-    print("\n【训练参数】")
-    print(f"  随机种子: {config.seed}")
-    print(f"  训练轮数: {config.training.num_epochs}")
-    print(f"  批次大小: {config.data.batch_size}")
-    print(f"  学习率: {config.training.learning_rate}")
-    print(f"  权重衰减: {config.training.weight_decay}")
-    print(f"  早停耐心值: {config.training.early_stop_patience}")
-    print(f"  早停最小改善: {config.training.early_stop_min_delta}")
-    print(f"  检查点保存频率: 每 {config.training.checkpoint_save_freq} 个epoch")
-    print(f"  休息策略: 每 {config.training.rest_interval_hours} 小时休息 {config.training.rest_duration}秒（{config.training.rest_duration/60:.1f}分钟）")
+    print("\n[ training parameters ]")
+    print(f" random seed : {config.seed}")
+    print(f" training epochs : {config.training.num_epochs}")
+    print(f" batch size : {config.data.batch_size}")
+    print(f" learning rate : {config.training.learning_rate}")
+    print(f" weight decay : {config.training.weight_decay}")
+    print(f" early-stopping patience : {config.training.early_stop_patience}")
+    print(f" minimum early-stopping improvement : {config.training.early_stop_min_delta}")
+    print(f" checkpoint frequency : per {config.training.checkpoint_save_freq} epoch")
+    print(f" rest policy : per {config.training.rest_interval_hours} hours before cooldown {config.training.rest_duration} seconds ({config.training.rest_duration/60:.1f} minutes )")
     if is_resuming:
-        print(f"  断点续训: 是（从检查点恢复）")
+        print(f" resume training : yes ( resume from checkpoint )")
     else:
-        print(f"  断点续训: 否（从头开始）")
+        print(f" resume training : no ( start from scratch )")
     
     # Configure the baseline model.
-    print("\n【模型超参数】")
-    print(f"  隐藏层维度: {config.model.hidden_dim}")
-    print(f"  图神经网络层数: {config.model.num_mp_layers}")
-    print(f"  消息传递类型: {config.model.mp_type}")
-    print(f"  Dropout率: {config.model.dropout}")
-    print(f"  输出维度: {config.model.out_dim} (LLE任务: Ex1, Ex2, Ex3, Rx1, Rx2, Rx3)")
+    print("\n[ model hyperparameters ]")
+    print(f" hidden-layer dimension : {config.model.hidden_dim}")
+    print(f" number of graph-neural-network layers : {config.model.num_mp_layers}")
+    print(f" Messaging type : {config.model.mp_type}")
+    print(f" Dropout rate : {config.model.dropout}")
+    print(f" output dimension : {config.model.out_dim} (LLE task : Ex1, Ex2, Ex3, Rx1, Rx2, Rx3)")
     
     # Configure repository paths.
-    print("\n【路径信息】")
-    print(f"  基础输出目录: {base_output_dir}")
-    print(f"  Seed目录: {seed_dir}")
-    print(f"  检查点保存目录: {config.model_save_dir}")
-    print(f"  结果保存目录: {config.result_dir}")
-    print(f"  最佳模型保存目录: {best_model_dir}")
+    print("\n[ path information ]")
+    print(f" base output directory : {base_output_dir}")
+    print(f" Seed directory : {seed_dir}")
+    print(f" checkpoint directory : {config.model_save_dir}")
+    print(f" result directory : {config.result_dir}")
+    print(f" best-model directory : {best_model_dir}")
     
     # Save the generated artifacts.
-    print("\n【文件保存路径】")
-    print(f"  检查点文件: {os.path.join(config.model_save_dir, 'checkpoint_epoch_*.pt')}")
-    print(f"  最佳模型权重: {os.path.join(best_model_dir, 'GLAM.pt')}")
-    print(f"  训练历史CSV: {os.path.join(config.result_dir, 'train_history.csv')}")
-    print(f"  训练/验证结果CSV: {os.path.join(config.result_dir, 'training_results.csv')}")
-    print(f"  测试集结果CSV: {os.path.join(config.result_dir, 'test_results.csv')}")
-    print(f"  训练指标TXT: {os.path.join(config.result_dir, 'training_metrics.txt')}")
-    print(f"  最佳指标TXT: {os.path.join(config.result_dir, 'best_metrics.txt')}")
-    print(f"  测试指标TXT: {os.path.join(config.result_dir, 'test_metrics.txt')}")
+    print("\n[ file output path ]")
+    print(f" checkpoint file : {os.path.join(config.model_save_dir, 'checkpoint_epoch_*.pt')}")
+    print(f" best model checkpoint : {os.path.join(best_model_dir, 'GLAM.pt')}")
+    print(f" training history CSV: {os.path.join(config.result_dir, 'train_history.csv')}")
+    print(f" Training / validation results CSV: {os.path.join(config.result_dir, 'training_results.csv')}")
+    print(f" test-set results CSV: {os.path.join(config.result_dir, 'test_results.csv')}")
+    print(f" training metrics TXT: {os.path.join(config.result_dir, 'training_metrics.txt')}")
+    print(f" best metrics TXT: {os.path.join(config.result_dir, 'best_metrics.txt')}")
+    print(f" Test metrics TXT: {os.path.join(config.result_dir, 'test_metrics.txt')}")
     
     print("=" * 100)
     
@@ -686,7 +686,7 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
         config=model_config
     ).to(device)
     
-    print(f"\n模型参数数量: {sum(p.numel() for p in model.parameters()):,}")
+    print(f"\n number of model parameters : {sum(p.numel() for p in model.parameters()):,}")
     
     # Compute the training loss.
     criterion = nn.MSELoss()
@@ -718,14 +718,14 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
         best_val_mse = resume_best_val_mse
         best_val_loss = resume_best_val_loss
         
-        print(f"\n从epoch {resume_from_epoch} 恢复训练")
-        print(f"最佳验证损失: {best_val_mse:.6f}")
-        print(f"已训练历史记录数: {len(train_history)}")
+        print(f"\n from epoch {resume_from_epoch} resume training ")
+        print(f" best validation loss : {best_val_mse:.6f}")
+        print(f" Trained History count : {len(train_history)}")
         print("=" * 100)
     else:
         resume_from_epoch = 0
     
-    print("\n开始训练...")
+    print("\n start training ...")
     print("=" * 100)
     
     start_time = time.time()
@@ -807,17 +807,17 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
         
         # Baseline workflow step.
         best_loss_str = f"{best_val_mse:.6f} (epoch {best_val_loss})" if best_val_loss != float('inf') else "initial"
-        print(f"Epoch {epoch+1}/{config.training.num_epochs} | 训练时间: {epoch_time:.2f}秒 | Train Loss: {train_loss:.6f}")
+        print(f"Epoch {epoch+1}/{config.training.num_epochs} | training time : {epoch_time:.2f} seconds | Train Loss: {train_loss:.6f}")
         print(f"Best Loss: {best_loss_str}")
         print("=" * 100)
-        print("【训练集指标】")
-        print(f"  【平均指标】 MAE={train_metrics['mae_mean']:.6f}±{train_metrics['mae_std']:.6f}  RMSE={train_metrics['rmse_mean']:.6f}±{train_metrics['rmse_std']:.6f}  R²={train_metrics['r2']:.6f}")
-        print(f"  【E相指标】  MAE={train_metrics['mae_E_mean']:.6f}±{train_metrics['mae_E_std']:.6f}  RMSE={train_metrics['rmse_E_mean']:.6f}±{train_metrics['rmse_E_std']:.6f}  R²={train_metrics['r2_E']:.6f}")
-        print(f"  【R相指标】  MAE={train_metrics['mae_R_mean']:.6f}±{train_metrics['mae_R_std']:.6f}  RMSE={train_metrics['rmse_R_mean']:.6f}±{train_metrics['rmse_R_std']:.6f}  R²={train_metrics['r2_R']:.6f}")
-        print("\n【验证集指标】")
-        print(f"  【平均指标】 MAE={val_metrics['mae_mean']:.6f}±{val_metrics['mae_std']:.6f}  RMSE={val_metrics['rmse_mean']:.6f}±{val_metrics['rmse_std']:.6f}  R²={val_metrics['r2']:.6f}")
-        print(f"  【E相指标】  MAE={val_metrics['mae_E_mean']:.6f}±{val_metrics['mae_E_std']:.6f}  RMSE={val_metrics['rmse_E_mean']:.6f}±{val_metrics['rmse_E_std']:.6f}  R²={val_metrics['r2_E']:.6f}")
-        print(f"  【R相指标】  MAE={val_metrics['mae_R_mean']:.6f}±{val_metrics['mae_R_std']:.6f}  RMSE={val_metrics['rmse_R_mean']:.6f}±{val_metrics['rmse_R_std']:.6f}  R²={val_metrics['r2_R']:.6f}")
+        print("[ Training metrics ]")
+        print(f" [ mean metrics ] MAE={train_metrics['mae_mean']:.6f}±{train_metrics['mae_std']:.6f} RMSE={train_metrics['rmse_mean']:.6f}±{train_metrics['rmse_std']:.6f} R²={train_metrics['r2']:.6f}")
+        print(f" [E phase metrics ] MAE={train_metrics['mae_E_mean']:.6f}±{train_metrics['mae_E_std']:.6f} RMSE={train_metrics['rmse_E_mean']:.6f}±{train_metrics['rmse_E_std']:.6f} R²={train_metrics['r2_E']:.6f}")
+        print(f" [R phase metrics ] MAE={train_metrics['mae_R_mean']:.6f}±{train_metrics['mae_R_std']:.6f} RMSE={train_metrics['rmse_R_mean']:.6f}±{train_metrics['rmse_R_std']:.6f} R²={train_metrics['r2_R']:.6f}")
+        print("\n[ validation metrics ]")
+        print(f" [ mean metrics ] MAE={val_metrics['mae_mean']:.6f}±{val_metrics['mae_std']:.6f} RMSE={val_metrics['rmse_mean']:.6f}±{val_metrics['rmse_std']:.6f} R²={val_metrics['r2']:.6f}")
+        print(f" [E phase metrics ] MAE={val_metrics['mae_E_mean']:.6f}±{val_metrics['mae_E_std']:.6f} RMSE={val_metrics['rmse_E_mean']:.6f}±{val_metrics['rmse_E_std']:.6f} R²={val_metrics['r2_E']:.6f}")
+        print(f" [R phase metrics ] MAE={val_metrics['mae_R_mean']:.6f}±{val_metrics['mae_R_std']:.6f} RMSE={val_metrics['rmse_R_mean']:.6f}±{val_metrics['rmse_R_std']:.6f} R²={val_metrics['r2_R']:.6f}")
         print("=" * 100)
         
         # Save the generated artifacts.
@@ -829,8 +829,8 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
             checkpoint_data = torch.load(checkpoint_path)
             checkpoint_data['train_history'] = train_history
             torch.save(checkpoint_data, checkpoint_path_with_history)
-            print(f"  检查点保存路径: {checkpoint_path}")
-            print(f"  训练历史保存路径: {checkpoint_path_with_history}")
+            print(f" checkpoint output path : {checkpoint_path}")
+            print(f" training history output path : {checkpoint_path_with_history}")
         
         # Baseline workflow step.
         current_time = time.time()
@@ -838,7 +838,7 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
         
         if elapsed_hours >= config.training.rest_interval_hours and (epoch + 1) < config.training.num_epochs:
             print("\n" + "=" * 100)
-            print(f"已训练 {elapsed_hours:.2f} 小时，休息 {config.training.rest_duration}秒（{config.training.rest_duration/60:.1f}分钟）让CPU/GPU有时间休息...")
+            print(f" Trained {elapsed_hours:.2f} hours , Break {config.training.rest_duration} seconds ({config.training.rest_duration/60:.1f} minutes ) allow CPU/GPU to allow a cooldown period ...")
             print("=" * 100 + "\n")
             time.sleep(config.training.rest_duration)
             last_rest_time = time.time()  # Baseline workflow step.
@@ -851,7 +851,7 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
             # Save the generated artifacts.
             model_path = os.path.join(best_model_dir, 'GLAM.pt')
             save_checkpoint(model, optimizer, scheduler, epoch + 1, val_metrics['mse'], config, model_path)
-            print(f"  最佳模型保存路径: {model_path}")
+            print(f" best model output path : {model_path}")
             # Save the generated artifacts.
             best_train_preds = train_metrics['predictions']
             best_train_labels = train_metrics['labels']
@@ -860,22 +860,22 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
         else:
             patience_counter += 1
             if patience_counter >= config.training.early_stop_patience:
-                print(f"\n早停触发！在epoch {epoch+1}停止训练。")
-                print(f"最佳模型在epoch {best_val_loss}，验证集MSE: {best_val_mse:.6f}")
-                print(f"已等待 {patience_counter}/{config.training.early_stop_patience} 个epoch无改善")
+                print(f"\n early stopping triggered ! at epoch {epoch+1} stop training .")
+                print(f" best model at epoch {best_val_loss}, validation set MSE: {best_val_mse:.6f}")
+                print(f" waited {patience_counter}/{config.training.early_stop_patience} epoch without improvement ")
                 break
     
     total_time = time.time() - start_time
     avg_time_per_epoch = total_time / len(train_history)
     
     print("\n" + "=" * 100)
-    print("训练完成！")
-    print(f"最佳模型在epoch {best_val_loss}，验证集MSE: {best_val_mse:.6f}")
-    print(f"总训练时间: {total_time:.2f}秒 ({total_time/60:.2f}分钟)")
-    print(f"平均每轮时间: {avg_time_per_epoch:.2f}秒")
+    print(" training complete !")
+    print(f" best model at epoch {best_val_loss}, validation set MSE: {best_val_mse:.6f}")
+    print(f" total training time : {total_time:.2f} seconds ({total_time/60:.2f} minutes )")
+    print(f" mean time per epoch : {avg_time_per_epoch:.2f} seconds ")
     
     # Load the input data.
-    print("\n加载最佳模型进行测试...")
+    print("\n load the best model Into rows Test ...")
     checkpoint = torch.load(os.path.join(best_model_dir, 'GLAM.pt'))
     model.load_state_dict(checkpoint['model_state_dict'])
     
@@ -1030,63 +1030,63 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
     best_metrics_txt_path = os.path.join(config.result_dir, 'best_metrics.txt')
     with open(best_metrics_txt_path, 'w', encoding='utf-8') as f:
         f.write("=" * 100 + "\n")
-        f.write("最佳模型指标\n")
+        f.write(" best-model metrics \n")
         f.write("=" * 100 + "\n\n")
-        f.write(f"随机种子: {config.seed}\n")
-        f.write(f"最佳epoch: {best_val_loss}\n")
-        f.write(f"最佳验证集MSE: {best_val_mse:.6f}\n")
-        f.write(f"总训练时间: {total_time:.2f}秒 ({total_time/60:.2f}分钟)\n")
-        f.write(f"平均每轮时间: {avg_time_per_epoch:.2f}秒\n")
-        f.write(f"总训练轮数: {len(train_history)}\n\n")
+        f.write(f" random seed : {config.seed}\n")
+        f.write(f" best epoch: {best_val_loss}\n")
+        f.write(f" best validation MSE: {best_val_mse:.6f}\n")
+        f.write(f" total training time : {total_time:.2f} seconds ({total_time/60:.2f} minutes )\n")
+        f.write(f" mean time per epoch : {avg_time_per_epoch:.2f} seconds \n")
+        f.write(f" total training epochs : {len(train_history)}\n\n")
         
         f.write("=" * 100 + "\n")
-        f.write("最佳验证集指标\n")
+        f.write(" best validation metrics \n")
         f.write("=" * 100 + "\n\n")
-        f.write("【Overall指标】\n")
+        f.write("[Overall metrics ]\n")
         f.write(f"  MAE: {best_val_metrics['mae_mean']:.6f}±{best_val_metrics['mae_std']:.6f}\n")
         f.write(f"  RMSE: {best_val_metrics['rmse_mean']:.6f}±{best_val_metrics['rmse_std']:.6f}\n")
         f.write(f"  R²: {best_val_metrics['r2']:.6f}\n\n")
-        f.write("【E相指标】\n")
+        f.write("[E phase metrics ]\n")
         f.write(f"  MAE: {best_val_metrics['mae_E_mean']:.6f}±{best_val_metrics['mae_E_std']:.6f}\n")
         f.write(f"  RMSE: {best_val_metrics['rmse_E_mean']:.6f}±{best_val_metrics['rmse_E_std']:.6f}\n")
         f.write(f"  R²: {best_val_metrics['r2_E']:.6f}\n\n")
-        f.write("【R相指标】\n")
+        f.write("[R phase metrics ]\n")
         f.write(f"  MAE: {best_val_metrics['mae_R_mean']:.6f}±{best_val_metrics['mae_R_std']:.6f}\n")
         f.write(f"  RMSE: {best_val_metrics['rmse_R_mean']:.6f}±{best_val_metrics['rmse_R_std']:.6f}\n")
         f.write(f"  R²: {best_val_metrics['r2_R']:.6f}\n\n")
         
         f.write("=" * 100 + "\n")
-        f.write("测试集指标\n")
+        f.write(" test metrics \n")
         f.write("=" * 100 + "\n\n")
-        f.write("【Overall指标】\n")
+        f.write("[Overall metrics ]\n")
         f.write(f"  MAE: {best_test_metrics['mae_mean']:.6f}±{best_test_metrics['mae_std']:.6f}\n")
         f.write(f"  RMSE: {best_test_metrics['rmse_mean']:.6f}±{best_test_metrics['rmse_std']:.6f}\n")
         f.write(f"  R²: {best_test_metrics['r2']:.6f}\n\n")
-        f.write("【E相指标】\n")
+        f.write("[E phase metrics ]\n")
         f.write(f"  MAE: {best_test_metrics['mae_E_mean']:.6f}±{best_test_metrics['mae_E_std']:.6f}\n")
         f.write(f"  RMSE: {best_test_metrics['rmse_E_mean']:.6f}±{best_test_metrics['rmse_E_std']:.6f}\n")
         f.write(f"  R²: {best_test_metrics['r2_E']:.6f}\n\n")
-        f.write("【R相指标】\n")
+        f.write("[R phase metrics ]\n")
         f.write(f"  MAE: {best_test_metrics['mae_R_mean']:.6f}±{best_test_metrics['mae_R_std']:.6f}\n")
         f.write(f"  RMSE: {best_test_metrics['rmse_R_mean']:.6f}±{best_test_metrics['rmse_R_std']:.6f}\n")
         f.write(f"  R²: {best_test_metrics['r2_R']:.6f}\n")
     
     print("\n" + "=" * 100)
-    print("训练结果文件保存路径:")
+    print(" Training results file output path :")
     print("=" * 100)
-    print(f"  基础输出目录: {os.path.abspath(base_output_dir)}")
-    print(f"  Seed目录: {os.path.abspath(seed_dir)}")
-    print(f"  检查点保存目录: {os.path.abspath(config.model_save_dir)}")
-    print(f"  结果保存目录: {os.path.abspath(config.result_dir)}")
-    print(f"  最佳模型保存目录: {os.path.abspath(best_model_dir)}")
-    print("\n  已保存的文件:")
-    print(f"    ✓ 训练历史CSV: {os.path.abspath(os.path.join(config.result_dir, 'train_history.csv'))}")
-    print(f"    ✓ 训练/验证结果CSV: {os.path.abspath(os.path.join(config.result_dir, 'training_results.csv'))}")
-    print(f"    ✓ 测试集结果CSV: {os.path.abspath(os.path.join(config.result_dir, 'test_results.csv'))}")
-    print(f"    ✓ 训练指标TXT: {os.path.abspath(os.path.join(config.result_dir, 'training_metrics.txt'))}")
-    print(f"    ✓ 最佳指标TXT: {os.path.abspath(os.path.join(config.result_dir, 'best_metrics.txt'))}")
-    print(f"    ✓ 测试指标TXT: {os.path.abspath(os.path.join(config.result_dir, 'test_metrics.txt'))}")
-    print(f"    ✓ 最佳模型权重: {os.path.abspath(os.path.join(best_model_dir, 'GLAM.pt'))}")
+    print(f" base output directory : {os.path.abspath(base_output_dir)}")
+    print(f" Seed directory : {os.path.abspath(seed_dir)}")
+    print(f" checkpoint directory : {os.path.abspath(config.model_save_dir)}")
+    print(f" result directory : {os.path.abspath(config.result_dir)}")
+    print(f" best-model directory : {os.path.abspath(best_model_dir)}")
+    print("\n saved file :")
+    print(f" ✓ training history CSV: {os.path.abspath(os.path.join(config.result_dir, 'train_history.csv'))}")
+    print(f" ✓ Training / validation results CSV: {os.path.abspath(os.path.join(config.result_dir, 'training_results.csv'))}")
+    print(f" ✓ test-set results CSV: {os.path.abspath(os.path.join(config.result_dir, 'test_results.csv'))}")
+    print(f" ✓ training metrics TXT: {os.path.abspath(os.path.join(config.result_dir, 'training_metrics.txt'))}")
+    print(f" ✓ best metrics TXT: {os.path.abspath(os.path.join(config.result_dir, 'best_metrics.txt'))}")
+    print(f" ✓ Test metrics TXT: {os.path.abspath(os.path.join(config.result_dir, 'test_metrics.txt'))}")
+    print(f" ✓ best model checkpoint : {os.path.abspath(os.path.join(best_model_dir, 'GLAM.pt'))}")
     print("=" * 100)
     
     # Evaluate the test subset.
@@ -1133,64 +1133,64 @@ def save_summary_txt(all_seeds, all_test_metrics, summary_dir):
     
     # Baseline workflow step.
     content = "=" * 100 + "\n"
-    content += "多Seed训练结果汇总\n"
+    content += " multiple Seed Training results Summary \n"
     content += "=" * 100 + "\n\n"
     
-    content += f"训练Seed列表: {all_seeds}\n"
-    content += f"Seed数量: {len(all_seeds)}\n\n"
+    content += f" Training Seed list : {all_seeds}\n"
+    content += f"Seed count : {len(all_seeds)}\n\n"
     
     content += "=" * 100 + "\n"
-    content += "测试集指标汇总（均值 ± 标准差）\n"
+    content += " test-metric summary ( mean ± standard deviation )\n"
     content += "=" * 100 + "\n\n"
     
     # Compute evaluation metrics.
-    content += "【Overall指标】\n"
+    content += "[Overall metrics ]\n"
     content += f"  MAE: {format_metric_with_std(summary_metrics['mae_mean'], summary_metrics['mae_std'])}\n"
     content += f"  RMSE: {format_metric_with_std(summary_metrics['rmse_mean'], summary_metrics['rmse_std'])}\n"
     content += f"  R²: {format_metric_with_std(summary_metrics['r2_mean'], summary_metrics['r2_std'])}\n\n"
     
     # Compute evaluation metrics.
-    content += "【E相指标】\n"
+    content += "[E phase metrics ]\n"
     content += f"  MAE: {format_metric_with_std(summary_metrics['mae_E_mean'], summary_metrics['mae_E_std'])}\n"
     content += f"  RMSE: {format_metric_with_std(summary_metrics['rmse_E_mean'], summary_metrics['rmse_E_std'])}\n"
     content += f"  R²: {format_metric_with_std(summary_metrics['r2_E_mean'], summary_metrics['r2_E_std'])}\n\n"
     
     # Compute evaluation metrics.
-    content += "【R相指标】\n"
+    content += "[R phase metrics ]\n"
     content += f"  MAE: {format_metric_with_std(summary_metrics['mae_R_mean'], summary_metrics['mae_R_std'])}\n"
     content += f"  RMSE: {format_metric_with_std(summary_metrics['rmse_R_mean'], summary_metrics['rmse_R_std'])}\n"
     content += f"  R²: {format_metric_with_std(summary_metrics['r2_R_mean'], summary_metrics['r2_R_std'])}\n\n"
     
     content += "=" * 100 + "\n"
-    content += "各Seed详细结果\n"
+    content += " Each Seed Detail results \n"
     content += "=" * 100 + "\n\n"
     
     for seed, metrics in zip(all_seeds, all_test_metrics):
         content += f"Seed {seed}:\n"
         content += f"  【Overall】 MAE={metrics['mae']:.6f}  RMSE={metrics['rmse']:.6f}  R²={metrics['r2']:.6f}\n"
-        content += f"  【E相】     MAE={metrics['mae_E']:.6f}  RMSE={metrics['rmse_E']:.6f}  R²={metrics['r2_E']:.6f}\n"
-        content += f"  【R相】     MAE={metrics['mae_R']:.6f}  RMSE={metrics['rmse_R']:.6f}  R²={metrics['r2_R']:.6f}\n\n"
+        content += f" [E phase ] MAE={metrics['mae_E']:.6f} RMSE={metrics['rmse_E']:.6f} R²={metrics['r2_E']:.6f}\n"
+        content += f" [R phase ] MAE={metrics['mae_R']:.6f} RMSE={metrics['rmse_R']:.6f} R²={metrics['r2_R']:.6f}\n\n"
     
     # Save the generated artifacts.
     summary_path = os.path.join(summary_dir, 'summary_results.txt')
     with open(summary_path, 'w', encoding='utf-8') as f:
         f.write(content)
     
-    print(f"\n汇总结果已保存到: {summary_path}")
+    print(f"\n summary saved to : {summary_path}")
     
     # Baseline workflow step.
     print("\n" + "=" * 100)
-    print("测试集指标汇总（均值 ± 标准差）")
+    print(" test-metric summary ( mean ± standard deviation )")
     print("=" * 100)
-    print("\n【Overall指标】")
+    print("\n[Overall metrics ]")
     print(f"  MAE: {format_metric_with_std(summary_metrics['mae_mean'], summary_metrics['mae_std'])}")
     print(f"  RMSE: {format_metric_with_std(summary_metrics['rmse_mean'], summary_metrics['rmse_std'])}")
     print(f"  R²: {format_metric_with_std(summary_metrics['r2_mean'], summary_metrics['r2_std'])}")
-    print("\n【E相指标】")
+    print("\n[E phase metrics ]")
     print(f"  MAE: {format_metric_with_std(summary_metrics['mae_E_mean'], summary_metrics['mae_E_std'])}")
     print(f"  RMSE: {format_metric_with_std(summary_metrics['rmse_E_mean'], summary_metrics['rmse_E_std'])}")
     print(f"  R²: {format_metric_with_std(summary_metrics['r2_E_mean'], summary_metrics['r2_E_std'])}")
-    print("\n【R相指标】")
+    print("\n[R phase metrics ]")
     print(f"  MAE: {format_metric_with_std(summary_metrics['mae_R_mean'], summary_metrics['mae_R_std'])}")
     print(f"  RMSE: {format_metric_with_std(summary_metrics['rmse_R_mean'], summary_metrics['rmse_R_std'])}")
     print(f"  R²: {format_metric_with_std(summary_metrics['r2_R_mean'], summary_metrics['r2_R_std'])}")
@@ -1200,12 +1200,12 @@ def save_summary_txt(all_seeds, all_test_metrics, summary_dir):
 def main_multi_seed(seeds=[42, 123, 456, 789, 2024], base_output_dir=None):
     """Run the main multi seed baseline operation."""
     print("=" * 100)
-    print("多Seed训练开始")
+    print(" multiple Seed Training start ")
     print("=" * 100)
-    print(f"Seed列表: {seeds}")
+    print(f"Seed list : {seeds}")
     if base_output_dir is None:
         base_output_dir = str(EXPERIMENT_ROOT / "runs" / "glam")
-    print(f"输出目录: {base_output_dir}")
+    print(f" output directory : {base_output_dir}")
     print("=" * 100)
     
     # Configure the output artifacts.
@@ -1216,7 +1216,7 @@ def main_multi_seed(seeds=[42, 123, 456, 789, 2024], base_output_dir=None):
     # Run the training step.
     for i, seed in enumerate(seeds):
         print(f"\n{'='*100}")
-        print(f"开始训练 Seed {seed} ({i+1}/{len(seeds)})")
+        print(f" start training Seed {seed} ({i+1}/{len(seeds)})")
         print(f"{'='*100}\n")
         
         # Baseline workflow step.
@@ -1258,54 +1258,54 @@ def main_multi_seed(seeds=[42, 123, 456, 789, 2024], base_output_dir=None):
         test_metrics_path = os.path.join(results_dir, 'test_metrics.txt')
         with open(test_metrics_path, 'w', encoding='utf-8') as f:
             f.write("=" * 100 + "\n")
-            f.write(f"Seed {seed} - 测试集指标\n")
+            f.write(f"Seed {seed} - test metrics \n")
             f.write("=" * 100 + "\n\n")
-            f.write("【Overall指标】\n")
+            f.write("[Overall metrics ]\n")
             f.write(f"  MAE: {test_metrics['mae_mean']:.6f}±{test_metrics['mae_std']:.6f}\n")
             f.write(f"  RMSE: {test_metrics['rmse_mean']:.6f}±{test_metrics['rmse_std']:.6f}\n")
             f.write(f"  R²: {test_metrics['r2']:.6f}\n\n")
-            f.write("【E相指标】\n")
+            f.write("[E phase metrics ]\n")
             f.write(f"  MAE: {test_metrics['mae_E_mean']:.6f}±{test_metrics['mae_E_std']:.6f}\n")
             f.write(f"  RMSE: {test_metrics['rmse_E_mean']:.6f}±{test_metrics['rmse_E_std']:.6f}\n")
             f.write(f"  R²: {test_metrics['r2_E']:.6f}\n\n")
-            f.write("【R相指标】\n")
+            f.write("[R phase metrics ]\n")
             f.write(f"  MAE: {test_metrics['mae_R_mean']:.6f}±{test_metrics['mae_R_std']:.6f}\n")
             f.write(f"  RMSE: {test_metrics['rmse_R_mean']:.6f}±{test_metrics['rmse_R_std']:.6f}\n")
             f.write(f"  R²: {test_metrics['r2_R']:.6f}\n")
         
-        print(f"\nSeed {seed} 训练完成！")
-        print(f"测试指标已保存到: {test_metrics_path}")
+        print(f"\nSeed {seed} training complete !")
+        print(f" test metrics saved to : {test_metrics_path}")
     
     # Save the generated artifacts.
     save_summary_txt(seeds, all_test_metrics, base_output_dir)
     
     print("\n" + "=" * 100)
-    print("所有Seed训练完成！")
+    print(" all Seed training complete !")
     print("=" * 100)
 
 
 if __name__ == "__main__":
     import argparse
     
-    parser = argparse.ArgumentParser(description='GLAM模型训练脚本')
+    parser = argparse.ArgumentParser(description='GLAM model training Script ')
     parser.add_argument('--multi-seed', action='store_true', 
-                        help='运行多seed训练')
+                        help=' run multiple seed Training ')
     parser.add_argument('--single-seed', action='store_true', 
-                        help='运行单seed训练')
+                        help=' run Single seed Training ')
     parser.add_argument('--seeds', type=int, nargs='+', default=[42, 123, 456, 789, 2024], 
-                        help='Seed列表（仅在--multi-seed时使用）')
+                        help='Seed list ( only in --multi-seed when used )')
     parser.add_argument('--output-dir', type=str,
                         default=str(EXPERIMENT_ROOT / 'runs' / 'glam'),
-                        help='输出目录（仅在--multi-seed时使用）')
+                        help=' output directory ( only in --multi-seed when used )')
     parser.add_argument('--seed', type=int, default=None, 
-                        help='单个seed训练时的随机种子')
+                        help=' Single seed training random seed ')
     parser.add_argument('--base-output-dir', type=str,
                         default=str(EXPERIMENT_ROOT / 'runs' / 'glam'),
-                        help='基础输出目录（默认: outputs，会自动创建seed_{seed}子目录）')
+                        help=' base output directory ( default : outputs, will Auto create seed_{seed} child directory )')
     parser.add_argument('--resume', type=str, default=None,
-                        help='从指定检查点恢复训练（检查点文件路径）')
+                        help=' from Designation checkpoint resume training ( checkpoint path )')
     parser.add_argument('--auto-resume', action='store_true',
-                        help='自动查找最新检查点并恢复训练')
+                        help=' automatically locate the latest checkpoint and resume training ')
     
     args = parser.parse_args()
     
@@ -1313,8 +1313,8 @@ if __name__ == "__main__":
     if not args.multi_seed and not args.single_seed:
         # Run the training step.
         print("=" * 100)
-        print("默认运行多Seed训练")
-        print(f"Seed列表: {args.seeds}")
+        print(" default run multiple Seed Training ")
+        print(f"Seed list : {args.seeds}")
         print("=" * 100)
         main_multi_seed(seeds=args.seeds, base_output_dir=args.output_dir)
     elif args.single_seed:

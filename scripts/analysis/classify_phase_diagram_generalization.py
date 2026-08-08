@@ -33,9 +33,9 @@ CATEGORY_ORDER = [
     "Failure",
 ]
 CATEGORY_CN = {
-    "Quantitative within tolerance": "在给定容差内定量正确",
-    "Qualitatively correct": "定性正确但超出给定容差",
-    "Failure": "失效",
+    "Quantitative within tolerance": " at Quantify correctly within a given tolerance ",
+    "Qualitatively correct": " Qualitatively correct but Out of given tolerance ",
+    "Failure": " Expired ",
 }
 
 

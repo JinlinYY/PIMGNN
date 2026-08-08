@@ -32,21 +32,9 @@ from psmi.train import train_or_load
 from psmi.utils import set_seed
 
 
-DEFAULT_DATASET = PROJECT_ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles_min3.xlsx"
-DEFAULT_CHECKPOINT = (
-    PROJECT_ROOT
-    / "models"
-    / "03_physics_constraints"
-    / "lle_run_混合物图-Cross-s3-tf-纯数据驱动test2"
-    / "best_model.pt"
-)
-DEFAULT_OUTPUT = (
-    PROJECT_ROOT
-    / "experiments"
-    / "11_ge_model_sensitivity"
-    / "runs"
-    / "current"
-)
+DEFAULT_DATASET = PROJECT_ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles.xlsx"
+DEFAULT_CHECKPOINT = PROJECT_ROOT / "models" / "paper_historical" / "figure2a_psmi" / "best_model.pt"
+DEFAULT_OUTPUT = PROJECT_ROOT / "experiments" / "11_ge_model_sensitivity" / "results"
 GE_MODELS = ("nrtl", "margules", "van_laar")
 
 

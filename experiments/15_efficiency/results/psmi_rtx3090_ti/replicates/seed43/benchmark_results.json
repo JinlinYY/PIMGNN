@@ -12,9 +12,9 @@
       6
     ],
     "gpu_total_memory_gib": 23.98779296875,
-    "checkpoint": "D:\\GGNN\\YXFL\\models\\03_physics_constraints\\lle_run_混合物图-Cross-s3-tf-化学势约束x\\best_model.pt",
-    "dataset": "D:\\GGNN\\YXFL\\datasets\\processed\\LLE-literature-data-boosted.xlsx",
-    "fg_corpus": "D:\\GGNN\\YXFL\\experiments\\03_physics_constraints\\runs\\lle_run_混合物图-Cross-s3-tf-化学势约束x\\artifacts\\fg_corpus.json",
+    "checkpoint": "models/efficiency_benchmark/best_model.pt",
+    "dataset": "datasets/processed/LLE-literature-data-boosted.xlsx",
+    "fg_corpus": "experiments/efficiency_benchmark/artifacts/fg_corpus.json",
     "dataset_records_available": 6709,
     "benchmark_pool_records": 256,
     "seed": 43,

@@ -1,4 +1,4 @@
-"""Tests for inference-only checkpoint reproduction helpers."""
+"""Tests for checkpoint reproduction helpers."""
 
 import hashlib
 import json
@@ -31,9 +31,9 @@ def test_checkpoint_input_verification_accepts_portable_paths(
     monkeypatch.setattr(C, "SPLIT_MANIFEST_PATH", str(split))
     checkpoint = {
         "provenance": {
-            "dataset_path": "D:/old/location/dataset.xlsx",
+            "dataset_path": "portable/example/dataset.xlsx",
             "dataset_sha256": sha256_file(dataset),
-            "split_manifest_path": "D:/old/location/split.json",
+            "split_manifest_path": "portable/example/split.json",
             "split_manifest_sha256": sha256_file(split),
         }
     }
@@ -52,7 +52,7 @@ def test_checkpoint_input_verification_rejects_modified_dataset(
     monkeypatch.setattr(C, "SPLIT_STRATEGY", "random")
     checkpoint = {
         "provenance": {
-            "dataset_path": "D:/old/location/dataset.xlsx",
+            "dataset_path": "portable/example/dataset.xlsx",
             "dataset_sha256": hashlib.sha256(b"original").hexdigest(),
         }
     }

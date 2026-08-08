@@ -15,10 +15,10 @@ from psmi_baselines.paths import TOTAL_CSV
 
 def load_model_from_checkpoint(checkpoint_path, device='cuda'):
     """Run the load model from checkpoint baseline operation."""
-    print(f"正在加载checkpoint: {checkpoint_path}")
+    print(f" loading checkpoint: {checkpoint_path}")
     
     if not os.path.exists(checkpoint_path):
-        raise FileNotFoundError(f"Checkpoint文件不存在: {checkpoint_path}")
+        raise FileNotFoundError(f"Checkpoint file does not exist : {checkpoint_path}")
     
     checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
     
@@ -28,9 +28,9 @@ def load_model_from_checkpoint(checkpoint_path, device='cuda'):
         # Baseline workflow step.
         args = argparse.Namespace(**args_dict)
     else:
-        raise ValueError("Checkpoint中未找到args参数，无法重建模型")
+        raise ValueError("Checkpoint in not found args parameters , unable to reconstruct the model ")
     
-    print(f"  模型参数:")
+    print(f" model parameters :")
     print(f"    seed: {args.seed}")
     print(f"    hidden_dim: {args.hidden_dim}")
     print(f"    num_layers: {args.num_layers}")
@@ -63,19 +63,19 @@ def create_model_from_args(args, input_dim, output_dim=6, device='cuda'):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='使用训练好的模型对测试集进行评估')
+    parser = argparse.ArgumentParser(description=' evaluate the test set with the trained model ')
     parser.add_argument('--checkpoint', type=str, default='seed_2024/seed_2024_best.pt', 
-                       help='模型checkpoint路径（默认: seed_2024/seed_2024_best.pt）')
+                       help=' model checkpoint path ( default : seed_2024/seed_2024_best.pt)')
     parser.add_argument('--data_path', type=str, default=str(TOTAL_CSV),
                        help='Input comparison CSV.')
     parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', 
-                       help='设备')
-    parser.add_argument('--batch_size', type=int, default=64, help='批次大小')
+                       help=' device ')
+    parser.add_argument('--batch_size', type=int, default=64, help=' batch size ')
     
     args_cmd = parser.parse_args()
     
     print("=" * 80)
-    print("模型测试脚本")
+    print(" model evaluation script ")
     print("=" * 80)
     
     # Load the input data.
@@ -84,15 +84,15 @@ def main():
     # Set the random seed.
     seed = args_train.seed
     set_seed(seed)
-    print(f"\n随机种子已设置为: {seed}")
+    print(f"\n random seed set to : {seed}")
     
     # Load the input data.
-    print(f"\n正在加载数据: {args_cmd.data_path}")
+    print(f"\n loading data : {args_cmd.data_path}")
     df = pd.read_csv(args_cmd.data_path)
     
     # Process the experiment data.
     if 'IL (Component 1) full name SMILES' in df.columns:
-        print("  检测到total.csv格式，正在转换...")
+        print(" detected total.csv format , True at convert ...")
         smiles1_list = []
         smiles2_list = []
         
@@ -121,9 +121,9 @@ def main():
             if targets.ndim == 1:
                 targets = targets.reshape(-1, 1)
         else:
-            raise ValueError("数据文件中必须包含Ex1-Ex3, Rx1-Rx3列或target列")
+            raise ValueError(" data file must contain Ex1-Ex3, Rx1-Rx3 column or target column ")
     else:
-        raise ValueError("数据文件格式不支持。需要包含smiles1/smiles2列或IL/Component列")
+        raise ValueError(" unsupported data-file format . must contain smiles1/smiles2 column or IL/Component column ")
     
     # Process the experiment data.
     dataset = MolecularDataset(smiles1_list, smiles2_list, targets)
@@ -140,27 +140,27 @@ def main():
         generator=torch.Generator().manual_seed(seed)
     )
     
-    print(f"  总样本数: {total_size}")
-    print(f"  训练集样本数: {len(train_dataset)} ({len(train_dataset)/total_size*100:.1f}%)")
-    print(f"  验证集样本数: {len(val_dataset)} ({len(val_dataset)/total_size*100:.1f}%)")
-    print(f"  测试集样本数: {len(test_dataset)} ({len(test_dataset)/total_size*100:.1f}%)")
+    print(f" total samples : {total_size}")
+    print(f" number of training samples : {len(train_dataset)} ({len(train_dataset)/total_size*100:.1f}%)")
+    print(f" number of validation samples : {len(val_dataset)} ({len(val_dataset)/total_size*100:.1f}%)")
+    print(f" number of test samples : {len(test_dataset)} ({len(test_dataset)/total_size*100:.1f}%)")
     
     # Baseline workflow step.
     sample_graph = dataset.graphs1[0]
     input_dim = sample_graph.x.size(1)
     output_dim = 6
     
-    print(f"\n  输入维度: {input_dim}")
-    print(f"  输出维度: {output_dim}")
+    print(f"\n input dimension : {input_dim}")
+    print(f" output dimension : {output_dim}")
     
     # Configure the baseline model.
-    print("\n正在创建模型...")
+    print("\n True at create model ...")
     model = create_model_from_args(args_train, input_dim, output_dim, args_cmd.device)
     
     # Load the input data.
-    print("正在加载模型权重...")
+    print(" True at load model checkpoint ...")
     model.load_state_dict(checkpoint['model_state_dict'])
-    print("模型权重加载完成！")
+    print(" model checkpoint loaded !")
     
     # Load the input data.
     def collate_fn(batch):
@@ -173,12 +173,12 @@ def main():
     
     # Evaluate the test subset.
     print("\n" + "=" * 80)
-    print("开始测试集评估")
+    print(" starting test-set evaluation ")
     print("=" * 80)
     
     test_results = evaluate(model, test_loader, args_cmd.device)
     
-    print("\n【测试集指标】")
+    print("\n[ test metrics ]")
     print_metrics(test_results['metrics'])
     
     # Save the generated artifacts.
@@ -186,19 +186,19 @@ def main():
     results_dir = os.path.join(output_dir, 'results')
     os.makedirs(results_dir, exist_ok=True)
     
-    print(f"\n正在保存测试结果到: {results_dir}")
+    print(f"\n saving Test results to : {results_dir}")
     save_results(test_results['predictions'], test_results['targets'], 'test', results_dir)
     
     # Save the generated artifacts.
     metrics_file = os.path.join(results_dir, 'test_metrics.txt')
     with open(metrics_file, 'w', encoding='utf-8') as f:
         f.write("=" * 80 + "\n")
-        f.write("测试集评估指标\n")
+        f.write(" test-set evaluation metrics \n")
         f.write("=" * 80 + "\n\n")
-        f.write(f"模型: {args_cmd.checkpoint}\n")
-        f.write(f"数据集: {args_cmd.data_path}\n")
-        f.write(f"测试集样本数: {len(test_dataset)}\n")
-        f.write(f"随机种子: {seed}\n\n")
+        f.write(f" model : {args_cmd.checkpoint}\n")
+        f.write(f" dataset : {args_cmd.data_path}\n")
+        f.write(f" number of test samples : {len(test_dataset)}\n")
+        f.write(f" random seed : {seed}\n\n")
         
         f.write("【Overall】\n")
         f.write(f"  MAE: {test_results['metrics']['all']['mae_mean']:.6f}±{test_results['metrics']['all']['mae_std']:.6f}\n")
@@ -215,8 +215,8 @@ def main():
         f.write(f"  RMSE: {test_results['metrics']['r_phase']['rmse_mean']:.6f}±{test_results['metrics']['r_phase']['rmse_std']:.6f}\n")
         f.write(f"  R²: {test_results['metrics']['r_phase']['r2']:.6f}\n")
     
-    print(f"测试指标已保存到: {metrics_file}")
-    print("\n测试完成！")
+    print(f" test metrics saved to : {metrics_file}")
+    print("\n Test complete !")
 
 
 if __name__ == '__main__':

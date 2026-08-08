@@ -4,7 +4,7 @@
 
 Run from the repository root:
 
-    E:\\anaconda\\envs\\ggnn39\\python.exe scripts/analysis/analyze_dataset_distribution.py
+    python scripts/analysis/analyze_dataset_distribution.py
 
 The script intentionally separates:
 1. raw workbook records, i.e. experimental tie-line/equilibrium-point rows;
@@ -837,7 +837,7 @@ def write_markdown_report(
         "Run from the project root:",
         "",
         "```powershell",
-        "E:\\anaconda\\envs\\ggnn39\\python.exe scripts/analysis/analyze_dataset_distribution.py",
+        "python scripts/analysis/analyze_dataset_distribution.py",
         "```",
         "",
         f"The preprocessing summary reuses `psmi.data.load_and_prepare_excel(..., min_points_per_group={min_points_per_group}, permute_23_aug=False)`. The no-augmentation setting is deliberate: swapping Components 2 and 3 is a training-time symmetry augmentation and is not counted as additional experimental LLE measurements.",
@@ -900,7 +900,7 @@ def write_markdown_report(
             "",
             "## Discrepancy Check Against Manuscript Counts",
             "",
-            "The locally analyzed files do not exactly reproduce the manuscript wording of `820 systems / 6316 equilibrium points` if `systems` is interpreted strictly as unique `system_id` values and `equilibrium points` as workbook rows. In the current curated IL-LLE workbook, 820 is recovered as the number of unique `(system_id, T)` groups, whereas the number of unique `system_id` values is 818. None of the raw or filtered stages in the two local workbooks gives 6316 tie-line rows. Possible explanations include a different frozen data version, additional curation not present in the current files, additional exclusion criteria beyond `min_points_per_group=6`, or use of `(system_id, T)` rather than `system_id` as the reported system count. The authors should confirm the exact data snapshot and counting convention before finalizing the SI and response letter.",
+            "The analyzed files do not yield `820 systems / 6316 equilibrium points` when `systems` is interpreted strictly as unique `system_id` values and `equilibrium points` as workbook rows. In the curated IL-LLE workbook, 820 corresponds to unique `(system_id, T)` groups, whereas 818 is the number of unique `system_id` values. None of the evaluated raw or filtered stages yields 6316 tie-line rows. This discrepancy indicates that the reported count depends on a different frozen dataset snapshot, additional curation criteria, or a `(system_id, T)` grouping convention. Reproducible reporting therefore requires an explicit dataset digest and counting convention.",
             "",
             f"{family_note}",
             "",

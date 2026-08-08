@@ -9,11 +9,11 @@ from pathlib import Path
 
 
 
-file_name = '应用案例-all_merged.xlsx' 
+file_name = 'application_case_all_merged.xlsx' 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-file_path = PROJECT_ROOT / "datasets" / "processed" / "应用案例-all_merged.xlsx"
+file_path = PROJECT_ROOT / "datasets" / "processed" / "application_case_all_merged.xlsx"
 
-print(f"正在尝试读取文件: {file_path}")
+print(f" True at attempt read file : {file_path}")
 
 
 try:
@@ -27,19 +27,19 @@ try:
             df = pd.read_csv(file_path, encoding='utf-8')
         except UnicodeDecodeError:
             
-            print("UTF-8 读取失败，尝试 GBK 编码...")
+            print("UTF-8 read failed , attempt GBK Encoding ...")
             df = pd.read_csv(file_path, encoding='gbk')
 
-    print("[OK] 文件读取成功！")
-    print(f"包含列: {df.columns.tolist()}")
+    print("[OK] file read successfully !")
+    print(f" Contains column : {df.columns.tolist()}")
 
 except FileNotFoundError:
-    print(f"[ERROR] 找不到文件：{file_path}")
-    print(f"系统寻找的路径是: {file_path}")
+    print(f"[ERROR] file not found :{file_path}")
+    print(f" System Lookup path yes : {file_path}")
     exit()
 except Exception as e:
-    print(f"[ERROR] 读取出错: {e}")
-    print("建议：如果是 .xlsx 文件，请确保安装了依赖库: pip install openpyxl")
+    print(f"[ERROR] read Error : {e}")
+    print(" recommendation : if yes .xlsx file , Please ensure Dependency library installed : pip install openpyxl")
     exit()
 
 
@@ -105,7 +105,7 @@ for sys in systems:
     ]
     
     if sys_df.empty:
-        print("跳过体系 (无数据)")
+        print(" skip system ( None data )")
         continue
 
     c1 = sys_df['Component 1'].iloc[0]
@@ -206,6 +206,6 @@ for sys in systems:
     save_path = os.path.join(output_dir, filename)
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
-    print(f"[OK] 已保存图片: {save_path}")
+    print(f"[OK] saved graph Tablet : {save_path}")
 
-print("所有图片绘制完成！")
+print(" all graph Tablet plotting complete !")

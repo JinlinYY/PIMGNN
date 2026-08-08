@@ -47,7 +47,7 @@ def pretrain_epoch(model, dataloader, optimizer, scheduler, device, tokenizer, m
     total_loss = 0
     num_batches = 0
     
-    progress_bar = tqdm(dataloader, desc="预训练", leave=False)
+    progress_bar = tqdm(dataloader, desc=" pretraining ", leave=False)
     
     for batch in progress_bar:
         input_ids = batch['input_ids'].to(device)
@@ -88,7 +88,7 @@ def pretrain_evaluate(model, dataloader, device, tokenizer, mlm_probability=0.15
     num_batches = 0
     
     with torch.no_grad():
-        for batch in tqdm(dataloader, desc="预训练验证", leave=False):
+        for batch in tqdm(dataloader, desc=" pretraining Verify ", leave=False):
             input_ids = batch['input_ids'].to(device)
             attention_mask = batch['attention_mask'].to(device)
             
@@ -116,7 +116,7 @@ def finetune_epoch(model, dataloader, optimizer, scheduler, device):
     num_batches = 0
     
     criterion = nn.MSELoss()
-    progress_bar = tqdm(dataloader, desc="微调", leave=False)
+    progress_bar = tqdm(dataloader, desc=" fine-tuning ", leave=False)
     
     for batch in progress_bar:
         input_ids = batch['input_ids'].to(device)
@@ -153,7 +153,7 @@ def finetune_evaluate(model, dataloader, device, return_predictions=False, datas
     all_labels = []
     
     with torch.no_grad():
-        for batch in tqdm(dataloader, desc="微调验证", leave=False):
+        for batch in tqdm(dataloader, desc=" fine-tuning Verify ", leave=False):
             input_ids = batch['input_ids'].to(device)
             attention_mask = batch['attention_mask'].to(device)
             labels = batch['labels'].to(device)  # [batch_size, 6]
@@ -235,52 +235,52 @@ def finetune_evaluate(model, dataloader, device, return_predictions=False, datas
 def print_config_info(args, train_size, val_size, test_size, device):
     """Run the print config info baseline operation."""
     print("\n" + "="*100)
-    print("【训练配置参数】")
+    print("[ training configuration ]")
     print("="*100)
     
-    print("\n【数据集信息】")
-    print(f"  训练集样本数: {train_size}")
-    print(f"  验证集样本数: {val_size}")
+    print("\n[ dataset information ]")
+    print(f" number of training samples : {train_size}")
+    print(f" number of validation samples : {val_size}")
     if test_size > 0:
-        print(f"  测试集样本数: {test_size}")
+        print(f" number of test samples : {test_size}")
     
-    print("\n【设备配置】")
-    print(f"  设备: {device}")
+    print("\n[ Device configuration ]")
+    print(f" device : {device}")
     if device.type == 'cuda':
-        print(f"  GPU名称: {torch.cuda.get_device_name(0)}")
-        print(f"  CUDA版本: {torch.version.cuda}")
+        print(f" GPU name : {torch.cuda.get_device_name(0)}")
+        print(f" CUDA version : {torch.version.cuda}")
         gpu_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)
-        print(f"  GPU内存: {gpu_memory:.2f} GB")
+        print(f" GPU memory : {gpu_memory:.2f} GB")
     
-    print("\n【训练参数】")
-    print(f"  随机种子: {args.random_seed}")
-    print(f"  训练轮数: {args.finetune_num_epochs}")
-    print(f"  批次大小: {args.finetune_batch_size}")
-    print(f"  学习率: {args.finetune_learning_rate}")
-    print(f"  权重衰减: 0.0001")
-    print(f"  早停耐心值: {args.early_stop_patience}")
-    print(f"  早停最小改善: {args.early_stop_min_delta}")
-    print(f"  检查点保存频率: 每 {args.checkpoint_save_freq} 个epoch")
+    print("\n[ training parameters ]")
+    print(f" random seed : {args.random_seed}")
+    print(f" training epochs : {args.finetune_num_epochs}")
+    print(f" batch size : {args.finetune_batch_size}")
+    print(f" learning rate : {args.finetune_learning_rate}")
+    print(f" weight decay : 0.0001")
+    print(f" early-stopping patience : {args.early_stop_patience}")
+    print(f" minimum early-stopping improvement : {args.early_stop_min_delta}")
+    print(f" checkpoint frequency : per {args.checkpoint_save_freq} epoch")
     if args.rest_interval_hours > 0:
         rest_interval_seconds = args.rest_interval_hours * 3600
-        print(f"  休息策略: 每 {args.rest_interval_hours:.1f}小时（{rest_interval_seconds:.0f}秒）休息 {args.rest_duration}秒（{args.rest_duration/60:.1f}分钟）")
+        print(f" rest policy : per {args.rest_interval_hours:.1f} hours ({rest_interval_seconds:.0f} seconds ) Break {args.rest_duration} seconds ({args.rest_duration/60:.1f} minutes )")
     else:
-        print(f"  休息策略: 无")
-    print(f"  断点续训: {'是' if args.resume_from_checkpoint else '否'}（{'从检查点恢复' if args.resume_from_checkpoint else '从头开始'}）")
+        print(f" rest policy : None ")
+    print(f" resume training : {' yes ' if args.resume_from_checkpoint else ' no '}({' resume from checkpoint ' if args.resume_from_checkpoint else ' start from scratch '})")
     
-    print("\n【模型超参数】")
-    print(f"  隐藏层维度: {args.hidden_size}")
-    print(f"  Transformer层数: {args.num_layers}")
-    print(f"  注意力头数: {args.num_heads}")
-    print(f"  前馈网络中间层维度: {args.intermediate_size}")
-    print(f"  Dropout率: {args.hidden_dropout_rate}")
-    print(f"  输出维度: 6 (多元回归任务: Ex1, Ex2, Ex3, Rx1, Rx2, Rx3)")
+    print("\n[ model hyperparameters ]")
+    print(f" hidden-layer dimension : {args.hidden_size}")
+    print(f" Transformer number of layers : {args.num_layers}")
+    print(f" number of attention heads : {args.num_heads}")
+    print(f" feed-forward intermediate dimension : {args.intermediate_size}")
+    print(f" Dropout rate : {args.hidden_dropout_rate}")
+    print(f" output dimension : 6 ( multiple Yuan Regression task : Ex1, Ex2, Ex3, Rx1, Rx2, Rx3)")
     
-    print("\n【路径信息】")
-    print(f"  输出目录: {args.finetune_output_dir}")
-    print(f"  结果目录: {args.finetune_output_dir}")
+    print("\n[ path information ]")
+    print(f" output directory : {args.finetune_output_dir}")
+    print(f" result directory : {args.finetune_output_dir}")
     if args.checkpoint_subdir:
-        print(f"  检查点目录: {os.path.join(args.finetune_output_dir, args.checkpoint_subdir)}")
+        print(f" checkpoint directory : {os.path.join(args.finetune_output_dir, args.checkpoint_subdir)}")
     
     print("="*100 + "\n")
 
@@ -288,7 +288,7 @@ def print_config_info(args, train_size, val_size, test_size, device):
 def print_epoch_info(epoch, total_epochs, epoch_time, train_loss, train_result, val_result, best_val_mse, best_epoch):
     """Run the print epoch info baseline operation."""
     print("="*100)
-    print(f"Epoch {epoch}/{total_epochs} | 训练时间: {epoch_time:.2f}秒 | Train Loss: {train_loss:.6f}")
+    print(f"Epoch {epoch}/{total_epochs} | training time : {epoch_time:.2f} seconds | Train Loss: {train_loss:.6f}")
     if best_epoch >= 0:
         print(f"Best Loss: {best_val_mse:.6f} (epoch {best_epoch})")
     else:
@@ -316,15 +316,15 @@ def print_epoch_info(epoch, total_epochs, epoch_time, train_loss, train_result, 
     val_r_r2 = np.mean([val_result['per_output_metrics'][i]['r2'] for i in [3, 4, 5]])
     val_r_std = np.mean([val_result['per_output_metrics'][i]['std'] for i in [3, 4, 5]])
     
-    print("【训练集指标】")
+    print("[ Training metrics ]")
     print(f"  Overall - MAE: {train_result['mae']:.6f} ± {train_result['std']:.6f}, RMSE: {train_result['rmse']:.6f} ± {train_result['std']:.6f}, R²: {train_result['r2']:.6f} ± {train_result['std']:.6f}")
-    print(f"  E相 - MAE: {train_e_mae:.6f} ± {train_e_std:.6f}, RMSE: {train_e_rmse:.6f} ± {train_e_std:.6f}, R²: {train_e_r2:.6f} ± {train_e_std:.6f}")
-    print(f"  R相 - MAE: {train_r_mae:.6f} ± {train_r_std:.6f}, RMSE: {train_r_rmse:.6f} ± {train_r_std:.6f}, R²: {train_r_r2:.6f} ± {train_r_std:.6f}")
+    print(f" E phase - MAE: {train_e_mae:.6f} ± {train_e_std:.6f}, RMSE: {train_e_rmse:.6f} ± {train_e_std:.6f}, R²: {train_e_r2:.6f} ± {train_e_std:.6f}")
+    print(f" R phase - MAE: {train_r_mae:.6f} ± {train_r_std:.6f}, RMSE: {train_r_rmse:.6f} ± {train_r_std:.6f}, R²: {train_r_r2:.6f} ± {train_r_std:.6f}")
     
-    print("\n【验证集指标】")
+    print("\n[ validation metrics ]")
     print(f"  Overall - MAE: {val_result['mae']:.6f} ± {val_result['std']:.6f}, RMSE: {val_result['rmse']:.6f} ± {val_result['std']:.6f}, R²: {val_result['r2']:.6f} ± {val_result['std']:.6f}")
-    print(f"  E相 - MAE: {val_e_mae:.6f} ± {val_e_std:.6f}, RMSE: {val_e_rmse:.6f} ± {val_e_std:.6f}, R²: {val_e_r2:.6f} ± {val_e_std:.6f}")
-    print(f"  R相 - MAE: {val_r_mae:.6f} ± {val_r_std:.6f}, RMSE: {val_r_rmse:.6f} ± {val_r_std:.6f}, R²: {val_r_r2:.6f} ± {val_r_std:.6f}")
+    print(f" E phase - MAE: {val_e_mae:.6f} ± {val_e_std:.6f}, RMSE: {val_e_rmse:.6f} ± {val_e_std:.6f}, R²: {val_e_r2:.6f} ± {val_e_std:.6f}")
+    print(f" R phase - MAE: {val_r_mae:.6f} ± {val_r_std:.6f}, RMSE: {val_r_rmse:.6f} ± {val_r_std:.6f}, R²: {val_r_r2:.6f} ± {val_r_std:.6f}")
     
     print("="*100 + "\n")
 
@@ -408,25 +408,25 @@ def save_metrics(best_metrics, output_dir, total_time, avg_time_per_epoch, total
     txt_path = os.path.join(results_dir, 'best_metrics.txt')
     with open(txt_path, 'w', encoding='utf-8') as f:
         f.write("="*100 + "\n")
-        f.write("最佳模型指标\n")
+        f.write(" best-model metrics \n")
         f.write("="*100 + "\n\n")
-        f.write(f"最佳epoch: {int(best_metrics.get('best_epoch', -1))}\n\n")
+        f.write(f" best epoch: {int(best_metrics.get('best_epoch', -1))}\n\n")
         
-        f.write("【Overall指标】\n")
-        f.write(f"训练集 - MAE: {best_train_mae:.6f}, RMSE: {best_train_rmse:.6f}, R²: {best_train_r2:.6f}\n")
-        f.write(f"验证集 - MAE: {best_val_mae:.6f}, RMSE: {best_val_rmse:.6f}, R²: {best_val_r2:.6f}\n\n")
+        f.write("[Overall metrics ]\n")
+        f.write(f" training set - MAE: {best_train_mae:.6f}, RMSE: {best_train_rmse:.6f}, R²: {best_train_r2:.6f}\n")
+        f.write(f" validation set - MAE: {best_val_mae:.6f}, RMSE: {best_val_rmse:.6f}, R²: {best_val_r2:.6f}\n\n")
         
-        f.write("【E相指标（Ex1, Ex2, Ex3）】\n")
-        f.write(f"训练集 - MAE: {best_train_e_mae:.6f}, RMSE: {best_train_e_rmse:.6f}\n")
-        f.write(f"验证集 - MAE: {best_val_e_mae:.6f}, RMSE: {best_val_e_rmse:.6f}\n\n")
+        f.write("[E phase metrics (Ex1, Ex2, Ex3)]\n")
+        f.write(f" training set - MAE: {best_train_e_mae:.6f}, RMSE: {best_train_e_rmse:.6f}\n")
+        f.write(f" validation set - MAE: {best_val_e_mae:.6f}, RMSE: {best_val_e_rmse:.6f}\n\n")
         
-        f.write("【R相指标（Rx1, Rx2, Rx3）】\n")
-        f.write(f"训练集 - MAE: {best_train_r_mae:.6f}, RMSE: {best_train_r_rmse:.6f}\n")
-        f.write(f"验证集 - MAE: {best_val_r_mae:.6f}, RMSE: {best_val_r_rmse:.6f}\n\n")
+        f.write("[R phase metrics (Rx1, Rx2, Rx3)]\n")
+        f.write(f" training set - MAE: {best_train_r_mae:.6f}, RMSE: {best_train_r_rmse:.6f}\n")
+        f.write(f" validation set - MAE: {best_val_r_mae:.6f}, RMSE: {best_val_r_rmse:.6f}\n\n")
         
-        f.write(f"总训练时间: {float(total_time):.2f}秒 ({float(total_time)/60:.2f}分钟)\n")
-        f.write(f"平均每轮时间: {float(avg_time_per_epoch):.2f}秒\n")
-        f.write(f"总训练轮数: {int(total_epochs)}\n")
+        f.write(f" total training time : {float(total_time):.2f} seconds ({float(total_time)/60:.2f} minutes )\n")
+        f.write(f" mean time per epoch : {float(avg_time_per_epoch):.2f} seconds \n")
+        f.write(f" total training epochs : {int(total_epochs)}\n")
     
     return txt_path
 
@@ -468,30 +468,30 @@ def train_single(args):
         tokenizer_config = os.path.join(tokenizer_path, 'tokenizer_config.json')
         vocab_file = os.path.join(tokenizer_path, 'vocab.txt')
         if os.path.exists(tokenizer_config) or os.path.exists(vocab_file):
-            print(f"从 {tokenizer_path} 加载已保存的tokenizer")
+            print(f" from {tokenizer_path} load saved tokenizer")
             try:
                 tokenizer = build_tokenizer(vocab_path=tokenizer_path, local_files_only=True)
             except Exception as e:
-                print(f"无法从本地加载tokenizer: {e}，尝试其他方法...")
+                print(f" unable to from Local load tokenizer: {e}, attempt Other methods ...")
     
     # Load the input data.
     if tokenizer is None:
         try:
-            print(f"尝试从HuggingFace下载tokenizer: {args.tokenizer_name}")
+            print(f" attempt from HuggingFace Download tokenizer: {args.tokenizer_name}")
             tokenizer = build_tokenizer(model_name=args.tokenizer_name, local_files_only=False, vocab_size=args.vocab_size)
         except Exception as e:
-            print(f"在线下载失败: {e}")
-            print("尝试使用本地缓存...")
+            print(f" online download failed : {e}")
+            print(" trying the local cache ...")
             try:
                 tokenizer = build_tokenizer(model_name=args.tokenizer_name, local_files_only=True, vocab_size=args.vocab_size)
             except Exception as e2:
-                print(f"本地缓存也不存在: {e2}")
-                print("使用简单的字符级tokenizer作为后备方案...")
+                print(f" local cache is also unavailable : {e2}")
+                print(" use Easy Character Level tokenizer as a fallback ...")
                 # Baseline workflow step.
                 tokenizer = build_tokenizer(model_name=args.tokenizer_name, local_files_only=True, vocab_size=args.vocab_size)
     
     # Save the generated artifacts.
-    print(f"保存tokenizer到: {args.pretrain_output_dir}")
+    print(f" save tokenizer to : {args.pretrain_output_dir}")
     tokenizer.save_pretrained(args.pretrain_output_dir)
     
     # Run the training step.
@@ -731,7 +731,7 @@ def train_single(args):
         if os.path.exists(args.resume_from_checkpoint):
             checkpoint_path_to_load = args.resume_from_checkpoint
         else:
-            print(f"警告: 指定的检查点路径不存在: {args.resume_from_checkpoint}")
+            print(f" warning : Designation checkpoint path does not exist : {args.resume_from_checkpoint}")
     
     # Handle model checkpoints.
     if checkpoint_path_to_load is None:
@@ -747,7 +747,7 @@ def train_single(args):
         if checkpoint_files:
             checkpoint_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
             checkpoint_path_to_load = checkpoint_files[0]
-            print(f"\n自动找到最新检查点: {checkpoint_path_to_load}")
+            print(f"\n automatically selected the latest checkpoint : {checkpoint_path_to_load}")
     
     # Load the input data.
     if checkpoint_path_to_load and os.path.exists(checkpoint_path_to_load):
@@ -763,10 +763,10 @@ def train_single(args):
         best_epoch = checkpoint.get('best_epoch', -1)
         no_improve_count = checkpoint.get('no_improve_count', 0)
         
-        print(f"\n从检查点恢复训练: {checkpoint_path_to_load}")
-        print(f"从epoch {start_epoch}继续训练")
-        print(f"最佳epoch: {best_epoch}, 最佳验证集MSE: {best_val_mse:.6f}")
-        print(f"已等待 {no_improve_count}/{args.early_stop_patience} 个epoch无改善")
+        print(f"\n resume training from a checkpoint : {checkpoint_path_to_load}")
+        print(f" from epoch {start_epoch} continue training ")
+        print(f" best epoch: {best_epoch}, best validation MSE: {best_val_mse:.6f}")
+        print(f" waited {no_improve_count}/{args.early_stop_patience} epoch without improvement ")
     
     # Baseline workflow step.
     total_start_time = time.time()
@@ -892,7 +892,7 @@ def train_single(args):
                 'best_val_std': best_val_std,
                 'no_improve_count': no_improve_count,
             }, checkpoint_path)
-            print(f"检查点已保存: {checkpoint_path}")
+            print(f" checkpoint saved : {checkpoint_path}")
         
         # Baseline workflow step.
         current_time = time.time()
@@ -901,7 +901,7 @@ def train_single(args):
         if rest_interval_seconds > 0 and elapsed_since_last_rest >= rest_interval_seconds and (epoch + 1) < args.finetune_num_epochs:
             elapsed_hours = elapsed_since_last_rest / 3600
             print("="*100)
-            print(f"已训练 {elapsed_hours:.2f}小时（{elapsed_since_last_rest:.0f}秒），休息 {args.rest_duration}秒（{args.rest_duration/60:.1f}分钟）让CPU/GPU有时间休息...")
+            print(f" Trained {elapsed_hours:.2f} hours ({elapsed_since_last_rest:.0f} seconds ), Break {args.rest_duration} seconds ({args.rest_duration/60:.1f} minutes ) allow CPU/GPU to allow a cooldown period ...")
             print("="*100 + "\n")
             time.sleep(args.rest_duration)
             last_rest_time = time.time()  # Baseline workflow step.
@@ -909,9 +909,9 @@ def train_single(args):
         # Apply early stopping.
         if no_improve_count >= args.early_stop_patience:
             print("="*100)
-            print(f"早停触发！在epoch {epoch + 1}停止训练。")
-            print(f"最佳模型在epoch {best_epoch}，验证集MSE: {best_val_mse:.6f}")
-            print(f"已等待 {no_improve_count}/{args.early_stop_patience} 个epoch无改善")
+            print(f" early stopping triggered ! at epoch {epoch + 1} stop training .")
+            print(f" best model at epoch {best_epoch}, validation set MSE: {best_val_mse:.6f}")
+            print(f" waited {no_improve_count}/{args.early_stop_patience} epoch without improvement ")
             print("="*100 + "\n")
             break
     
@@ -1028,26 +1028,26 @@ def train_single(args):
     training_metrics_path = os.path.join(results_dir, 'training_metrics.txt')
     with open(training_metrics_path, 'w', encoding='utf-8') as f:
         f.write("="*100 + "\n")
-        f.write("训练指标详情\n")
+        f.write(" training-metric summary \n")
         f.write("="*100 + "\n\n")
         for entry in training_history:
             f.write(f"Epoch {entry['epoch']}:\n")
-            f.write(f"  训练集 - MAE={entry['train_mae']:.6f}  RMSE={entry['train_rmse']:.6f}  R²={entry['train_r2']:.6f}  STD={entry['train_std']:.4f}\n")
-            f.write(f"  验证集 - MAE={entry['val_mae']:.6f}  RMSE={entry['val_rmse']:.6f}  R²={entry['val_r2']:.6f}  STD={entry['val_std']:.4f}\n\n")
+            f.write(f" training set - MAE={entry['train_mae']:.6f} RMSE={entry['train_rmse']:.6f} R²={entry['train_r2']:.6f} STD={entry['train_std']:.4f}\n")
+            f.write(f" validation set - MAE={entry['val_mae']:.6f} RMSE={entry['val_rmse']:.6f} R²={entry['val_r2']:.6f} STD={entry['val_std']:.4f}\n\n")
         f.write("="*100 + "\n")
-        f.write("最佳模型指标\n")
+        f.write(" best-model metrics \n")
         f.write("="*100 + "\n")
-        f.write(f"最佳epoch: {best_epoch}\n")
-        f.write(f"最佳验证集MSE: {best_val_mse:.6f}\n")
-        f.write(f"最佳验证集RMSE: {best_val_rmse:.6f}\n")
-        f.write(f"最佳验证集MAE: {best_val_mae:.6f}\n")
-        f.write(f"最佳验证集R²: {best_val_r2:.6f}\n")
-        f.write(f"最佳验证集STD: {best_val_std:.4f}\n")
+        f.write(f" best epoch: {best_epoch}\n")
+        f.write(f" best validation MSE: {best_val_mse:.6f}\n")
+        f.write(f" best validation RMSE: {best_val_rmse:.6f}\n")
+        f.write(f" best validation MAE: {best_val_mae:.6f}\n")
+        f.write(f" best validation R²: {best_val_r2:.6f}\n")
+        f.write(f" best validation STD: {best_val_std:.4f}\n")
     
     # Evaluate the test subset.
     if finetune_test_loader:
         print("\n" + "="*100)
-        print("【测试集评估（使用最佳模型权重）】")
+        print("[ test-set evaluation ( using the best model checkpoint )]")
         print("="*100)
         test_result = finetune_evaluate(finetune_model, finetune_test_loader, device, return_predictions=True)
         
@@ -1062,10 +1062,10 @@ def train_single(args):
         test_r_r2 = np.mean([test_result['per_output_metrics'][i]['r2'] for i in [3, 4, 5]])
         test_r_std = np.mean([test_result['per_output_metrics'][i]['std'] for i in [3, 4, 5]])
         
-        print("【测试集指标】")
+        print("[ test metrics ]")
         print(f"  Overall - MAE: {test_result['mae']:.6f} ± {test_result['std']:.6f}, RMSE: {test_result['rmse']:.6f} ± {test_result['std']:.6f}")
-        print(f"  E相 - MAE: {test_e_mae:.6f} ± {test_e_std:.6f}, RMSE: {test_e_rmse:.6f} ± {test_e_std:.6f}, R²: {test_e_r2:.6f} ± {test_e_std:.6f}")
-        print(f"  R相 - MAE: {test_r_mae:.6f} ± {test_r_std:.6f}, RMSE: {test_r_rmse:.6f} ± {test_r_std:.6f}, R²: {test_r_r2:.6f} ± {test_r_std:.6f}")
+        print(f" E phase - MAE: {test_e_mae:.6f} ± {test_e_std:.6f}, RMSE: {test_e_rmse:.6f} ± {test_e_std:.6f}, R²: {test_e_r2:.6f} ± {test_e_std:.6f}")
+        print(f" R phase - MAE: {test_r_mae:.6f} ± {test_r_std:.6f}, RMSE: {test_r_rmse:.6f} ± {test_r_std:.6f}, R²: {test_r_r2:.6f} ± {test_r_std:.6f}")
         print("="*100 + "\n")
         
         # Save the generated artifacts.
@@ -1092,16 +1092,16 @@ def train_single(args):
         test_metrics_path = os.path.join(results_dir, 'test_metrics.txt')
         with open(test_metrics_path, 'w', encoding='utf-8') as f:
             f.write("="*100 + "\n")
-            f.write("测试集指标（使用最佳模型权重）\n")
+            f.write(" test metrics ( using the best model checkpoint )\n")
             f.write("="*100 + "\n\n")
-            f.write("【Overall指标】\n")
+            f.write("[Overall metrics ]\n")
             f.write(f"MAE: {test_result['mae']:.6f} ± {test_result['std']:.6f}\n")
             f.write(f"RMSE: {test_result['rmse']:.6f} ± {test_result['std']:.6f}\n\n")
-            f.write("【E相指标（Ex1, Ex2, Ex3）】\n")
+            f.write("[E phase metrics (Ex1, Ex2, Ex3)]\n")
             f.write(f"MAE: {test_e_mae:.6f} ± {test_e_std:.6f}\n")
             f.write(f"RMSE: {test_e_rmse:.6f} ± {test_e_std:.6f}\n")
             f.write(f"R²: {test_e_r2:.6f} ± {test_e_std:.6f}\n\n")
-            f.write("【R相指标（Rx1, Rx2, Rx3）】\n")
+            f.write("[R phase metrics (Rx1, Rx2, Rx3)]\n")
             f.write(f"MAE: {test_r_mae:.6f} ± {test_r_std:.6f}\n")
             f.write(f"RMSE: {test_r_rmse:.6f} ± {test_r_std:.6f}\n")
             f.write(f"R²: {test_r_r2:.6f} ± {test_r_std:.6f}\n")
@@ -1109,20 +1109,20 @@ def train_single(args):
     
     # Run the training step.
     print("="*100)
-    print("训练完成！")
-    print(f"最佳模型在epoch {best_epoch}，验证集MSE: {best_val_mse:.6f}")
-    print(f"总训练时间: {total_time:.2f}秒 ({total_time/60:.2f}分钟)")
-    print(f"平均每轮时间: {avg_time_per_epoch:.2f}秒")
-    print("\n结果文件已保存:")
-    print(f"  - 训练历史CSV: {history_csv_path}")
-    print(f"  - 训练集结果CSV: {train_pred_path}")
-    print(f"  - 验证集结果CSV: {val_pred_path}")
+    print(" training complete !")
+    print(f" best model at epoch {best_epoch}, validation set MSE: {best_val_mse:.6f}")
+    print(f" total training time : {total_time:.2f} seconds ({total_time/60:.2f} minutes )")
+    print(f" mean time per epoch : {avg_time_per_epoch:.2f} seconds ")
+    print("\n result file saved :")
+    print(f" - training history CSV: {history_csv_path}")
+    print(f" - training set results CSV: {train_pred_path}")
+    print(f" - validation set results CSV: {val_pred_path}")
     if test_pred_path:
-        print(f"  - 测试集结果CSV: {test_pred_path}")
-        print(f"  - 测试集指标TXT: {test_metrics_path}")
-    print(f"  - 训练指标TXT: {training_metrics_path}")
-    print(f"  - 最佳指标TXT: {metrics_txt_path}")
-    print(f"  - 模型权重: {final_model_path}")
+        print(f" - test-set results CSV: {test_pred_path}")
+        print(f" - test metrics TXT: {test_metrics_path}")
+    print(f" - training metrics TXT: {training_metrics_path}")
+    print(f" - best metrics TXT: {metrics_txt_path}")
+    print(f" - model checkpoint : {final_model_path}")
     print("="*100)
 
 
@@ -1145,7 +1145,7 @@ BASE_OUTPUT_DIR = str(EXPERIMENT_ROOT / 'runs' / 'solvbert')
 def train_with_seed(seed, args_override=None):
     """Run the train with seed baseline operation."""
     print("\n" + "="*100)
-    print(f"开始训练 - 随机种子: {seed}")
+    print(f" start training - random seed : {seed}")
     print("="*100 + "\n")
     
     # Set the random seed.
@@ -1202,7 +1202,7 @@ def train_with_seed(seed, args_override=None):
             if key not in ['pretrain_output_dir', 'finetune_output_dir']:
                 setattr(args, key, value)
             else:
-                print(f"警告: 参数 '{key}' 被忽略，将使用seed特定的路径: {getattr(args, key)}")
+                print(f" warning : parameters '{key}' Ignored , will use seed Specific path : {getattr(args, key)}")
     
     # Configure repository paths.
     args.pretrain_output_dir = pretrain_output_dir
@@ -1210,8 +1210,8 @@ def train_with_seed(seed, args_override=None):
     
     try:
         train_single(args)
-        print(f"\n种子 {seed} 训练完成！")
-        print(f"结果保存在: {seed_output_dir}")
+        print(f"\n Seeds {seed} training complete !")
+        print(f" results save at : {seed_output_dir}")
         
         # Read the input data.
         metrics_file = os.path.join(finetune_output_dir, 'best_metrics.txt')
@@ -1222,12 +1222,12 @@ def train_with_seed(seed, args_override=None):
                     content = f.read()
                     # Compute evaluation metrics.
                     import re
-                    overall_start = content.find('【Overall指标】')
-                    e_start = content.find('【E相指标')
+                    overall_start = content.find('[Overall metrics ]')
+                    e_start = content.find('[E phase metrics ')
                     if overall_start >= 0 and e_start >= 0:
                         overall_section = content[overall_start:e_start]
-                        train_overall_match = re.search(r'训练集 - MAE: ([\d.]+), RMSE: ([\d.]+)', overall_section)
-                        val_overall_match = re.search(r'验证集 - MAE: ([\d.]+), RMSE: ([\d.]+)', overall_section)
+                        train_overall_match = re.search(r' training set - MAE: ([\d.]+), RMSE: ([\d.]+)', overall_section)
+                        val_overall_match = re.search(r' validation set - MAE: ([\d.]+), RMSE: ([\d.]+)', overall_section)
                         if train_overall_match:
                             metrics['train_mae'] = float(train_overall_match.group(1))
                             metrics['train_rmse'] = float(train_overall_match.group(2))
@@ -1236,11 +1236,11 @@ def train_with_seed(seed, args_override=None):
                             metrics['val_rmse'] = float(val_overall_match.group(2))
                     
                     # Compute evaluation metrics.
-                    r_start = content.find('【R相指标')
+                    r_start = content.find('[R phase metrics ')
                     if e_start >= 0 and r_start >= 0:
                         e_section = content[e_start:r_start]
-                        train_e_match = re.search(r'训练集 - MAE: ([\d.]+), RMSE: ([\d.]+)', e_section)
-                        val_e_match = re.search(r'验证集 - MAE: ([\d.]+), RMSE: ([\d.]+)', e_section)
+                        train_e_match = re.search(r' training set - MAE: ([\d.]+), RMSE: ([\d.]+)', e_section)
+                        val_e_match = re.search(r' validation set - MAE: ([\d.]+), RMSE: ([\d.]+)', e_section)
                         if train_e_match:
                             metrics['train_e_mae'] = float(train_e_match.group(1))
                             metrics['train_e_rmse'] = float(train_e_match.group(2))
@@ -1251,8 +1251,8 @@ def train_with_seed(seed, args_override=None):
                     # Compute evaluation metrics.
                     if r_start >= 0:
                         r_section = content[r_start:]
-                        train_r_match = re.search(r'训练集 - MAE: ([\d.]+), RMSE: ([\d.]+)', r_section)
-                        val_r_match = re.search(r'验证集 - MAE: ([\d.]+), RMSE: ([\d.]+)', r_section)
+                        train_r_match = re.search(r' training set - MAE: ([\d.]+), RMSE: ([\d.]+)', r_section)
+                        val_r_match = re.search(r' validation set - MAE: ([\d.]+), RMSE: ([\d.]+)', r_section)
                         if train_r_match:
                             metrics['train_r_mae'] = float(train_r_match.group(1))
                             metrics['train_r_rmse'] = float(train_r_match.group(2))
@@ -1260,11 +1260,11 @@ def train_with_seed(seed, args_override=None):
                             metrics['val_r_mae'] = float(val_r_match.group(1))
                             metrics['val_r_rmse'] = float(val_r_match.group(2))
             except Exception as e:
-                print(f"警告: 无法解析种子 {seed} 的指标文件: {e}")
+                print(f" warning : unable to parse Seeds {seed} metrics file : {e}")
         
         return metrics
     except Exception as e:
-        print(f"\n种子 {seed} 训练失败！错误: {str(e)}")
+        print(f"\n Seeds {seed} training failed ! error : {str(e)}")
         import traceback
         traceback.print_exc()
         return None
@@ -1276,13 +1276,13 @@ def train_multiple_seeds(seeds=None, args_override=None):
         seeds = DEFAULT_SEEDS
     
     print("="*100)
-    print("批量训练脚本 - 使用多个随机种子")
+    print(" Batch Training Script - use multiple random seed ")
     print("="*100)
-    print(f"\n将使用以下随机种子: {seeds}")
-    print(f"每个种子的训练结果将保存在: {BASE_OUTPUT_DIR}/seed_{{seed}}/")
-    print(f"检查点将保存在: {BASE_OUTPUT_DIR}/seed_{{seed}}/checkpoint/")
-    print(f"最佳模型权重将保存在: {BASE_OUTPUT_DIR}/seed_{{seed}}/best_model.pt")
-    print(f"所有训练结果文件将保存在: {BASE_OUTPUT_DIR}/seed_{{seed}}/")
+    print(f"\n will use Below random seed : {seeds}")
+    print(f" per seeds Training results will save at : {BASE_OUTPUT_DIR}/seed_{{seed}}/")
+    print(f" checkpoint will save at : {BASE_OUTPUT_DIR}/seed_{{seed}}/checkpoint/")
+    print(f" best model checkpoint will save at : {BASE_OUTPUT_DIR}/seed_{{seed}}/best_model.pt")
+    print(f" all Training results file will save at : {BASE_OUTPUT_DIR}/seed_{{seed}}/")
     print("\n" + "="*100 + "\n")
     
     # Configure the output artifacts.
@@ -1295,7 +1295,7 @@ def train_multiple_seeds(seeds=None, args_override=None):
     
     # Set the random seed.
     for i, seed in enumerate(seeds, 1):
-        print(f"\n[{i}/{len(seeds)}] 处理种子: {seed}")
+        print(f"\n[{i}/{len(seeds)}] process Seeds : {seed}")
         
         result = train_with_seed(seed, args_override)
         if result:
@@ -1314,7 +1314,7 @@ def train_multiple_seeds(seeds=None, args_override=None):
         summary_path = os.path.join(BASE_OUTPUT_DIR, 'summary_metrics.txt')
         with open(summary_path, 'w', encoding='utf-8') as f:
             f.write("="*100 + "\n")
-            f.write("多种子训练结果汇总（均值 ± 标准差）\n")
+            f.write(" multiple Seed Training results Summary ( mean ± standard deviation )\n")
             f.write("="*100 + "\n\n")
             
             # Compute evaluation metrics.
@@ -1333,9 +1333,9 @@ def train_multiple_seeds(seeds=None, args_override=None):
                 val_rmse_mean = np.mean(val_rmses)
                 val_rmse_std = np.std(val_rmses)
                 
-                f.write("【Overall指标】\n")
-                f.write(f"训练集 - MAE: {train_mae_mean:.4f} ± {train_mae_std:.4f}, RMSE: {train_rmse_mean:.4f} ± {train_rmse_std:.4f}\n")
-                f.write(f"验证集 - MAE: {val_mae_mean:.4f} ± {val_mae_std:.4f}, RMSE: {val_rmse_mean:.4f} ± {val_rmse_std:.4f}\n\n")
+                f.write("[Overall metrics ]\n")
+                f.write(f" training set - MAE: {train_mae_mean:.4f} ± {train_mae_std:.4f}, RMSE: {train_rmse_mean:.4f} ± {train_rmse_std:.4f}\n")
+                f.write(f" validation set - MAE: {val_mae_mean:.4f} ± {val_mae_std:.4f}, RMSE: {val_rmse_mean:.4f} ± {val_rmse_std:.4f}\n\n")
             
             # Compute evaluation metrics.
             train_e_maes = [m['train_e_mae'] for m in all_metrics if 'train_e_mae' in m]
@@ -1353,9 +1353,9 @@ def train_multiple_seeds(seeds=None, args_override=None):
                 val_e_rmse_mean = np.mean(val_e_rmses)
                 val_e_rmse_std = np.std(val_e_rmses)
                 
-                f.write("【E相指标（Ex1, Ex2, Ex3）】\n")
-                f.write(f"训练集 - MAE: {train_e_mae_mean:.4f} ± {train_e_mae_std:.4f}, RMSE: {train_e_rmse_mean:.4f} ± {train_e_rmse_std:.4f}\n")
-                f.write(f"验证集 - MAE: {val_e_mae_mean:.4f} ± {val_e_mae_std:.4f}, RMSE: {val_e_rmse_mean:.4f} ± {val_e_rmse_std:.4f}\n\n")
+                f.write("[E phase metrics (Ex1, Ex2, Ex3)]\n")
+                f.write(f" training set - MAE: {train_e_mae_mean:.4f} ± {train_e_mae_std:.4f}, RMSE: {train_e_rmse_mean:.4f} ± {train_e_rmse_std:.4f}\n")
+                f.write(f" validation set - MAE: {val_e_mae_mean:.4f} ± {val_e_mae_std:.4f}, RMSE: {val_e_rmse_mean:.4f} ± {val_e_rmse_std:.4f}\n\n")
             
             # Compute evaluation metrics.
             train_r_maes = [m['train_r_mae'] for m in all_metrics if 'train_r_mae' in m]
@@ -1373,48 +1373,48 @@ def train_multiple_seeds(seeds=None, args_override=None):
                 val_r_rmse_mean = np.mean(val_r_rmses)
                 val_r_rmse_std = np.std(val_r_rmses)
                 
-                f.write("【R相指标（Rx1, Rx2, Rx3）】\n")
-                f.write(f"训练集 - MAE: {train_r_mae_mean:.4f} ± {train_r_mae_std:.4f}, RMSE: {train_r_rmse_mean:.4f} ± {train_r_rmse_std:.4f}\n")
-                f.write(f"验证集 - MAE: {val_r_mae_mean:.4f} ± {val_r_mae_std:.4f}, RMSE: {val_r_rmse_mean:.4f} ± {val_r_rmse_std:.4f}\n\n")
+                f.write("[R phase metrics (Rx1, Rx2, Rx3)]\n")
+                f.write(f" training set - MAE: {train_r_mae_mean:.4f} ± {train_r_mae_std:.4f}, RMSE: {train_r_rmse_mean:.4f} ± {train_r_rmse_std:.4f}\n")
+                f.write(f" validation set - MAE: {val_r_mae_mean:.4f} ± {val_r_mae_std:.4f}, RMSE: {val_r_rmse_mean:.4f} ± {val_r_rmse_std:.4f}\n\n")
             
-            f.write(f"训练的种子数: {len(success_seeds)}\n")
-            f.write(f"成功的种子: {success_seeds}\n")
+            f.write(f" Training number of seeds : {len(success_seeds)}\n")
+            f.write(f" successful Seeds : {success_seeds}\n")
             if failed_seeds:
-                f.write(f"失败的种子: {failed_seeds}\n")
+                f.write(f" failed seeds : {failed_seeds}\n")
         
-        print(f"\n汇总指标已保存到: {summary_path}")
+        print(f"\n Summary metrics saved to : {summary_path}")
     
     # Baseline workflow step.
     print("\n" + "="*100)
-    print("批量训练完成！")
+    print(" Batch training complete !")
     print("="*100)
-    print(f"\n成功训练的种子: {success_seeds}")
+    print(f"\n successful Training Seeds : {success_seeds}")
     if failed_seeds:
-        print(f"失败的种子: {failed_seeds}")
-    print(f"\n所有结果保存在: {BASE_OUTPUT_DIR}/")
+        print(f" failed seeds : {failed_seeds}")
+    print(f"\n all results save at : {BASE_OUTPUT_DIR}/")
     if all_metrics:
-        print(f"汇总指标保存在: {os.path.join(BASE_OUTPUT_DIR, 'summary_metrics.txt')}")
+        print(f" Summary metrics save at : {os.path.join(BASE_OUTPUT_DIR, 'summary_metrics.txt')}")
     print("="*100)
 
 
 def create_parser():
     """Run the create parser baseline operation."""
-    parser = argparse.ArgumentParser(description='SolvBERT完整训练流程（预训练+微调），支持单次训练和批量多种子训练')
+    parser = argparse.ArgumentParser(description='SolvBERT Complete Training workflow ( pretraining + fine-tuning ), supports Single Training and Batch multiple Seed Training ')
     
     # Run the training step.
     parser.add_argument('--mode', type=str, choices=['single', 'multiple'], default='multiple',
-                        help='训练模式: single=单次训练, multiple=批量多种子训练')
+                        help=' Training Mode : single= Single Training , multiple= Batch multiple Seed Training ')
     parser.add_argument('--seeds', type=int, nargs='+', default=None,
-                        help='批量训练时的种子列表（仅在mode=multiple时有效）')
+                        help=' When batch training Seeds list ( only in mode=multiple effective when )')
     
     # Run the training step.
-    parser.add_argument('--pretrain_train_data', type=str, default=PRETRAIN_TRAIN_DATA, help='预训练训练数据路径')
-    parser.add_argument('--pretrain_val_data', type=str, default=PRETRAIN_VAL_DATA, help='预训练验证数据路径')
+    parser.add_argument('--pretrain_train_data', type=str, default=PRETRAIN_TRAIN_DATA, help=' pretraining Training data path ')
+    parser.add_argument('--pretrain_val_data', type=str, default=PRETRAIN_VAL_DATA, help=' pretraining Verify data path ')
     
     # Process the experiment data.
-    parser.add_argument('--finetune_train_data', type=str, default=FINETUNE_TRAIN_DATA, help='微调训练数据路径')
-    parser.add_argument('--finetune_val_data', type=str, default=FINETUNE_VAL_DATA, help='微调验证数据路径')
-    parser.add_argument('--finetune_test_data', type=str, default=FINETUNE_TEST_DATA, help='微调测试数据路径（可选）')
+    parser.add_argument('--finetune_train_data', type=str, default=FINETUNE_TRAIN_DATA, help=' fine-tuning Training data path ')
+    parser.add_argument('--finetune_val_data', type=str, default=FINETUNE_VAL_DATA, help=' fine-tuning Verify data path ')
+    parser.add_argument('--finetune_test_data', type=str, default=FINETUNE_TEST_DATA, help=' fine-tuning Test data path ( Optional )')
     
     # Configure the output artifacts.
     parser.add_argument('--pretrain_output_dir', type=str,
@@ -1423,43 +1423,43 @@ def create_parser():
     parser.add_argument('--finetune_output_dir', type=str,
                         default=str(EXPERIMENT_ROOT / 'runs' / 'solvbert' / 'finetune'),
                         help='Fine-tuning output directory.')
-    parser.add_argument('--checkpoint_subdir', type=str, default=None, help='checkpoint子目录（如果指定，checkpoint将保存到此子目录）')
+    parser.add_argument('--checkpoint_subdir', type=str, default=None, help='checkpoint child directory ( if Designation ,checkpoint will save To this child directory )')
     
     # Configure the baseline model.
-    parser.add_argument('--vocab_size', type=int, default=1000, help='词汇表大小')
-    parser.add_argument('--hidden_size', type=int, default=256, help='隐藏层维度')
-    parser.add_argument('--num_layers', type=int, default=6, help='Transformer层数')
-    parser.add_argument('--num_heads', type=int, default=8, help='注意力头数')
-    parser.add_argument('--intermediate_size', type=int, default=1024, help='前馈网络中间层维度')
-    parser.add_argument('--max_length', type=int, default=512, help='最大序列长度')
+    parser.add_argument('--vocab_size', type=int, default=1000, help=' Glossary Size ')
+    parser.add_argument('--hidden_size', type=int, default=256, help=' hidden-layer dimension ')
+    parser.add_argument('--num_layers', type=int, default=6, help='Transformer number of layers ')
+    parser.add_argument('--num_heads', type=int, default=8, help=' number of attention heads ')
+    parser.add_argument('--intermediate_size', type=int, default=1024, help=' feed-forward intermediate dimension ')
+    parser.add_argument('--max_length', type=int, default=512, help=' maximum sequence length ')
     
     # Run the training step.
-    parser.add_argument('--pretrain_batch_size', type=int, default=16, help='预训练批次大小')
-    parser.add_argument('--pretrain_learning_rate', type=float, default=2e-5, help='预训练学习率')
-    parser.add_argument('--pretrain_num_epochs', type=int, default=10, help='预训练轮数')
-    parser.add_argument('--pretrain_warmup_steps', type=int, default=1000, help='预训练预热步数')
-    parser.add_argument('--mlm_probability', type=float, default=0.15, help='掩码概率')
+    parser.add_argument('--pretrain_batch_size', type=int, default=16, help=' pretraining batch size ')
+    parser.add_argument('--pretrain_learning_rate', type=float, default=2e-5, help=' pretraining learning rate ')
+    parser.add_argument('--pretrain_num_epochs', type=int, default=10, help=' pre training epochs ')
+    parser.add_argument('--pretrain_warmup_steps', type=int, default=1000, help=' pretraining Number of warm-up steps ')
+    parser.add_argument('--mlm_probability', type=float, default=0.15, help=' Mask General rate ')
     
     # Baseline workflow step.
-    parser.add_argument('--finetune_batch_size', type=int, default=16, help='微调批次大小')
-    parser.add_argument('--finetune_learning_rate', type=float, default=8e-5, help='微调学习率')
-    parser.add_argument('--finetune_num_epochs', type=int, default=200, help='微调轮数（增加到200以支持早停）')
-    parser.add_argument('--finetune_warmup_steps', type=int, default=500, help='微调预热步数')
-    parser.add_argument('--hidden_dropout_rate', type=float, default=0.4, help='Dropout率')
+    parser.add_argument('--finetune_batch_size', type=int, default=16, help=' fine-tuning batch size ')
+    parser.add_argument('--finetune_learning_rate', type=float, default=8e-5, help=' fine-tuning learning rate ')
+    parser.add_argument('--finetune_num_epochs', type=int, default=200, help=' fine-tuning number of rounds ( Increase to 200 in supports Early Stop )')
+    parser.add_argument('--finetune_warmup_steps', type=int, default=500, help=' fine-tuning Number of warm-up steps ')
+    parser.add_argument('--hidden_dropout_rate', type=float, default=0.4, help='Dropout rate ')
     
     # Run the training step.
-    parser.add_argument('--early_stop_patience', type=int, default=50, help='早停耐心值（设置为50）')
-    parser.add_argument('--early_stop_min_delta', type=float, default=0.0, help='早停最小改善')
-    parser.add_argument('--checkpoint_save_freq', type=int, default=10, help='检查点保存频率（每N个epoch）')
-    parser.add_argument('--rest_interval_hours', type=float, default=2.0, help='休息间隔（每N小时休息，0表示不休息）')
-    parser.add_argument('--rest_duration', type=int, default=300, help='休息时长（秒）')
-    parser.add_argument('--resume_from_checkpoint', type=str, default=None, help='从检查点恢复训练（检查点路径）')
+    parser.add_argument('--early_stop_patience', type=int, default=50, help=' early-stopping patience ( set is 50)')
+    parser.add_argument('--early_stop_min_delta', type=float, default=0.0, help=' minimum early-stopping improvement ')
+    parser.add_argument('--checkpoint_save_freq', type=int, default=10, help=' checkpoint frequency ( per N epoch)')
+    parser.add_argument('--rest_interval_hours', type=float, default=2.0, help=' rest interval ( per N hours before cooldown ,0 Indicates no rest )')
+    parser.add_argument('--rest_duration', type=int, default=300, help=' rest duration ( seconds )')
+    parser.add_argument('--resume_from_checkpoint', type=str, default=None, help=' resume training from a checkpoint ( checkpoint path )')
     
     # Baseline workflow step.
-    parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', help='设备')
-    parser.add_argument('--tokenizer_name', type=str, default='bert-base-uncased', help='tokenizer名称')
-    parser.add_argument('--skip_pretrain', action='store_true', help='跳过预训练，直接微调')
-    parser.add_argument('--random_seed', type=int, default=2024, help='随机种子（仅在mode=single时有效）')
+    parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', help=' device ')
+    parser.add_argument('--tokenizer_name', type=str, default='bert-base-uncased', help='tokenizer name ')
+    parser.add_argument('--skip_pretrain', action='store_true', help=' skip pretraining , Direct fine-tuning ')
+    parser.add_argument('--random_seed', type=int, default=2024, help=' random seed ( only in mode=single effective when )')
     
     return parser
 

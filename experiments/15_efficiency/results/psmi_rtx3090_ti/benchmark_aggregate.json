@@ -7,8 +7,8 @@
       44
     ],
     "device": "NVIDIA GeForce RTX 3090 Ti",
-    "checkpoint": "D:\\GGNN\\YXFL\\models\\03_physics_constraints\\lle_run_混合物图-Cross-s3-tf-化学势约束x\\best_model.pt",
-    "dataset": "D:\\GGNN\\YXFL\\datasets\\processed\\LLE-literature-data-boosted.xlsx",
+    "checkpoint": "models/efficiency_benchmark/best_model.pt",
+    "dataset": "datasets/processed/LLE-literature-data-boosted.xlsx",
     "pool_records_per_run": 256,
     "torch": "2.6.0+cu126",
     "cuda_runtime": "12.6"

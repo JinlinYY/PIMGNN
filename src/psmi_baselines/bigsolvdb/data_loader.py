@@ -54,10 +54,10 @@ def load_bigsolvdb_data(
     fp_radius: int = 2
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Run the load bigsolvdb data baseline operation."""
-    print(f"加载数据集: {csv_path}")
+    print(f" load dataset : {csv_path}")
     df = pd.read_csv(csv_path)
     
-    print(f"原始数据量: {len(df)}")
+    print(f" number of raw records : {len(df)}")
     
     # Process the experiment data.
     df = df.copy()
@@ -69,15 +69,15 @@ def load_bigsolvdb_data(
     
     # Baseline workflow step.
     if target_col not in df.columns:
-        raise ValueError(f"目标列 '{target_col}' 不存在。可用列: {list(df.columns)}")
+        raise ValueError(f" target column '{target_col}' does not exist . available columns : {list(df.columns)}")
     
     # Baseline workflow step.
     df = df.dropna(subset=[target_col, 'Temperature_K']).copy()
     
-    print(f"清理后数据量: {len(df)}")
+    print(f" number of cleaned records : {len(df)}")
     
     # Baseline workflow step.
-    print("生成分子指纹...")
+    print(" generate molecular fingerprints ...")
     solute_fps = []
     solvent_fps = []
     
@@ -99,7 +99,7 @@ def load_bigsolvdb_data(
     df['target'] = df[target_col].astype(np.float32)
     
     # Run the training step.
-    print(f"划分数据集: 测试集{test_size:.1%}, 验证集{val_size:.1%}")
+    print(f" split dataset : test set {test_size:.1%}, validation set {val_size:.1%}")
     
     # Run the training step.
     train_val_df, test_df = train_test_split(
@@ -118,9 +118,9 @@ def load_bigsolvdb_data(
         shuffle=True
     )
     
-    print(f"训练集: {len(train_df)} 样本")
-    print(f"验证集: {len(val_df)} 样本")
-    print(f"测试集: {len(test_df)} 样本")
+    print(f" training set : {len(train_df)} sample ")
+    print(f" validation set : {len(val_df)} sample ")
+    print(f" test set : {len(test_df)} sample ")
     
     return train_df, val_df, test_df
 

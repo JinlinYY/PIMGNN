@@ -34,7 +34,7 @@ def load_csv_data(
               "Ex1", "Ex2", "Ex3", "Rx1", "Rx2", "Rx3"]
     for c in needed:
         if c not in df.columns:
-            raise ValueError(f"缺少必要的列: {c}. 可用列: {list(df.columns)}")
+            raise ValueError(f" missing required columns : {c}. available columns : {list(df.columns)}")
     
     # Baseline workflow step.
     for c in ["smiles1", "smiles2", "smiles3"]:
@@ -111,11 +111,11 @@ def split_by_system_id(
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Run the split by system id baseline operation."""
     if system_col not in df.columns:
-        raise ValueError(f"列 '{system_col}' 不存在。可用列: {list(df.columns)}")
+        raise ValueError(f" column '{system_col}' does not exist . available columns : {list(df.columns)}")
     
     # Baseline workflow step.
     systems = sorted(df[system_col].unique().tolist())
-    print(f"总共有 {len(systems)} 个不同的system ID")
+    print(f" Total total Yes {len(systems)} Different system ID")
     
     # Set the random seed.
     rng = np.random.RandomState(seed)
@@ -131,20 +131,20 @@ def split_by_system_id(
     val_sys = set(systems[n_train:n_train + n_val])
     test_sys = set(systems[n_train + n_val:])
     
-    print(f"\n划分结果:")
-    print(f"  训练集: {len(train_sys)} 个system ({len(train_sys)/n*100:.1f}%)")
-    print(f"  验证集: {len(val_sys)} 个system ({len(val_sys)/n*100:.1f}%)")
-    print(f"  测试集: {len(test_sys)} 个system ({len(test_sys)/n*100:.1f}%)")
+    print(f"\n Divide results :")
+    print(f" training set : {len(train_sys)} system ({len(train_sys)/n*100:.1f}%)")
+    print(f" validation set : {len(val_sys)} system ({len(val_sys)/n*100:.1f}%)")
+    print(f" test set : {len(test_sys)} system ({len(test_sys)/n*100:.1f}%)")
     
     # Process the experiment data.
     train_df = df[df[system_col].isin(train_sys)].copy()
     val_df = df[df[system_col].isin(val_sys)].copy()
     test_df = df[df[system_col].isin(test_sys)].copy()
     
-    print(f"\n数据行数:")
-    print(f"  训练集: {len(train_df)} 行 ({len(train_df)/len(df)*100:.1f}%)")
-    print(f"  验证集: {len(val_df)} 行 ({len(val_df)/len(df)*100:.1f}%)")
-    print(f"  测试集: {len(test_df)} 行 ({len(test_df)/len(df)*100:.1f}%)")
+    print(f"\n data rows Number :")
+    print(f" training set : {len(train_df)} rows ({len(train_df)/len(df)*100:.1f}%)")
+    print(f" validation set : {len(val_df)} rows ({len(val_df)/len(df)*100:.1f}%)")
+    print(f" test set : {len(test_df)} rows ({len(test_df)/len(df)*100:.1f}%)")
     
     return train_df, val_df, test_df
 
@@ -158,25 +158,25 @@ def split_dataset_main():
     os.makedirs(output_dir, exist_ok=True)
     
     print("=" * 80)
-    print("数据集划分脚本")
+    print(" dataset Partition script ")
     print("=" * 80)
-    print(f"\n输入文件: {input_file}")
-    print(f"输出目录: {output_dir}")
+    print(f"\n input file : {input_file}")
+    print(f" output directory : {output_dir}")
     
     # Read the input data.
-    print("\n正在读取数据...")
+    print("\n reading data ...")
     df = pd.read_csv(input_file)
-    print(f"数据形状: {df.shape}")
-    print(f"列名: {list(df.columns)}")
+    print(f" data shape : {df.shape}")
+    print(f" column First Name : {list(df.columns)}")
     
     # Baseline workflow step.
     required_cols = ['LLE system NO.']
     for col in required_cols:
         if col not in df.columns:
-            raise ValueError(f"缺少必要的列: {col}")
+            raise ValueError(f" missing required columns : {col}")
     
     # Process the experiment data.
-    print("\n正在划分数据集...")
+    print("\n True at split dataset ...")
     train_df, val_df, test_df = split_by_system_id(
         df,
         system_col='LLE system NO.',
@@ -186,7 +186,7 @@ def split_dataset_main():
     )
     
     # Save the generated artifacts.
-    print("\n正在保存数据集...")
+    print("\n saving dataset ...")
     train_path = os.path.join(output_dir, "train.csv")
     val_path = os.path.join(output_dir, "validation.csv")
     test_path = os.path.join(output_dir, "test.csv")
@@ -195,26 +195,26 @@ def split_dataset_main():
     val_df.to_csv(val_path, index=False, encoding='utf-8-sig')
     test_df.to_csv(test_path, index=False, encoding='utf-8-sig')
     
-    print(f"\n[OK] 训练集已保存: {train_path}")
-    print(f"[OK] 验证集已保存: {val_path}")
-    print(f"[OK] 测试集已保存: {test_path}")
+    print(f"\n[OK] training set saved : {train_path}")
+    print(f"[OK] validation set saved : {val_path}")
+    print(f"[OK] test set saved : {test_path}")
     
     # Save the generated artifacts.
     info_path = os.path.join(output_dir, "split_info.txt")
     with open(info_path, 'w', encoding='utf-8') as f:
-        f.write("数据集划分信息\n")
+        f.write(" dataset Divide information \n")
         f.write("=" * 80 + "\n\n")
-        f.write(f"随机种子: {SEED}\n")
-        f.write(f"划分比例: 训练集80% : 验证集10% : 测试集10%\n\n")
-        f.write(f"总数据行数: {len(df)}\n")
-        f.write(f"总system数: {df['LLE system NO.'].nunique()}\n\n")
-        f.write(f"训练集: {len(train_df)} 行, {train_df['LLE system NO.'].nunique()} 个system\n")
-        f.write(f"验证集: {len(val_df)} 行, {val_df['LLE system NO.'].nunique()} 个system\n")
-        f.write(f"测试集: {len(test_df)} 行, {test_df['LLE system NO.'].nunique()} 个system\n")
+        f.write(f" random seed : {SEED}\n")
+        f.write(f" Partition Ratio : training set 80% : validation set 10% : test set 10%\n\n")
+        f.write(f" total According to rows Number : {len(df)}\n")
+        f.write(f" Total system Number : {df['LLE system NO.'].nunique()}\n\n")
+        f.write(f" training set : {len(train_df)} rows , {train_df['LLE system NO.'].nunique()} system\n")
+        f.write(f" validation set : {len(val_df)} rows , {val_df['LLE system NO.'].nunique()} system\n")
+        f.write(f" test set : {len(test_df)} rows , {test_df['LLE system NO.'].nunique()} system\n")
     
-    print(f"\n[OK] 划分信息已保存: {info_path}")
+    print(f"\n[OK] Divide information saved : {info_path}")
     print("\n" + "=" * 80)
-    print("数据集划分完成！")
+    print(" dataset split complete !")
     print("=" * 80)
 
 

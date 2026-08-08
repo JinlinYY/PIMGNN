@@ -185,8 +185,8 @@ def train_single_seed(
     os.makedirs(seed_out_dir, exist_ok=True)
     
     print(f"\n{'='*80}")
-    print(f"训练种子: {seed}")
-    print(f"输出目录: {seed_out_dir}")
+    print(f" Training Seeds : {seed}")
+    print(f" output directory : {seed_out_dir}")
     print(f"{'='*80}\n")
     
     # Set the random seed.
@@ -243,7 +243,7 @@ def train_single_seed(
     # Baseline workflow step.
     if resume_from and os.path.exists(resume_from):
         checkpoint = torch.load(resume_from, map_location=device)
-        print(f"从检查点恢复: {resume_from}")
+        print(f" resume from checkpoint : {resume_from}")
         
         if 'state_dict' in checkpoint:
             model.load_state_dict(checkpoint['state_dict'])
@@ -263,7 +263,7 @@ def train_single_seed(
             T_scaler = Scaler.from_state_dict(checkpoint['T_scaler'])
     
     # Run the training step.
-    print(f"\n开始训练 (从epoch {start_epoch}/{epochs})...")
+    print(f"\n start training ( from epoch {start_epoch}/{epochs})...")
     print(f"{'='*80}")
     
     for epoch in range(start_epoch, epochs + 1):
@@ -296,10 +296,10 @@ def train_single_seed(
             best_epoch = epoch
         
         # Baseline workflow step.
-        print(f"\nEpoch {epoch}/{epochs} | 时间: {epoch_time:.2f}秒")
-        print(f"  训练集: MAE={train_metrics['mae']:.6f}  RMSE={train_metrics['rmse']:.6f}  R²={train_metrics['r2']:.6f}")
-        print(f"  验证集: MAE={val_metrics['mae']:.6f}  RMSE={val_metrics['rmse']:.6f}  R²={val_metrics['r2']:.6f}")
-        print(f"  最佳验证集MAE: {best_val_mae:.6f} (epoch {best_epoch})")
+        print(f"\nEpoch {epoch}/{epochs} | Time : {epoch_time:.2f} seconds ")
+        print(f" training set : MAE={train_metrics['mae']:.6f} RMSE={train_metrics['rmse']:.6f} R²={train_metrics['r2']:.6f}")
+        print(f" validation set : MAE={val_metrics['mae']:.6f} RMSE={val_metrics['rmse']:.6f} R²={val_metrics['r2']:.6f}")
+        print(f" best validation MAE: {best_val_mae:.6f} (epoch {best_epoch})")
         
         # Save the generated artifacts.
         if epoch % save_checkpoint_every == 0 or epoch == epochs:
@@ -314,12 +314,12 @@ def train_single_seed(
                 'best_epoch': best_epoch,
                 'best_model_state': best_model_state,
             }, checkpoint_path)
-            print(f"  检查点已保存: {checkpoint_path}")
+            print(f" checkpoint saved : {checkpoint_path}")
         
         # Apply early stopping.
         if early_stopping(val_metrics['mae']):
-            print(f"\n早停触发！在epoch {epoch}停止训练。")
-            print(f"最佳模型在epoch {best_epoch}，验证集MAE: {best_val_mae:.6f}")
+            print(f"\n early stopping triggered ! at epoch {epoch} stop training .")
+            print(f" best model at epoch {best_epoch}, validation set MAE: {best_val_mae:.6f}")
             break
     
     # Load the input data.
@@ -358,20 +358,20 @@ def train_single_seed(
     metrics_txt_path = os.path.join(seed_out_dir, "best_metrics.txt")
     with open(metrics_txt_path, 'w', encoding='utf-8') as f:
         f.write("="*80 + "\n")
-        f.write(f"训练结果指标 (Seed: {seed})\n")
+        f.write(f" Training results metrics (Seed: {seed})\n")
         f.write("="*80 + "\n\n")
-        f.write(f"最佳epoch: {best_epoch}\n")
-        f.write(f"最佳验证集MAE: {best_val_mae:.6f}\n\n")
-        f.write("测试集指标:\n")
+        f.write(f" best epoch: {best_epoch}\n")
+        f.write(f" best validation MAE: {best_val_mae:.6f}\n\n")
+        f.write(" test metrics :\n")
         f.write("-"*80 + "\n")
         f.write(f"MAE:  {test_metrics['mae']:.6f}\n")
         f.write(f"RMSE: {test_metrics['rmse']:.6f}\n")
         f.write(f"R²:   {test_metrics['r2']:.6f}\n")
         f.write("="*80 + "\n")
     
-    print(f"\n训练完成！")
-    print(f"最佳epoch: {best_epoch}, 最佳验证集MAE: {best_val_mae:.6f}")
-    print(f"测试集: MAE={test_metrics['mae']:.6f}  RMSE={test_metrics['rmse']:.6f}  R²={test_metrics['r2']:.6f}")
+    print(f"\n training complete !")
+    print(f" best epoch: {best_epoch}, best validation MAE: {best_val_mae:.6f}")
+    print(f" test set : MAE={test_metrics['mae']:.6f} RMSE={test_metrics['rmse']:.6f} R²={test_metrics['r2']:.6f}")
     
     return best_metrics
 
@@ -392,12 +392,12 @@ def collect_all_results(out_dir: str, seeds: List[int]) -> pd.DataFrame:
             with open(txt_file, 'r', encoding='utf-8') as f:
                 content = f.read()
                 # Baseline workflow step.
-                epoch_match = re.search(r'最佳epoch:\s+(\d+)', content)
+                epoch_match = re.search(r' best epoch:\s+(\d+)', content)
                 if epoch_match:
                     metrics['best_epoch'] = int(epoch_match.group(1))
                 
                 # Evaluate the validation subset.
-                val_mae_match = re.search(r'最佳验证集MAE:\s+([\d.]+)', content)
+                val_mae_match = re.search(r' best validation MAE:\s+([\d.]+)', content)
                 if val_mae_match:
                     metrics['best_val_mae'] = float(val_mae_match.group(1))
                 
@@ -459,31 +459,31 @@ def collect_all_results(out_dir: str, seeds: List[int]) -> pd.DataFrame:
     summary_txt_path = os.path.join(out_dir, "results_summary.txt")
     with open(summary_txt_path, 'w', encoding='utf-8') as f:
         f.write("="*80 + "\n")
-        f.write("所有随机种子的训练结果统计（均值±标准差）\n")
+        f.write(" training statistics across all random seeds ( mean ± standard deviation )\n")
         f.write("="*80 + "\n\n")
-        f.write(f"随机种子: {seeds}\n")
-        f.write(f"种子数量: {len(seeds)}\n\n")
-        f.write("测试集指标统计:\n")
+        f.write(f" random seed : {seeds}\n")
+        f.write(f" number of seeds : {len(seeds)}\n\n")
+        f.write(" test metrics statistics :\n")
         f.write("-"*80 + "\n")
         if 'test_mae_format' in stats:
             f.write(f"MAE:  {stats['test_mae_format']}\n")
-            f.write(f"      (均值: {stats['test_mae_mean']:.4f}, 标准差: {stats['test_mae_std']:.4f})\n")
+            f.write(f" ( mean : {stats['test_mae_mean']:.4f}, standard deviation : {stats['test_mae_std']:.4f})\n")
         if 'test_rmse_format' in stats:
             f.write(f"RMSE: {stats['test_rmse_format']}\n")
-            f.write(f"      (均值: {stats['test_rmse_mean']:.4f}, 标准差: {stats['test_rmse_std']:.4f})\n")
+            f.write(f" ( mean : {stats['test_rmse_mean']:.4f}, standard deviation : {stats['test_rmse_std']:.4f})\n")
         if 'test_r2_format' in stats:
             f.write(f"R²:   {stats['test_r2_format']}\n")
-            f.write(f"      (均值: {stats['test_r2_mean']:.4f}, 标准差: {stats['test_r2_std']:.4f})\n")
+            f.write(f" ( mean : {stats['test_r2_mean']:.4f}, standard deviation : {stats['test_r2_std']:.4f})\n")
         f.write("\n" + "="*80 + "\n")
-        f.write("各种子详细结果:\n")
+        f.write(" per-seed results :\n")
         f.write("-"*80 + "\n")
         for _, row in df.iterrows():
             f.write(f"\nSeed {row['seed']}:\n")
-            f.write(f"  最佳epoch: {row['best_epoch']}\n")
-            f.write(f"  最佳验证集MAE: {row['best_val_mae']:.6f}\n")
-            f.write(f"  测试集MAE:  {row['test_mae']:.6f}\n")
-            f.write(f"  测试集RMSE: {row['test_rmse']:.6f}\n")
-            f.write(f"  测试集R²:   {row['test_r2']:.6f}\n")
+            f.write(f" best epoch: {row['best_epoch']}\n")
+            f.write(f" best validation MAE: {row['best_val_mae']:.6f}\n")
+            f.write(f" test set MAE: {row['test_mae']:.6f}\n")
+            f.write(f" test set RMSE: {row['test_rmse']:.6f}\n")
+            f.write(f" test set R²: {row['test_r2']:.6f}\n")
         f.write("="*80 + "\n")
     
     # Save the generated artifacts.
@@ -497,7 +497,7 @@ def collect_all_results(out_dir: str, seeds: List[int]) -> pd.DataFrame:
 
 
 def main():
-    parser = argparse.ArgumentParser(description='BigSolvDB训练脚本')
+    parser = argparse.ArgumentParser(description='BigSolvDB Training Script ')
     parser.add_argument('--data_path', type=str, default=str(BIGSOLVDB_CSV),
                        help='BigSolvDB dataset path.')
     parser.add_argument('--output_dir', type=str,
@@ -505,16 +505,16 @@ def main():
                        help='Directory for BigSolvDB run artifacts.')
     parser.add_argument('--model_name', type=str, default='mlp', 
                        choices=['mlp', 'ann', 'lstm', 'transformer', 'tabknet'],
-                       help='模型名称')
+                       help=' model name ')
     parser.add_argument('--seeds', type=int, nargs='+', 
                        default=[42, 123, 456, 789, 2024],
-                       help='随机种子列表')
-    parser.add_argument('--batch_size', type=int, default=1024, help='批次大小')
-    parser.add_argument('--epochs', type=int, default=300, help='训练轮数')
-    parser.add_argument('--lr', type=float, default=2e-4, help='学习率')
-    parser.add_argument('--patience', type=int, default=50, help='早停耐心值')
-    parser.add_argument('--resume', type=str, default=None, help='断点续训路径')
-    parser.add_argument('--auto_resume', action='store_true', help='自动查找最新检查点')
+                       help=' random-seed list ')
+    parser.add_argument('--batch_size', type=int, default=1024, help=' batch size ')
+    parser.add_argument('--epochs', type=int, default=300, help=' training epochs ')
+    parser.add_argument('--lr', type=float, default=2e-4, help=' learning rate ')
+    parser.add_argument('--patience', type=int, default=50, help=' early-stopping patience ')
+    parser.add_argument('--resume', type=str, default=None, help=' resume-checkpoint path ')
+    parser.add_argument('--auto_resume', action='store_true', help=' automatically locate the latest checkpoint ')
     
     args = parser.parse_args()
     
@@ -523,16 +523,16 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
     
     print("="*80)
-    print("BigSolvDB数据集训练")
+    print("BigSolvDB dataset Training ")
     print("="*80)
-    print(f"数据集: {args.data_path}")
-    print(f"模型: {args.model_name}")
-    print(f"随机种子: {args.seeds}")
-    print(f"输出目录: {out_dir}")
+    print(f" dataset : {args.data_path}")
+    print(f" model : {args.model_name}")
+    print(f" random seed : {args.seeds}")
+    print(f" output directory : {out_dir}")
     print("="*80)
     
     # Set the random seed.
-    print("\n加载数据集...")
+    print("\n load dataset ...")
     train_df, val_df, test_df = load_bigsolvdb_data(
         csv_path=args.data_path,
         target_col="LogS(mol/L)",
@@ -541,15 +541,15 @@ def main():
     
     # Set the random seed.
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    print(f"\n使用设备: {device}")
-    print(f"\n总共需要训练 {len(args.seeds)} 个随机种子，将依次顺序执行")
+    print(f"\n use device : {device}")
+    print(f"\n total training runs {len(args.seeds)} random seed , will run sequentially ")
     print("="*80)
     
     for idx, seed in enumerate(args.seeds, 1):
         seed_out_dir = os.path.join(out_dir, f"seed_{seed}")
         
         print(f"\n{'='*80}")
-        print(f"【第 {idx}/{len(args.seeds)} 个种子】开始训练 seed={seed}")
+        print(f"[ number {idx}/{len(args.seeds)} seeds ] start training seed={seed}")
         print(f"{'='*80}")
         
         # Handle model checkpoints.
@@ -565,7 +565,7 @@ def main():
                         return -1
                 checkpoint_files.sort(key=extract_epoch, reverse=True)
                 resume_from = checkpoint_files[0]
-                print(f"自动找到最新检查点: {resume_from}")
+                print(f" automatically selected the latest checkpoint : {resume_from}")
         
         # Set the random seed.
         train_single_seed(
@@ -584,42 +584,42 @@ def main():
         )
         
         print(f"\n{'='*80}")
-        print(f"【第 {idx}/{len(args.seeds)} 个种子】seed={seed} 训练完成")
+        print(f"[ number {idx}/{len(args.seeds)} seeds ]seed={seed} training complete ")
         print(f"{'='*80}")
         
         # Set the random seed.
         if idx < len(args.seeds):
             remaining = len(args.seeds) - idx
-            print(f"\n还有 {remaining} 个种子待训练，即将开始下一个...")
+            print(f"\n remaining {remaining} seeds To be trained , starting the next run ...")
             print("-"*80)
     
     # Baseline workflow step.
     print("\n" + "="*80)
-    print("收集所有种子的结果...")
+    print(" collect results for all seeds ...")
     print("="*80)
     stats_df, stats = collect_all_results(out_dir, args.seeds)
     
     if not stats_df.empty and stats:
         print("\n" + "="*80)
-        print("结果统计（均值±标准差）")
+        print(" results statistics ( mean ± standard deviation )")
         print("="*80)
-        print("\n测试集指标:")
+        print("\n test metrics :")
         print("-"*80)
         if 'test_mae_format' in stats:
             print(f"MAE:  {stats['test_mae_format']}")
-            print(f"      (均值: {stats['test_mae_mean']:.4f}, 标准差: {stats['test_mae_std']:.4f})")
+            print(f" ( mean : {stats['test_mae_mean']:.4f}, standard deviation : {stats['test_mae_std']:.4f})")
         if 'test_rmse_format' in stats:
             print(f"RMSE: {stats['test_rmse_format']}")
-            print(f"      (均值: {stats['test_rmse_mean']:.4f}, 标准差: {stats['test_rmse_std']:.4f})")
+            print(f" ( mean : {stats['test_rmse_mean']:.4f}, standard deviation : {stats['test_rmse_std']:.4f})")
         if 'test_r2_format' in stats:
             print(f"R²:   {stats['test_r2_format']}")
-            print(f"      (均值: {stats['test_r2_mean']:.4f}, 标准差: {stats['test_r2_std']:.4f})")
+            print(f" ( mean : {stats['test_r2_mean']:.4f}, standard deviation : {stats['test_r2_std']:.4f})")
         print("-"*80)
-        print(f"\n结果已保存到:")
-        print(f"  - CSV格式: {os.path.join(out_dir, 'results_summary.csv')}")
-        print(f"  - TXT格式: {os.path.join(out_dir, 'results_summary.txt')}")
+        print(f"\n results saved to :")
+        print(f" - CSV format : {os.path.join(out_dir, 'results_summary.csv')}")
+        print(f" - TXT format : {os.path.join(out_dir, 'results_summary.txt')}")
     
-    print("\n训练完成！")
+    print("\n training complete !")
 
 
 if __name__ == "__main__":

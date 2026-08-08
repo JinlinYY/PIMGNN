@@ -15,7 +15,7 @@ tmp/
 .DS_Store
 Thumbs.db
 
-# Private manuscript and revision materials must never be committed.
+# Private research documents are excluded from the software release.
 private/
 *.doc
 *.docx

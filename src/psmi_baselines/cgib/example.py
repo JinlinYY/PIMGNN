@@ -23,14 +23,14 @@ targets = [0.5, 0.8, 0.3]
 # Process the experiment data.
 dataset = MolecularDataset(smiles1_list, smiles2_list, targets)
 
-print(f"数据集大小: {len(dataset)}")
-print(f"有效样本数: {len(dataset.valid_indices)}")
+print(f" dataset size : {len(dataset)}")
+print(f" number of valid samples : {len(dataset.valid_indices)}")
 
 if len(dataset) > 0:
     # Baseline workflow step.
     sample_graph = dataset.graphs1[0]
     input_dim = sample_graph.x.size(1)
-    print(f"输入特征维度: {input_dim}")
+    print(f" input-feature dimension : {input_dim}")
     
     # Configure the baseline model.
     model = CGIB(
@@ -42,7 +42,7 @@ if len(dataset) > 0:
         gnn_type='mpnn'
     )
     
-    print(f"模型参数数量: {sum(p.numel() for p in model.parameters())}")
+    print(f" number of model parameters : {sum(p.numel() for p in model.parameters())}")
     
     # Baseline workflow step.
     batch1, batch2, batch_targets = create_batch(
@@ -55,15 +55,15 @@ if len(dataset) > 0:
     model.eval()
     with torch.no_grad():
         pred, loss_components = model(batch1, batch2, return_loss_components=True)
-        print(f"\n预测形状: {pred.shape}")
-        print(f"预测值: {pred.squeeze().numpy()}")
-        print(f"\n损失组件:")
-        print(f"  MI1损失: {loss_components['mi1'].item():.4f}")
-        print(f"  MI2损失: {loss_components['mi2'].item():.4f}")
-        print(f"  Lambda均值: {loss_components['lambda'].mean().item():.4f}")
-        print(f"  P均值: {loss_components['p'].mean().item():.4f}")
+        print(f"\n prediction shape : {pred.shape}")
+        print(f" prediction : {pred.squeeze().numpy()}")
+        print(f"\n loss Components :")
+        print(f" MI1 loss : {loss_components['mi1'].item():.4f}")
+        print(f" MI2 loss : {loss_components['mi2'].item():.4f}")
+        print(f" Lambda mean : {loss_components['lambda'].mean().item():.4f}")
+        print(f" P mean : {loss_components['p'].mean().item():.4f}")
     
-    print("\n模型测试成功！")
+    print("\n model test passed !")
 else:
-    print("数据集为空，请检查SMILES字符串格式")
+    print(" dataset is empty , please check SMILES String format ")
 

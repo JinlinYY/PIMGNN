@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "description": "Inference-only registry for corrected_v2 checkpoints; no entry starts training.",
+  "description": "Checkpoint evaluation registry for the corrected_v2 protocol.",
   "runs": [
     {
       "id": "main_supervised_seed42",

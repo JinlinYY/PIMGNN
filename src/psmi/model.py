@@ -535,13 +535,13 @@ class TokenFusionTransformer(nn.Module):
         type_ids: Optional[torch.Tensor] = None,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """Run the forward pass."""
-        assert tokens.dim() == 3, f"tokens 必须是 (B,L,D)，得到 {tokens.shape}"
+        assert tokens.dim() == 3, f"tokens must be (B,L,D), obtained {tokens.shape}"
         B, L, D = tokens.shape
-        assert D == self.d_model, f"令牌维度不匹配：得到 {D}，期望 {self.d_model}"
+        assert D == self.d_model, f" token dimension mismatch : obtained {D}, expected {self.d_model}"
         device = tokens.device
 
         if type_ids is not None:
-            assert type_ids.shape[:2] == (B, L), f"type_ids 必须是 (B,L)，得到 {type_ids.shape}"
+            assert type_ids.shape[:2] == (B, L), f"type_ids must be (B,L), obtained {type_ids.shape}"
             type_ids = type_ids.to(device=device, dtype=torch.long)
 
         

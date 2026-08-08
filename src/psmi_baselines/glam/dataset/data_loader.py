@@ -77,18 +77,18 @@ def load_LLE_dataset(csv_path, test_size=0.2, val_size=0.1, random_state=42):
     """Run the load LLE dataset baseline operation."""
     # Read the input data.
     if not os.path.exists(csv_path):
-        raise FileNotFoundError(f"CSV文件不存在: {csv_path}")
+        raise FileNotFoundError(f"CSV file does not exist : {csv_path}")
     
     try:
         df = pd.read_csv(csv_path)
     except Exception as e:
-        raise ValueError(f"无法读取CSV文件 {csv_path}: {e}")
+        raise ValueError(f" unable to read CSV file {csv_path}: {e}")
     
     if len(df) == 0:
-        raise ValueError(f"CSV文件为空: {csv_path}")
+        raise ValueError(f"CSV file is Empty : {csv_path}")
     
-    print(f"数据集总样本数: {len(df)}")
-    print(f"数据集列: {df.columns.tolist()}")
+    print(f" dataset total samples : {len(df)}")
+    print(f" dataset column : {df.columns.tolist()}")
     
     # Baseline workflow step.
     required_columns = [
@@ -101,7 +101,7 @@ def load_LLE_dataset(csv_path, test_size=0.2, val_size=0.1, random_state=42):
     ]
     missing_columns = [col for col in required_columns if col not in df.columns]
     if missing_columns:
-        raise ValueError(f"CSV文件缺少必要的列: {missing_columns}\n实际列: {df.columns.tolist()}")
+        raise ValueError(f"CSV file missing required columns : {missing_columns}\n Actual column : {df.columns.tolist()}")
     
     # Baseline workflow step.
     data_list = []
@@ -120,21 +120,21 @@ def load_LLE_dataset(csv_path, test_size=0.2, val_size=0.1, random_state=42):
             failed_count += 1
             failed_reasons['il'] += 1
             if failed_count <= 5:  # Baseline workflow step.
-                print(f"警告: 第{idx+1}行IL SMILES为空或无效")
+                print(f" warning : number {idx+1} rows IL SMILES is empty or invalid ")
             continue
         
         if pd.isna(row['Component 2 SMILES']) or comp2_smiles == 'nan' or comp2_smiles.strip() == '':
             failed_count += 1
             failed_reasons['comp2'] += 1
             if failed_count <= 5:
-                print(f"警告: 第{idx+1}行Component 2 SMILES为空或无效")
+                print(f" warning : number {idx+1} rows Component 2 SMILES is empty or invalid ")
             continue
         
         if pd.isna(row['Component 3 SMILES']) or comp3_smiles == 'nan' or comp3_smiles.strip() == '':
             failed_count += 1
             failed_reasons['comp3'] += 1
             if failed_count <= 5:
-                print(f"警告: 第{idx+1}行Component 3 SMILES为空或无效")
+                print(f" warning : number {idx+1} rows Component 3 SMILES is empty or invalid ")
             continue
         
         # Configure the output artifacts.
@@ -177,33 +177,33 @@ def load_LLE_dataset(csv_path, test_size=0.2, val_size=0.1, random_state=42):
             if il_graph is None:
                 failed_reasons['il'] += 1
                 if failed_count <= 5:
-                    print(f"警告: 第{idx+1}行IL SMILES无法转换为图: {il_smiles[:50]}")
+                    print(f" warning : number {idx+1} rows IL SMILES unable to convert to a graph : {il_smiles[:50]}")
             if comp2_graph is None:
                 failed_reasons['comp2'] += 1
                 if failed_count <= 5:
-                    print(f"警告: 第{idx+1}行Component 2 SMILES无法转换为图: {comp2_smiles[:50]}")
+                    print(f" warning : number {idx+1} rows Component 2 SMILES unable to convert to a graph : {comp2_smiles[:50]}")
             if comp3_graph is None:
                 failed_reasons['comp3'] += 1
                 if failed_count <= 5:
-                    print(f"警告: 第{idx+1}行Component 3 SMILES无法转换为图: {comp3_smiles[:50]}")
+                    print(f" warning : number {idx+1} rows Component 3 SMILES unable to convert to a graph : {comp3_smiles[:50]}")
     
-    print(f"成功处理 {len(data_list)} 个样本")
+    print(f" successful process {len(data_list)} samples ")
     if failed_count > 0:
-        print(f"失败 {failed_count} 个样本")
-        print(f"失败原因统计: IL={failed_reasons['il']}, Component2={failed_reasons['comp2']}, Component3={failed_reasons['comp3']}")
+        print(f" failed {failed_count} samples ")
+        print(f" failed reason statistics : IL={failed_reasons['il']}, Component2={failed_reasons['comp2']}, Component3={failed_reasons['comp3']}")
     
     # Process the experiment data.
     if len(data_list) == 0:
         error_msg = (
-            "错误: 没有成功处理任何样本！\n"
-            "可能的原因：\n"
-            "1. CSV文件路径不正确或文件不存在\n"
-            "2. CSV文件为空或格式不正确\n"
-            "3. SMILES字符串格式有问题，RDKit无法解析\n"
-            "4. 列名不匹配（请检查列名是否正确）\n"
-            f"当前CSV路径: {csv_path}\n"
-            f"CSV文件是否存在: {os.path.exists(csv_path)}\n"
-            f"CSV总行数: {len(df)}"
+            " error : None successful process Any sample !\n"
+            " May reason :\n"
+            "1. CSV file path Incorrect or file does not exist \n"
+            "2. CSV file is Empty or format Incorrect \n"
+            "3. SMILES String format Problem ,RDKit unable to parse \n"
+            "4. column First Name mismatch ( please check column First Name whether Correct )\n"
+            f" current CSV path : {csv_path}\n"
+            f"CSV file whether Deposit at : {os.path.exists(csv_path)}\n"
+            f"CSV Total rows Number : {len(df)}"
         )
         raise ValueError(error_msg)
     
@@ -239,11 +239,11 @@ def load_LLE_dataset(csv_path, test_size=0.2, val_size=0.1, random_state=42):
     
     # Process the experiment data.
     if len(indices) == 0:
-        raise ValueError("错误: 数据集为空，无法进行划分！")
+        raise ValueError(" error : dataset is empty , unable to Into rows Divide !")
     
     # Process the experiment data.
     if len(indices) < 10:
-        print(f"警告: 数据量很小（{len(indices)}个样本），将使用较小的测试集比例")
+        print(f" warning : data Small Amount ({len(indices)} samples ), will use Smaller test set Scale ")
         test_size_adjusted = min(test_size, 0.1)  # Evaluate the test subset.
     else:
         test_size_adjusted = test_size
@@ -268,10 +268,10 @@ def load_LLE_dataset(csv_path, test_size=0.2, val_size=0.1, random_state=42):
     test_data = [data_list[i] for i in test_indices]
     test_labels = labels[test_indices]
     
-    print(f"\n数据集划分:")
-    print(f"训练集: {len(train_data)} 样本")
-    print(f"验证集: {len(val_data)} 样本")
-    print(f"测试集: {len(test_data)} 样本")
+    print(f"\n dataset Divide :")
+    print(f" training set : {len(train_data)} sample ")
+    print(f" validation set : {len(val_data)} sample ")
+    print(f" test set : {len(test_data)} sample ")
     
     return {
         'train': {'data': train_data, 'labels': train_labels},
@@ -305,7 +305,7 @@ if __name__ == "__main__":
     csv_path = "dataset/total.csv"
     datasets = load_LLE_dataset(csv_path)
     
-    print("\n示例数据:")
+    print("\n example data :")
     sample = datasets['train']['data'][0]
     print(f"IL SMILES: {sample['il_smiles']}")
     print(f"Component 2 SMILES: {sample['comp2_smiles']}")

@@ -7,10 +7,10 @@
       "posthoc_test_diagnostics"
     ],
     "fitted_independently_by_system": true,
-    "dataset_path": "D:\\GGNN\\YXFL\\datasets\\processed\\update-LLE-all-with-smiles.xlsx",
+    "dataset_path": "datasets/processed/update-LLE-all-with-smiles.xlsx",
     "dataset_sha256": "76812d7a9ba8c6e6660e1acbf15817ff0725664d7fcf69b0fb0a84e133529f06",
-    "split_manifest_path": "D:\\GGNN\\YXFL\\datasets\\parameters\\corrected_v2\\nrtl_split_manifest.json",
-    "split_manifest_sha256": "2d5982540a1763db1bedffdda5b97996299b6e5512e0b4135f38a0142d11e75e",
+    "split_manifest_path": "datasets/parameters/corrected_v2/nrtl_split_manifest.json",
+    "split_manifest_sha256": "d7789c51cbcce838524fb11349fe4e664d7020c527298ab71354cbc89d1b3ef9",
     "split_strategy": "manifest",
     "seed": 42,
     "alpha": 0.3,

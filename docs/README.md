@@ -1,7 +1,7 @@
-# 文档目录
+# Documentation
 
-- `architecture/`：当前科学模型契约与架构说明；
-- `guides/`：运行和应用案例说明；
-- `results/`：带配置、哈希和检查点来源的修正版结果摘要。
+- `architecture/scientific_model_contract.md` defines the model architecture, input contract, thermodynamic regularization, and compatibility boundaries.
+- `results/corrected_v2_multiseed.md` reports the corrected multi-seed benchmark.
+- `guides/application_case.md` describes the industrial application input and output format.
 
-论文实验代码、已有结果和结果图的完整入口位于公开仓库的 `experiments/README.md`。内部工作记录不属于公开文档索引。
+The experiment-to-paper mapping is available in `experiments/README.md`.

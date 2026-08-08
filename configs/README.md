@@ -1,18 +1,11 @@
-# 配置文件说明
+# Configuration System
 
-配置按数据、模型、训练阶段和完整实验四层组织。运行时可以重复使用
-`--config`，后面的配置覆盖前面的同名参数；完整实验配置也可以通过
-`include` 引用其他配置。
+PSMI configurations are composed from layered YAML files.
 
-```powershell
-conda activate ggnn39
-python scripts/train.py --config configs/experiments/main_benchmark_stage1.yaml
-```
+- `data/` defines datasets, filters, split manifests, and thermodynamic parameter files.
+- `model/` defines graph encoders, functional-group interactions, scalar inputs, and fusion modes.
+- `training/` defines optimization, checkpoint selection, regularization, and evaluation behavior.
+- `experiments/` composes complete training protocols.
+- `reproduction/` registers published checkpoints for standardized evaluation.
 
-`psmi_corrected_v2.yaml` 使用与批处理图索引一致的样本优先节点顺序。历史权重
-只能在显式选择 `legacy_component_major` 时复现旧行为，不得把旧结果标记成修正
-模型结果。
-
-主要基准配置使用温度和相路径两个标量。扩展数据配置额外使用标准化压力，并且
-必须在论文方法中明确说明这一输入差异。
-
+Paths are resolved relative to the repository root. Command-line `KEY=VALUE` overrides are applied after the YAML layers.

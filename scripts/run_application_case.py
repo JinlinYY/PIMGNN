@@ -19,7 +19,7 @@ except ModuleNotFoundError:  # Support ``import scripts.run_application_case``.
     from scripts._bootstrap import add_src_to_path
 
 PROJECT_ROOT = add_src_to_path()
-DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "experiments" / "09_application_cases" / "runs" / "reproduction"
+DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "experiments" / "14_industrial_cases" / "00_application_workflow" / "results" / "reproduction"
 
 import numpy as np
 import pandas as pd
@@ -82,7 +82,7 @@ def load_and_prepare_application_excel(path: str) -> pd.DataFrame:
     df = pd.read_excel(path)
     df.columns = [_norm_col(c) for c in df.columns]
     
-    print(f"原始列名: {df.columns.tolist()}")
+    print(f"Input columns: {df.columns.tolist()}")
     
     
     col_system = _find_col(df.columns.tolist(), [
@@ -91,7 +91,7 @@ def load_and_prepare_application_excel(path: str) -> pd.DataFrame:
         "System No.", "System No", "System ID", "system_id",
     ])
     if col_system is None:
-        print("警告：找不到系统 ID 列，使用默认值 1")
+        print("Warning: no system identifier column was found; using system_id=1.")
         df["system_id"] = 1
     else:
         df = df.rename(columns={col_system: "system_id"})
@@ -145,7 +145,7 @@ def load_and_prepare_application_excel(path: str) -> pd.DataFrame:
             if not any(c in sample for c in ['c', 'c', 'n', 'o', 's', 'p', '(', ')', '=']):
                 smiles_col = _find_col(df.columns.tolist(), [f"{col} SMILES", f"{col.replace('smiles', '')} SMILES"])
                 if smiles_col and smiles_col != col:
-                    print(f"使用 {smiles_col} 作为 {col} 的 SMILES 来源")
+                    print(f"Using {smiles_col} as the SMILES source for {col}.")
                     df[col] = df[smiles_col]
     
     
@@ -158,10 +158,10 @@ def load_and_prepare_application_excel(path: str) -> pd.DataFrame:
     
     
     if "t" not in df.columns:
-        print("计算滴定点 t（PCA-based）...")
+        print("Computing the phase-path coordinate t with PCA...")
         df = safe_group_apply_t(df)
     
-    print(f"加载了 {len(df)} 个数据点")
+    print(f"Loaded {len(df)} data points.")
     
     return df
 
@@ -216,7 +216,7 @@ def load_application_case_plot_excel(path: str) -> pd.DataFrame:
                  "Ex1", "Ex2", "Ex3", "Rx1", "Rx2", "Rx3"]
     for c in need_cols:
         if c not in df.columns:
-            raise KeyError(f"缺少列：{c}")
+            raise KeyError(f" missing columns :{c}")
 
     return df
 
@@ -230,7 +230,7 @@ def load_model_and_scaler(ckpt_path: str, device: str) -> tuple:
     if not os.path.isfile(ckpt_path):
         raise FileNotFoundError(f"Checkpoint not found: {ckpt_path}")
     
-    print(f"加载模型: {ckpt_path}")
+    print(f" load model : {ckpt_path}")
     
     ckpt = torch.load(ckpt_path, map_location=device)
     
@@ -269,14 +269,14 @@ def load_model_and_scaler(ckpt_path: str, device: str) -> tuple:
                 model_state = ckpt
             else:
                 
-                print(f"警告: 无法识别检查点格式。检查点键: {list(ckpt.keys())}")
+                print(f" warning : unable to Identify checkpoint format . checkpoint Key : {list(ckpt.keys())}")
                 model_state = ckpt
     else:
         
         model_state = ckpt
     
     if model_state is None:
-        raise ValueError(f"无法从检查点中提取模型权重。检查点格式: {ckpt.keys() if isinstance(ckpt, dict) else type(ckpt)}")
+        raise ValueError(f" unable to from checkpoint in Extract model checkpoint . checkpoint format : {ckpt.keys() if isinstance(ckpt, dict) else type(ckpt)}")
     
     print(f"  T_mean: {T_mean}, T_std: {T_std}")
     
@@ -348,26 +348,26 @@ def test_application_case(
     if device is None:
         device = getattr(C, "DEVICE", "cuda" if torch.cuda.is_available() else "cpu")
     
-    print(f"使用设备: {device}")
+    print(f" use device : {device}")
     Path(out_dir).mkdir(parents=True, exist_ok=True)
     
     
-    print("\n========== 加载数据 ==========")
+    print("\n========== load data ==========")
     df_raw = load_and_prepare_application_excel(excel_path)
-    print(f"原始数据形状: {df_raw.shape}")
+    print(f" Original data shape : {df_raw.shape}")
     
     
-    print("正在增加预测点以获得更平滑的曲线...")
+    print(" True at Increase prediction point for smoother Curve ...")
     df_aug = augment_prediction_points(df_raw, num_points=50)
-    print(f"增加后数据形状: {df_aug.shape}")
+    print(f" Increase after data shape : {df_aug.shape}")
     
     
-    print("\n========== 加载模型 ==========")
+    print("\n========== load model ==========")
     model, T_scaler, config_dict = load_model_and_scaler(ckpt_path, device)
-    print(f"模型加载成功")
+    print(f" model loaded successfully ")
     
     
-    print("\n========== 进行预测 ==========")
+    print("\n========== Into rows prediction ==========")
     with torch.no_grad():
         df_pred = predict_pointwise_df_raw(model, T_scaler, df_aug, device=device)
     
@@ -375,15 +375,15 @@ def test_application_case(
     output_csv = os.path.join(out_dir, "application_case_predictions.csv")
     df_pred.to_csv(output_csv, index=False, encoding="utf-8-sig")
 
-    print(f"预测结果已保存到: {output_csv}")
+    print(f" predictions saved to : {output_csv}")
     
     
-    print("\n========== 预测统计 ==========")
+    print("\n========== prediction statistics ==========")
     if "pred_Ex1" in df_pred.columns:
-        print("\nExtract 相预测值统计:")
+        print("\nExtract phase-prediction statistics :")
         for i in range(1, 4):
             print(f"  Ex{i}: min={df_pred[f'pred_Ex{i}'].min():.6f}, max={df_pred[f'pred_Ex{i}'].max():.6f}, mean={df_pred[f'pred_Ex{i}'].mean():.6f}")
-        print("\nRaffinate 相预测值统计:")
+        print("\nRaffinate phase-prediction statistics :")
         for i in range(1, 4):
             print(f"  Rx{i}: min={df_pred[f'pred_Rx{i}'].min():.6f}, max={df_pred[f'pred_Rx{i}'].max():.6f}, mean={df_pred[f'pred_Rx{i}'].mean():.6f}")
     
@@ -521,7 +521,7 @@ def plot_ternary_detailed(df_pred: pd.DataFrame, out_dir: str) -> None:
         plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
         plt.savefig(save_path, dpi=300, bbox_inches="tight")
         plt.close()
-        print(f"[OK] 已保存: {save_path}")
+        print(f"[OK] saved : {save_path}")
 
     
     if plot_data_list:
@@ -604,7 +604,7 @@ def plot_ternary_detailed(df_pred: pd.DataFrame, out_dir: str) -> None:
         df_long = df_long[final_cols]
         
         df_long.to_csv(plot_csv_path, index=False, encoding="utf-8-sig")
-        print(f"[OK] 格式化绘图数据已保存: {plot_csv_path}")
+        print(f"[OK] format Hua Painting graph data saved : {plot_csv_path}")
 
 
 def plot_ternary_models_vs_experiment(df_plot: pd.DataFrame, out_dir: str) -> None:
@@ -683,7 +683,7 @@ def plot_ternary_models_vs_experiment(df_plot: pd.DataFrame, out_dir: str) -> No
         plt.subplots_adjust(left=0.1, right=0.85, top=0.9, bottom=0.1) 
         plt.savefig(save_path, dpi=300, bbox_inches="tight")
         plt.close()
-        print(f"[OK] 已保存: {save_path}")
+        print(f"[OK] saved : {save_path}")
 
 
 def plot_parity_diagrams(df_pred: pd.DataFrame, out_dir: str) -> None:
@@ -739,7 +739,7 @@ def plot_parity_diagrams(df_pred: pd.DataFrame, out_dir: str) -> None:
     plt.tight_layout()
     plt.savefig(save_path, dpi=300, bbox_inches="tight")
     plt.close()
-    print(f"[OK] 已保存: {save_path}")
+    print(f"[OK] saved : {save_path}")
 
 
 def print_statistics(df_pred: pd.DataFrame, out_dir: str) -> None:
@@ -748,18 +748,18 @@ def print_statistics(df_pred: pd.DataFrame, out_dir: str) -> None:
     
     report = []
     report.append("=" * 70)
-    report.append("应用案例预测结果统计分析")
+    report.append(" application case predictions statistics Analytics ")
     report.append("=" * 70)
     report.append("")
     
-    report.append(f"总数据点数: {len(df_pred)}")
-    report.append(f"系统数量: {df_pred['system_id'].nunique()}")
-    report.append(f"温度数量: {df_pred['T'].nunique()}")
+    report.append(f" total Base Points : {len(df_pred)}")
+    report.append(f" System count : {df_pred['system_id'].nunique()}")
+    report.append(f" temperature count : {df_pred['T'].nunique()}")
     report.append("")
     
     
     report.append("=" * 70)
-    report.append("Extract 相预测结果统计")
+    report.append("Extract phase-prediction statistics ")
     report.append("=" * 70)
     
     for comp_idx, (true_col, pred_col) in enumerate([("Ex1", "pred_Ex1"), ("Ex2", "pred_Ex2"), ("Ex3", "pred_Ex3")], 1):
@@ -777,17 +777,17 @@ def print_statistics(df_pred: pd.DataFrame, out_dir: str) -> None:
                 r2 = 1 - np.sum((true_vals - pred_vals) ** 2) / denom if denom > 1e-10 else 0
                 
                 report.append(f"\nComponent {comp_idx} (Ex{comp_idx}):")
-                report.append(f"  真实值范围: [{true_vals.min():.6f}, {true_vals.max():.6f}]")
-                report.append(f"  预测值范围: [{pred_vals.min():.6f}, {pred_vals.max():.6f}]")
-                report.append(f"  平均绝对误差 (MAE): {mae:.6f}")
-                report.append(f"  均方根误差 (RMSE): {rmse:.6f}")
-                report.append(f"  R² 得分: {r2:.6f}")
+                report.append(f" target range : [{true_vals.min():.6f}, {true_vals.max():.6f}]")
+                report.append(f" prediction range : [{pred_vals.min():.6f}, {pred_vals.max():.6f}]")
+                report.append(f" mean absolute error (MAE): {mae:.6f}")
+                report.append(f" root mean squared error (RMSE): {rmse:.6f}")
+                report.append(f" R² score : {r2:.6f}")
             else:
                 report.append(f"\nComponent {comp_idx} (Ex{comp_idx}): No valid data for comparison")
     
     
     report.append("\n" + "=" * 70)
-    report.append("Raffinate 相预测结果统计")
+    report.append("Raffinate phase-prediction statistics ")
     report.append("=" * 70)
     
     for comp_idx, (true_col, pred_col) in enumerate([("Rx1", "pred_Rx1"), ("Rx2", "pred_Rx2"), ("Rx3", "pred_Rx3")], 1):
@@ -805,11 +805,11 @@ def print_statistics(df_pred: pd.DataFrame, out_dir: str) -> None:
                 r2 = 1 - np.sum((true_vals - pred_vals) ** 2) / denom if denom > 1e-10 else 0
                 
                 report.append(f"\nComponent {comp_idx} (Rx{comp_idx}):")
-                report.append(f"  真实值范围: [{true_vals.min():.6f}, {true_vals.max():.6f}]")
-                report.append(f"  预测值范围: [{pred_vals.min():.6f}, {pred_vals.max():.6f}]")
-                report.append(f"  平均绝对误差 (MAE): {mae:.6f}")
-                report.append(f"  均方根误差 (RMSE): {rmse:.6f}")
-                report.append(f"  R² 得分: {r2:.6f}")
+                report.append(f" target range : [{true_vals.min():.6f}, {true_vals.max():.6f}]")
+                report.append(f" prediction range : [{pred_vals.min():.6f}, {pred_vals.max():.6f}]")
+                report.append(f" mean absolute error (MAE): {mae:.6f}")
+                report.append(f" root mean squared error (RMSE): {rmse:.6f}")
+                report.append(f" R² score : {r2:.6f}")
             else:
                 report.append(f"\nComponent {comp_idx} (Rx{comp_idx}): No valid data for comparison")
     
@@ -821,50 +821,50 @@ def print_statistics(df_pred: pd.DataFrame, out_dir: str) -> None:
     report_path = os.path.join(out_dir, "detailed_analysis.txt")
     with open(report_path, "w", encoding="utf-8") as f:
         f.write(report_text)
-    print(f"\n[OK] 详细分析已保存: {report_path}")
+    print(f"\n[OK] Detailed Analysis saved : {report_path}")
 
 
 def analyze_application_case(csv_path: str, out_dir: str = str(DEFAULT_OUTPUT_DIR)) -> None:
     """Analyze application case."""
     if not os.path.isfile(csv_path):
-        print(f"错误: CSV 文件不存在: {csv_path}")
+        print(f" error : CSV file does not exist : {csv_path}")
         sys.exit(1)
     
-    print(f"加载数据: {csv_path}")
+    print(f" load data : {csv_path}")
     df_pred = pd.read_csv(csv_path)
-    print(f"加载了 {len(df_pred)} 个数据点\n")
+    print(f"Loaded {len(df_pred)} prediction rows.\n")
     
-    print("正在生成可视化和分析...\n")
+    print(" generating Visualization and Analytics ...\n")
     
-    print("1. 生成三角相图...")
+    print("1. generate Triangle phase diagram ...")
     plot_ternary_detailed(df_pred, out_dir)
     
-    print("\n2. 生成奇偶图...")
+    print("\n2. generate Parity graph ...")
     plot_parity_diagrams(df_pred, out_dir)
     
-    print("\n3. 生成统计分析...")
+    print("\n3. generate statistics Analytics ...")
     print_statistics(df_pred, out_dir)
     
-    print(f"\n所有结果已保存到: {out_dir}")
-    print("完成！")
+    print(f"\n all results saved to : {out_dir}")
+    print(" complete !")
 
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="应用案例的完整工作流或单独分析",
+        description="Run the complete application-case workflow or analyze existing predictions.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-示例：
-  # 完整工作流（Excel -> 预测 -> 分析）
-  python scripts/run_application_case.py --excel datasets/raw/应用案例1.xlsx \\
-    --ckpt models/03_physics_constraints/lle_run_混合物图-Cross-s3-tf-纯数据驱动test2/best_model.pt \\
-    --out_dir experiments/09_application_cases/runs/reproduction
-  
-  # 单独分析已有的CSV预测结果
-  python scripts/run_application_case.py --csv experiments/09_application_cases/runs/current/predictions/application_case_predictions.csv \\
-    --out_dir experiments/09_application_cases/runs/reproduction --analyze_only
-        """
+Examples:
+ # Complete workflow: Excel -> prediction -> analysis
+ python scripts/run_application_case.py --excel datasets/raw/application_case_1.xlsx \\
+ --ckpt models/paper_historical/figure2a_psmi/best_model.pt \\
+ --out_dir experiments/14_industrial_cases/00_application_workflow/results/reproduction
+ 
+ # Analyze an existing prediction table 
+ python scripts/run_application_case.py --csv experiments/14_industrial_cases/00_application_workflow/results/application_case_predictions.csv \\
+ --out_dir experiments/14_industrial_cases/00_application_workflow/results/reproduction --analyze_only
+ """
     )
     
     
@@ -872,19 +872,19 @@ def main():
         "--excel", "-e",
         type=str,
         default=None,
-        help="应用案例 Excel 文件路径（用于完整工作流）"
+        help="Application-case Excel file for the complete workflow."
     )
     parser.add_argument(
         "--ckpt", "-c",
         type=str,
         default=None,
-        help="模型检查点路径（用于完整工作流）"
+        help="Model checkpoint for the complete workflow."
     )
     parser.add_argument(
         "--csv",
         type=str,
         default=None,
-        help="预测结果 CSV 文件路径（用于单独分析）"
+        help="Existing prediction CSV for analysis-only mode."
     )
     
     
@@ -892,20 +892,20 @@ def main():
         "--out_dir", "-o",
         type=str,
         default=str(DEFAULT_OUTPUT_DIR),
-        help="输出目录"
+        help="Output directory."
     )
     parser.add_argument(
         "--device", "-d",
         type=str,
         default=None,
-        help="计算设备 (cuda/cpu)"
+        help="Compute device: cuda or cpu."
     )
     
     
     parser.add_argument(
         "--analyze_only",
         action="store_true",
-        help="仅进行分析和可视化（需要提供 --csv）"
+        help="Analyze and visualize an existing prediction table; requires --csv."
     )
     
     args = parser.parse_args()
@@ -913,7 +913,7 @@ def main():
     
     if args.analyze_only:
         if args.csv is None:
-            print("错误: --analyze_only 模式需要提供 --csv 参数")
+            print("Error: --analyze_only requires --csv.")
             sys.exit(1)
         analyze_application_case(args.csv, args.out_dir)
         return
@@ -921,7 +921,7 @@ def main():
     
     if args.excel is not None and args.ckpt is None:
         if not os.path.isfile(args.excel):
-            print(f"错误: Excel 文件不存在: {args.excel}")
+            print(f" error : Excel file does not exist : {args.excel}")
             sys.exit(1)
         df_plot = load_application_case_plot_excel(args.excel)
         plot_ternary_models_vs_experiment(df_plot, args.out_dir)
@@ -929,16 +929,16 @@ def main():
 
     
     if args.excel is None or args.ckpt is None:
-        print("错误: 完整工作流需要提供 --excel 和 --ckpt 参数")
+        print("Error: the complete workflow requires --excel and --ckpt.")
         parser.print_help()
         sys.exit(1)
 
     if not os.path.isfile(args.excel):
-        print(f"错误: Excel 文件不存在: {args.excel}")
+        print(f" error : Excel file does not exist : {args.excel}")
         sys.exit(1)
 
     if not os.path.isfile(args.ckpt):
-        print(f"错误: 模型检查点不存在: {args.ckpt}")
+        print(f" error : model checkpoint does not exist : {args.ckpt}")
         sys.exit(1)
 
     

@@ -1,5 +1,5 @@
 {
-  "dataset": "D:\\GGNN\\YXFL\\datasets\\processed\\update-LLE-all-with-smiles_no-missing-smiles.xlsx",
+  "dataset": "datasets/processed/update-LLE-all-with-smiles_no-missing-smiles.xlsx",
   "thresholds": [
     3,
     4,

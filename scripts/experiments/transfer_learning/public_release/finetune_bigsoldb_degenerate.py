@@ -118,13 +118,13 @@ def main():
     # Legacy public-release workflow step.
     model_path = str(args.pretrained)
     if os.path.exists(model_path):
-        print(f"📦 正在加载三元预训练基座: {model_path}...")
+        print(f"📦 loading Ternary pretraining Pedestal : {model_path}...")
         checkpoint = torch.load(model_path, map_location=C.DEVICE, weights_only=True)
         model_dict = model.state_dict()
         transfer_dict = compatible_backbone_weights(checkpoint, model_dict)
         model_dict.update(transfer_dict)
         model.load_state_dict(model_dict)
-        print(f"✅ 成功融合 {len(transfer_dict)} 层三元交互特征！")
+        print(f"✅ successful Fusion {len(transfer_dict)} Layer Ternary Interaction feature !")
     else:
         print(f"Pretrained checkpoint not found: {model_path}")
         return
@@ -142,7 +142,7 @@ def main():
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.5)
     criterion = nn.MSELoss()
     
-    print("\n🔥 退化极限微调正式开始...")
+    print("\n🔥 Degeneration Limit fine-tuning Formal start ...")
     for epoch in range(epochs):
         model.train() 
         total_loss = 0.0
@@ -158,7 +158,7 @@ def main():
         scheduler.step()
         print(f"Epoch {epoch+1:02d}/{epochs} | Log-MSE Loss: {total_loss / train_size:.4f}")
 
-    print("\n正在生成最终预测结果...")
+    print("\n generating final predictions ...")
     model.eval()
     all_preds, all_trues = [], []
     with torch.no_grad():
@@ -169,7 +169,7 @@ def main():
             
     args.output.parent.mkdir(parents=True, exist_ok=True)
     pd.DataFrame({'y_true': all_trues, 'y_pred': all_preds}).to_csv(args.output, index=False)
-    print("✅ 巅峰任务完成！请查收 BigSolDB_results_transfer.csv")
+    print("✅ Pinnacle task complete ! Please check BigSolDB_results_transfer.csv")
 
 if __name__ == "__main__":
     main()

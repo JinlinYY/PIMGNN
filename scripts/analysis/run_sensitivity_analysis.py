@@ -983,7 +983,7 @@ def write_markdown(
     conc_key_table_md = df_to_markdown(conc_key_table_df, floatfmt=".5f")
 
     run_cmd = (
-        "E:/anaconda/envs/ggnn39/python.exe scripts/analysis/run_sensitivity_analysis.py "
+        "python scripts/analysis/run_sensitivity_analysis.py "
         f'--checkpoint "{s.get("checkpoint", "")}" '
         f'--pred-csv "{s.get("prediction_csv", "")}"'
     )

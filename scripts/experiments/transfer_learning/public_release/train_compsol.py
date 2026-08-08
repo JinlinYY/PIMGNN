@@ -78,22 +78,22 @@ def main():
     batch_size = 128      # Legacy public-release workflow step.
     base_lr = 1e-3        # Legacy public-release workflow step.
     
-    print(f"🚀 启动 CompSol 深度精调任务 (目标 {epochs} 轮)...")
+    print(f"🚀 launch CompSol Deep Fine Tune task ( Goal {epochs} round )...")
     epochs = args.epochs
     batch_size = args.batch_size
     base_lr = args.learning_rate
     args.output_dir.mkdir(parents=True, exist_ok=True)
     if not os.path.exists(file_path):
-        print(f"❌ 找不到文件 {file_path}")
+        print(f"❌ file not found {file_path}")
         return
 
-    print("正在加载 Excel 数据...")
+    print(" loading Excel data ...")
     df = pd.read_excel(file_path)
     
     # Legacy public-release workflow step.
     g_cache = GraphCache(add_hs=C.GRAPH_ADD_HS, use_gasteiger=C.GRAPH_USE_GASTEIGER, max_atoms=C.GRAPH_MAX_ATOMS)
     smiles_clean = [s for s in pd.concat([df["smiles1"], df["smiles2"], df["smiles3"]]).unique() if pd.notna(s) and str(s) != '-']
-    print(f"正在构建 {len(smiles_clean)} 个分子的缓存，请稍候...")
+    print(f" building {len(smiles_clean)} molecule Cache , Please Wait ...")
     g_cache.build_from_smiles(smiles_clean)
     
     train_size = int(0.8 * len(df))
@@ -109,7 +109,7 @@ def main():
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
     criterion = nn.MSELoss()
     
-    print("\n🔥 训练正式开始...")
+    print("\n🔥 training started ...")
     model.train()
     for epoch in range(epochs):
         total_loss = 0.0
@@ -134,9 +134,9 @@ def main():
         # Legacy public-release workflow step.
         if (epoch + 1) % 10 == 0:
             torch.save(model.state_dict(), args.output_dir / f"checkpoint_epoch_{epoch+1}.pt")
-            print(f"   [保存] 已生成检查点 CompSol_checkpoint_ep{epoch+1}.pt")
+            print(f" [ save ] Already generate checkpoint CompSol_checkpoint_ep{epoch+1}.pt")
 
-    print("\n正在生成最终预测结果...")
+    print("\n generating final predictions ...")
     model.eval()
     all_preds, all_trues = [], []
     with torch.no_grad():
@@ -148,7 +148,7 @@ def main():
     pd.DataFrame({'y_true': all_trues, 'y_pred': all_preds}).to_csv(
         args.output_dir / "predictions.csv", index=False
     )
-    print("✅ 深度训练圆满完成！结果已更新至 CompSol_results.csv")
+    print("✅ In-Depth Training Successful complete ! results Already update to CompSol_results.csv")
 
 if __name__ == "__main__":
     main()

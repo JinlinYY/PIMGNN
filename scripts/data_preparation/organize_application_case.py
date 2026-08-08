@@ -24,9 +24,9 @@ def format_temp(t: float) -> str:
 
 def main() -> None:
     ap = argparse.ArgumentParser("Organize application-case results by system+temperature")
-    ap.add_argument("--excel_path", type=str, required=True, help="输入 Excel 路径")
-    ap.add_argument("--out_dir", type=str, required=True, help="输出目录")
-    ap.add_argument("--group_by_temp", action="store_true", help="是否按 (体系编号 + 温度) 分组")
+    ap.add_argument("--excel_path", type=str, required=True, help=" input Excel path ")
+    ap.add_argument("--out_dir", type=str, required=True, help=" output directory ")
+    ap.add_argument("--group_by_temp", action="store_true", help=" whether by ( system identifier + temperature ) Grouping ")
     args = ap.parse_args()
 
     df = pd.read_excel(Path(args.excel_path))
@@ -37,7 +37,7 @@ def main() -> None:
     ]
     for c in need_cols:
         if c not in df.columns:
-            raise ValueError(f"缺少列：{c}")
+            raise ValueError(f" missing columns :{c}")
 
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)

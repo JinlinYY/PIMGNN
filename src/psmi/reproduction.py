@@ -316,8 +316,7 @@ def evaluate_saved_checkpoint(
 
     report: Dict[str, Any] = {
         "schema_version": 1,
-        "execution_mode": "checkpoint_inference_only",
-        "training_performed": False,
+        "execution_mode": "checkpoint_evaluation",
         "seed": int(getattr(C, "SEED", 42)),
         "device": selected_device,
         "checkpoint": {
@@ -393,7 +392,6 @@ def summarize_reports(report_paths: Sequence[Path | str]) -> pd.DataFrame:
                 "rmse_overall": metrics["rmse"],
                 "r2_overall": metrics["r2"],
                 "input_hashes_verified": bool(report["inputs"].get("verified")),
-                "training_performed": bool(report["training_performed"]),
             }
         )
     return pd.DataFrame(rows)

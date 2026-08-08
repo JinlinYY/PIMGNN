@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
-  "description": "Historical paper checkpoints evaluated without training on the fixed 612/75/78 system split.",
+  "description": "Historical paper checkpoint registry for the fixed 612/75/78 system split.",
   "runs": [
     {
       "id": "figure2a_psmi",
       "group": "paper_figure_2a",
       "seed": 42,
       "config": "configs/experiments/main_benchmark_stage1.yaml",
-      "checkpoint": "models/03_physics_constraints/lle_run_混合物图-Cross-s3-tf-纯数据驱动test2/best_model.pt",
-      "fg_corpus": "experiments/03_physics_constraints/runs/lle_run_混合物图-Cross-s3-tf-纯数据驱动test2/artifacts/fg_corpus.json",
-      "reference_predictions": "experiments/03_physics_constraints/runs/lle_run_混合物图-Cross-s3-tf-纯数据驱动test2/predictions/test_df_raw_pointwise_predictions.csv",
+      "checkpoint": "models/paper_historical/figure2a_psmi/best_model.pt",
+      "fg_corpus": "experiments/paper_historical/figure2a_psmi/artifacts/fg_corpus.json",
+      "reference_predictions": "experiments/paper_historical/figure2a_psmi/predictions/test_df_raw_pointwise_predictions.csv",
       "set": [
         "MIXTURE_NODE_LAYOUT=legacy_component_major"
       ],
@@ -20,9 +20,9 @@
       "group": "paper_table_3",
       "seed": 42,
       "config": "configs/experiments/main_benchmark_stage1.yaml",
-      "checkpoint": "models/04_architecture_ablation/lle_run_混合物图-Cross-s3-Transformer/best_model.pt",
-      "fg_corpus": "experiments/04_architecture_ablation/runs/lle_run_混合物图-Cross-s3-Transformer/artifacts/fg_corpus.json",
-      "reference_predictions": "experiments/04_architecture_ablation/runs/lle_run_混合物图-Cross-s3-Transformer/predictions/test_df_raw_pointwise_predictions.csv",
+      "checkpoint": "models/paper_historical/table3_data_driven/best_model.pt",
+      "fg_corpus": "experiments/paper_historical/table3_data_driven/artifacts/fg_corpus.json",
+      "reference_predictions": "experiments/paper_historical/table3_data_driven/predictions/test_df_raw_pointwise_predictions.csv",
       "set": [
         "MIXTURE_NODE_LAYOUT=legacy_component_major"
       ],
@@ -33,9 +33,9 @@
       "group": "paper_table_3",
       "seed": 42,
       "config": "configs/experiments/main_benchmark_stage1.yaml",
-      "checkpoint": "models/03_physics_constraints/lle_run_混合物图-Cross-s3-tf-化学势约束/best_model.pt",
-      "fg_corpus": "experiments/03_physics_constraints/runs/lle_run_混合物图-Cross-s3-tf-化学势约束/artifacts/fg_corpus.json",
-      "reference_predictions": "experiments/03_physics_constraints/runs/lle_run_混合物图-Cross-s3-tf-化学势约束/predictions/test_df_raw_pointwise_predictions.csv",
+      "checkpoint": "models/paper_historical/table3_physics_informed/best_model.pt",
+      "fg_corpus": "experiments/paper_historical/table3_physics_informed/artifacts/fg_corpus.json",
+      "reference_predictions": "experiments/paper_historical/table3_physics_informed/predictions/test_df_raw_pointwise_predictions.csv",
       "set": [
         "MIXTURE_NODE_LAYOUT=legacy_component_major"
       ],

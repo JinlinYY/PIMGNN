@@ -364,7 +364,7 @@ def main():
 
     state = ckpt.get("state_dict", ckpt.get("model", None))
     if state is None:
-        raise ValueError("Checkpoint 中未找到 state_dict/model")
+        raise ValueError("Checkpoint in not found state_dict/model")
 
     keys = list(state.keys())
 
@@ -455,35 +455,35 @@ def main():
         if len(df_metrics_sys) > 0:
             df_metrics_sys = df_metrics_sys.sort_values(["system_id"]).reset_index(drop=True)
 
-        p_metrics = os.path.join(out_dir, "新应用案例_metrics.json")
+        p_metrics = os.path.join(out_dir, " new application case _metrics.json")
         with open(p_metrics, "w", encoding="utf-8") as f:
             json.dump({"overall": m_all}, f, ensure_ascii=False, indent=2)
 
-        p_metrics_txt = os.path.join(out_dir, "新应用案例_metrics.txt")
+        p_metrics_txt = os.path.join(out_dir, " new application case _metrics.txt")
         with open(p_metrics_txt, "w", encoding="utf-8") as f:
             for k, v in m_all.items():
                 f.write(f"{k}: {v}\n")
 
-        p_sys_csv = os.path.join(out_dir, "新应用案例_metrics_by_system.csv")
+        p_sys_csv = os.path.join(out_dir, " new application case _metrics_by_system.csv")
         df_metrics_sys.to_csv(p_sys_csv, index=False, encoding="utf-8-sig")
 
-        p_sys_xlsx = os.path.join(out_dir, "新应用案例_metrics_by_system.xlsx")
+        p_sys_xlsx = os.path.join(out_dir, " new application case _metrics_by_system.xlsx")
         df_metrics_sys.to_excel(p_sys_xlsx, index=False)
 
-        p_sys_json = os.path.join(out_dir, "新应用案例_metrics_by_system.json")
+        p_sys_json = os.path.join(out_dir, " new application case _metrics_by_system.json")
         with open(p_sys_json, "w", encoding="utf-8") as f:
             json.dump(metrics_sys, f, ensure_ascii=False, indent=2)
 
-        p_csv = os.path.join(out_dir, "新应用案例_predictions.csv")
+        p_csv = os.path.join(out_dir, " new application case _predictions.csv")
         out.to_csv(p_csv, index=False, encoding="utf-8-sig")
 
-        p_xlsx = os.path.join(out_dir, "新应用案例_predictions.xlsx")
+        p_xlsx = os.path.join(out_dir, " new application case _predictions.xlsx")
         out.to_excel(p_xlsx, index=False)
 
     print(f"[OK] Saved: {p_csv}")
     print(f"[OK] Saved: {p_xlsx}")
     if has_labels:
-        print(f"[OK] Saved: {os.path.join(out_dir, '新应用案例_metrics.json')}")
+        print(f"[OK] Saved: {os.path.join(out_dir, ' new application case _metrics.json')}")
     print(f"[OK] Rows: {len(out)}")
 
 if __name__ == "__main__":

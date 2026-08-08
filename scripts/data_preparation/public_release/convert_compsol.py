@@ -35,10 +35,10 @@ def main() -> None:
             break
 
     if not source_file:
-        print("❌ 没找到 CompSol Excel 文件！请确认文件在当前文件夹里。")
+        print("❌ None found CompSol Excel file ! verify file at current file Clip .")
         return
 
-    print(f"🚀 找到源文件: {source_file}")
+    print(f"🚀 found Source file : {source_file}")
     save_path = str(args.output)
 
     # Legacy public-release workflow step.
@@ -155,16 +155,16 @@ def main() -> None:
     }
 
     # Legacy public-release workflow step.
-    print("📖 正在读取 Excel (Sheet='Binary mixtures')...")
+    print("📖 reading Excel (Sheet='Binary mixtures')...")
     try:
         # Legacy public-release workflow step.
         df = pd.read_excel(source_file, sheet_name="Binary mixtures", skiprows=1, engine="openpyxl")
     except:
-        print("⚠️ 读取 Binary mixtures 失败，尝试读取默认 Sheet...")
+        print("⚠️ read Binary mixtures failed , attempt read default Sheet...")
         df = pd.read_excel(source_file, skiprows=1, engine="openpyxl")
 
-    print(f"📊 原始数据: {len(df)} 行")
-    print("⚡ 开始离线匹配 (Matches -> SMILES)...")
+    print(f"📊 Original data : {len(df)} rows ")
+    print("⚡ start Offline Matching (Matches -> SMILES)...")
 
     new_data = []
     match_count = 0
@@ -204,16 +204,16 @@ def main() -> None:
         df_out = pd.DataFrame(new_data)
         df_out.to_excel(save_path, index=False)
         print("\n" + "="*40)
-        print(f"🎉 成功生成！无需联网！")
-        print(f"📊 成功匹配数据: {len(new_data)} 条")
-        print(f"   (这比之前的几百条多多了，而且速度极快)")
-        print(f"📂 保存路径: {os.path.abspath(save_path)}")
+        print(f"🎉 successful generate ! No internet required !")
+        print(f"📊 successful match data : {len(new_data)} bar ")
+        print(f" ( This vs. before Hundreds multiple multiple of , And Very Fast )")
+        print(f"📂 output path : {os.path.abspath(save_path)}")
         print("="*40)
-        print("👉 现在的下一步：")
-        print(f"1. 确认 config.py 里 EXCEL_PATH = '{save_path}'")
-        print("2. 运行 python main.py")
+        print("👉 Now at Next :")
+        print(f"1. Confirm config.py Vil. EXCEL_PATH = '{save_path}'")
+        print("2. run python main.py")
     else:
-        print("❌ 匹配数量为 0。请检查 Excel 里的名字是否真的很奇怪。")
+        print("❌ match count is 0. please check Excel Vil. First Name whether true Strange .")
 
 
 if __name__ == "__main__":

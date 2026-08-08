@@ -38,10 +38,10 @@ if solute_graph is not None and solvent_graph is not None:
     model.eval()
     with torch.no_grad():
         prediction, interaction_map = model(solute_batch, solvent_batch)
-        print(f"溶质: {solute_smiles}")
-        print(f"溶剂: {solvent_smiles}")
-        print(f"预测的溶剂化自由能: {prediction.item():.4f} kcal/mol")
-        print(f"交互映射形状: {interaction_map.shape}")
+        print(f" solute : {solute_smiles}")
+        print(f" solvent : {solvent_smiles}")
+        print(f" prediction solvent Transforming Free Energy : {prediction.item():.4f} kcal/mol")
+        print(f" Interaction Mapping shape : {interaction_map.shape}")
 else:
-    print("无法解析SMILES字符串")
+    print(" unable to parse SMILES String ")
 

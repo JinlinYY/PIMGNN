@@ -1,26 +1,28 @@
-# 物理约束正则化对比
+# Physics-Regularized Learning
 
-- 论文位置：主文 2.3；主文 3.1.2；表 3
-- 证据状态：代码和已有结果齐全
-- 整理原则：直接归档工程中已有文件，本次未重新训练模型。
+## Paper mapping
 
-## 代码入口
+- Main text Section 2.3
+- Main text Section 3.1.2
+- Table 3
+
+## Available resources
+
+The supervised and physics-regularized configurations, checkpoints, prediction metrics, and thermodynamic diagnostics are available.
+
+## Evidence status
+
+Executable code and reference artifacts available.
+
+## Code entry points
 
 - `scripts/train.py`
 - `src/psmi/loss.py`
 - `src/psmi/ge_models.py`
 - `src/psmi/nrtl_flash.py`
 
-## 运行入口
+## Commands
 
 ```powershell
 python scripts/train.py --help
 ```
-
-## 说明
-
-- 监督阶段与物理约束阶段的逐种子指标来自主基准 corrected_v2 结果。
-
-## 已归档内容
-
-本目录中的 `results`、`figures` 或 `data` 来自当前工程已有输出。

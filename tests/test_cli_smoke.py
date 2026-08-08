@@ -30,7 +30,7 @@ APPLICATION_CSV = next(
     (path for path in _APPLICATION_CSV_CANDIDATES if path.is_file()),
     _APPLICATION_CSV_CANDIDATES[0],
 )
-APPLICATION_EXCEL = PROJECT_ROOT / "datasets" / "raw" / "应用案例1.xlsx"
+APPLICATION_EXCEL = PROJECT_ROOT / "datasets" / "raw" / "application_case_1.xlsx"
 DEFAULT_CHECKPOINT = (
     PROJECT_ROOT
     / "models"

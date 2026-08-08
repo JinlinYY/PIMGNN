@@ -146,14 +146,14 @@ def plot_one_system_compare(
 
 def main() -> None:
     ap = argparse.ArgumentParser("Plot application-case LLE phase diagram comparison")
-    ap.add_argument("--excel_path", type=str, required=True, help="输入 Excel 路径")
-    ap.add_argument("--out_dir", type=str, required=True, help="输出目录")
+    ap.add_argument("--excel_path", type=str, required=True, help=" input Excel path ")
+    ap.add_argument("--out_dir", type=str, required=True, help=" output directory ")
     ap.add_argument("--group_by_temp", action="store_true",
-                    help="是否把 (体系编号 + 温度) 当作不同体系（仅对原始 Excel 有效）")
-    ap.add_argument("--draw_curve", action="store_true", help="是否画 Ex/Rx 边界曲线（PCA排序连线）")
-    ap.add_argument("--draw_tielines", action="store_true", help="是否画 tie-lines（连线 Ex/Rx）")
-    ap.add_argument("--make_pdf", action="store_true", help="是否合并导出多页 PDF")
-    ap.add_argument("--max_systems", type=int, default=-1, help="最多导出多少个体系（-1=全部）")
+                    help=" whether put ( system identifier + temperature ) Treat as Different system ( only for Original Excel valid )")
+    ap.add_argument("--draw_curve", action="store_true", help=" whether to plot Ex/Rx boundary curve (PCA ordered polyline )")
+    ap.add_argument("--draw_tielines", action="store_true", help=" whether to plot tie-lines( Connect Ex/Rx)")
+    ap.add_argument("--make_pdf", action="store_true", help=" whether to export a multipage document PDF")
+    ap.add_argument("--max_systems", type=int, default=-1, help=" maximum number of systems to export (-1= all )")
     args = ap.parse_args()
 
     out_dir = Path(args.out_dir)
@@ -180,7 +180,7 @@ def main() -> None:
             base_cols = ["LLE system NO.", "T/K"] + need_cols
             for c in base_cols:
                 if c not in df.columns:
-                    raise ValueError(f"缺少列：{c}")
+                    raise ValueError(f" missing columns :{c}")
             keys = ["LLE system NO.", "T/K"] if args.group_by_temp else ["LLE system NO."]
             grouped = df.groupby(keys, dropna=False, sort=False)
             for k, sub in grouped:

@@ -80,7 +80,7 @@ class IntramolecularMessagePassing(MessagePassing):
         # Baseline workflow step.
         # Baseline workflow step.
         if u.size(1) != 6:
-            raise ValueError(f"u 的形状不正确: {u.shape}, 期望第二维为 6")
+            raise ValueError(f"u shape Incorrect : {u.shape}, expected number Two dimensions is 6")
         
         if batch is not None:
             u_expanded = u[batch[row]]  # (E, 6)
@@ -91,10 +91,10 @@ class IntramolecularMessagePassing(MessagePassing):
         expected_dim = x_i.size(1) * 2 + edge_attr.size(1) + u_expanded.size(1)
         actual_dim = x_i.size(1) + x_j.size(1) + edge_attr.size(1) + u_expanded.size(1)
         if actual_dim != expected_dim:
-            raise ValueError(f"edge_input 维度不匹配: x_i={x_i.size(1)}, x_j={x_j.size(1)}, "
+            raise ValueError(f"edge_input dimension mismatch : x_i={x_i.size(1)}, x_j={x_j.size(1)}, "
                            f"edge_attr={edge_attr.size(1)}, u_expanded={u_expanded.size(1)}, "
-                           f"期望总维度={self.node_feat_dim * 2 + self.edge_dim + 6}, "
-                           f"实际总维度={actual_dim}")
+                           f" expected Total dimension ={self.node_feat_dim * 2 + self.edge_dim + 6}, "
+                           f" Actual Total dimension ={actual_dim}")
         
         edge_input = torch.cat([x_i, x_j, edge_attr, u_expanded], dim=-1)
         edge_attr_updated = edge_attr + self.edge_net(edge_input)
@@ -384,13 +384,13 @@ class MMGNN(nn.Module):
                     if u.size(0) % 6 == 0:
                         u = u.view(-1, 6)
                     else:
-                        raise ValueError(f"无法处理 1D global_features 的形状: {u.shape}")
+                        raise ValueError(f" unable to process 1D global_features shape : {u.shape}")
             else:
                 # Baseline workflow step.
                 if u.size(0) % 6 == 0:
                     u = u.view(-1, 6)
                 else:
-                    raise ValueError(f"无法处理 1D global_features 的形状: {u.shape}")
+                    raise ValueError(f" unable to process 1D global_features shape : {u.shape}")
         elif u.dim() > 2:
             # Baseline workflow step.
             u = u.view(-1, u.size(-1))
@@ -422,7 +422,7 @@ class MMGNN(nn.Module):
                     num_mols = u.size(1) // 6
                     u = u.view(batch_size, num_mols, 6).mean(dim=1)  # (B, 6)
                 else:
-                    raise ValueError(f"无法处理 global_features 的形状: {u.shape}, batch_size={batch_size}, 期望第二维是 6 的倍数")
+                    raise ValueError(f" unable to process global_features shape : {u.shape}, batch_size={batch_size}, expected number Two dimensions yes 6 multiple ")
             else:
                 # Baseline workflow step.
                 if u.size(0) % batch_size == 0:
@@ -430,9 +430,9 @@ class MMGNN(nn.Module):
                     if u.size(1) == 6:
                         u = u.view(batch_size, mols_per_sample, 6).mean(dim=1)  # (B, 6)
                     else:
-                        raise ValueError(f"无法处理 global_features 的形状: {u.shape}, batch_size={batch_size}")
+                        raise ValueError(f" unable to process global_features shape : {u.shape}, batch_size={batch_size}")
                 else:
-                    raise ValueError(f"global_features 的第一维 ({u.size(0)}) 无法被 batch_size ({batch_size}) 整除")
+                    raise ValueError(f"global_features number M dimensions ({u.size(0)}) unable to by batch_size ({batch_size}) Divide by ")
         else:
             # Baseline workflow step.
             if u.size(0) >= 3 and u.size(1) == 6:
@@ -444,7 +444,7 @@ class MMGNN(nn.Module):
         
         # Baseline workflow step.
         if u.dim() != 2 or u.size(1) != 6:
-            raise ValueError(f"处理后的 global_features 形状不正确: {u.shape}, 期望形状为 (B, 6)")
+            raise ValueError(f" process after global_features shape Incorrect : {u.shape}, expected shape is (B, 6)")
         
         # Save the generated artifacts.
         u_global = u  # Baseline workflow step.

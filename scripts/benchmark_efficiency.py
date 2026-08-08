@@ -37,16 +37,8 @@ from psmi.utils import Scaler, batch_to_device, set_seed
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_CHECKPOINT = (
-    PROJECT_ROOT
-    / "models"
-    / "03_physics_constraints"
-    / "lle_run_混合物图-Cross-s3-tf-化学势约束x"
-    / "best_model.pt"
-)
-DEFAULT_OUTPUT_DIR = (
-    PROJECT_ROOT / "experiments" / "10_efficiency" / "runs" / "psmi_rtx3090_ti"
-)
+DEFAULT_CHECKPOINT = PROJECT_ROOT / "models" / "efficiency_benchmark" / "best_model.pt"
+DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "experiments" / "15_efficiency" / "results" / "psmi_rtx3090_ti"
 
 
 def _percentile(values: Sequence[float], q: float) -> float:

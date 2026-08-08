@@ -8,7 +8,7 @@ from .glam import GLAM, GLAMEnsemble, ConfigurationSpace
 def example_single_graph():
     """Run the example single graph baseline operation."""
     print("=" * 50)
-    print("单图架构示例 - 分子性质预测")
+    print(" Single graph Architecture example - molecule Nature prediction ")
     print("=" * 50)
     
     # Configure the baseline model.
@@ -22,7 +22,7 @@ def example_single_graph():
         task_type='property'
     )
     
-    print(f"模型配置: {model.config}")
+    print(f" model configuration : {model.config}")
     
     # Process the experiment data.
     num_nodes = 10
@@ -42,17 +42,17 @@ def example_single_graph():
             batch=batch.batch
         )
     
-    print(f"输入节点数: {num_nodes}")
-    print(f"输入边数: {num_edges}")
-    print(f"输出形状: {output.shape}")
-    print(f"预测值: {output.item():.4f}")
+    print(f" input node count : {num_nodes}")
+    print(f" input edge count : {num_edges}")
+    print(f" output shape : {output.shape}")
+    print(f" prediction : {output.item():.4f}")
     print()
 
 
 def example_pair_graph():
     """Run the example pair graph baseline operation."""
     print("=" * 50)
-    print("双图架构示例 - 分子相互作用预测")
+    print(" Double graph Architecture example - molecule phase Interaction prediction ")
     print("=" * 50)
     
     # Configure the baseline model.
@@ -66,7 +66,7 @@ def example_pair_graph():
         task_type='interaction'
     )
     
-    print(f"模型配置: {model.config}")
+    print(f" model configuration : {model.config}")
     
     # Process the experiment data.
     num_nodes1 = 8
@@ -88,17 +88,17 @@ def example_pair_graph():
             x2, edge_index2
         )
     
-    print(f"图1节点数: {num_nodes1}, 边数: {num_edges1}")
-    print(f"图2节点数: {num_nodes2}, 边数: {num_edges2}")
-    print(f"输出形状: {output.shape}")
-    print(f"预测值: {output.item():.4f}")
+    print(f" graph 1 node count : {num_nodes1}, edge count : {num_edges1}")
+    print(f" graph 2 node count : {num_nodes2}, edge count : {num_edges2}")
+    print(f" output shape : {output.shape}")
+    print(f" prediction : {output.item():.4f}")
     print()
 
 
 def example_ensemble():
     """Run the example ensemble baseline operation."""
     print("=" * 50)
-    print("集成模型示例")
+    print(" Integration model example ")
     print("=" * 50)
     
     node_dim = 9
@@ -113,9 +113,9 @@ def example_ensemble():
         ensemble_size=ensemble_size
     )
     
-    print(f"集成模型数量: {ensemble_size}")
+    print(f" Integration model count : {ensemble_size}")
     for i, model in enumerate(ensemble_model.models):
-        print(f"模型 {i+1} 配置: {model.config}")
+        print(f" model {i+1} configuration : {model.config}")
     
     # Process the experiment data.
     num_nodes = 10
@@ -133,44 +133,44 @@ def example_ensemble():
             batch=batch.batch
         )
     
-    print(f"集成预测输出形状: {output.shape}")
-    print(f"集成预测值: {output.item():.4f}")
+    print(f" Integration prediction output shape : {output.shape}")
+    print(f" Integration prediction : {output.item():.4f}")
     print()
 
 
 def example_config_space():
     """Run the example config space baseline operation."""
     print("=" * 50)
-    print("配置空间示例")
+    print(" configuration Space example ")
     print("=" * 50)
     
     config_space = ConfigurationSpace()
     
     # Baseline workflow step.
-    print("采样5个分子性质预测配置:")
+    print(" sampling 5 molecule Nature prediction configuration :")
     configs_property = config_space.sample_configs(5, task_type='property')
     for i, config in enumerate(configs_property):
-        print(f"配置 {i+1}:")
-        print(f"  MP类型: {config['mp_type']}")
-        print(f"  隐藏维度: {config['hidden_dim']}")
-        print(f"  MP层数: {config['num_mp_layers']}")
-        print(f"  学习率: {config['learning_rate']}")
+        print(f" configuration {i+1}:")
+        print(f" MP type : {config['mp_type']}")
+        print(f" hidden dimension : {config['hidden_dim']}")
+        print(f" MP number of layers : {config['num_mp_layers']}")
+        print(f" learning rate : {config['learning_rate']}")
         print()
     
-    print("采样3个分子相互作用预测配置:")
+    print(" sampling 3 molecule phase Interaction prediction configuration :")
     configs_interaction = config_space.sample_configs(3, task_type='interaction')
     for i, config in enumerate(configs_interaction):
-        print(f"配置 {i+1}:")
-        print(f"  MP类型: {config['mp_type']}")
-        print(f"  融合类型: {config['fusion_type']}")
-        print(f"  隐藏维度: {config['hidden_dim']}")
+        print(f" configuration {i+1}:")
+        print(f" MP type : {config['mp_type']}")
+        print(f" Fusion type : {config['fusion_type']}")
+        print(f" hidden dimension : {config['hidden_dim']}")
         print()
 
 
 def example_training():
     """Run the example training baseline operation."""
     print("=" * 50)
-    print("训练示例")
+    print(" Training example ")
     print("=" * 50)
     
     node_dim = 9
@@ -210,9 +210,9 @@ def example_training():
     loss.backward()
     optimizer.step()
     
-    print(f"训练损失: {loss.item():.4f}")
-    print(f"预测输出形状: {output.shape}")
-    print(f"真实标签形状: {labels.shape}")
+    print(f" training loss : {loss.item():.4f}")
+    print(f" prediction output shape : {output.shape}")
+    print(f" Real label shape : {labels.shape}")
     print()
 
 
@@ -225,6 +225,6 @@ if __name__ == "__main__":
     example_training()
     
     print("=" * 50)
-    print("所有示例运行完成！")
+    print(" all example run complete !")
     print("=" * 50)
 

@@ -1,4 +1,4 @@
-"""Run registered PSMI checkpoints in isolated inference-only subprocesses."""
+"""Evaluate registered PSMI checkpoints in isolated subprocesses."""
 
 from __future__ import annotations
 
@@ -99,7 +99,7 @@ def main() -> int:
             command.extend(["--device", args.device])
         if args.no_plots:
             command.append("--no-plots")
-        print(f"[inference-only] {run['id']}", flush=True)
+        print(f"[checkpoint-evaluation] {run['id']}", flush=True)
         subprocess.run(command, cwd=PROJECT_ROOT, check=True)
         report_paths.append(run_output / "reproduction_report.json")
 

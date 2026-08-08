@@ -214,7 +214,7 @@ TF_TYPE_VOCAB = 16
 # Expanded-dataset fine-tuning
 USE_FINE_TUNE = False
 FINE_TUNE_EXCEL_PATH = str(
-    DATASETS_DIR / "processed" / "LLE-literature-data-case-mul-去掉IL.xlsx"
+    DATASETS_DIR / "processed" / "LLE-literature-data-case-mul-without-IL.xlsx"
 )
 PRETRAINED_MODEL_PATH = LOAD_CKPT_PATH
 FINE_TUNE_LR = 2e-5

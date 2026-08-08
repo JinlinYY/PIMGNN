@@ -1,10 +1,19 @@
-# 通用机器学习与图神经网络对比实验
+# Machine-Learning and Graph-Neural-Network Baselines
 
-- 论文位置：主文 3.1.1；表 1
-- 证据状态：代码和已有结果齐全
-- 整理原则：直接归档工程中已有文件，本次未重新训练模型。
+## Paper mapping
 
-## 代码入口
+- Main text Section 3.1.1
+- Table 1
+
+## Available resources
+
+Baseline implementations and five-seed reference summaries are available.
+
+## Evidence status
+
+Executable code and reference artifacts available.
+
+## Code entry points
 
 - `scripts/experiments/baselines/run_classical_multi_seed.py`
 - `scripts/experiments/baselines/run_cignn.py`
@@ -12,16 +21,8 @@
 - `scripts/experiments/baselines/run_glam.py`
 - `src/psmi_baselines`
 
-## 运行入口
+## Commands
 
 ```powershell
 python scripts/experiments/baselines/run_classical_multi_seed.py --help
 ```
-
-## 说明
-
-- 归档论文对比表使用的历史五随机种子汇总。其划分协议与 corrected_v2 主基准不同，不能混合解读。
-
-## 已归档内容
-
-本目录中的 `results`、`figures` 或 `data` 来自当前工程已有输出。

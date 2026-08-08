@@ -33,11 +33,11 @@ class SolvDataset(Dataset):
         elif data_path.endswith('.tsv'):
             self.data = pd.read_csv(data_path, sep='\t')
         else:
-            raise ValueError(f"不支持的文件格式: {data_path}")
+            raise ValueError(f" unsupported file format : {data_path}")
         
         # Baseline workflow step.
         if smiles_col not in self.data.columns:
-            raise ValueError(f"列 '{smiles_col}' 不存在于数据文件中")
+            raise ValueError(f" column '{smiles_col}' does not exist on data file in ")
         
         self.smiles_col = smiles_col
         
@@ -49,7 +49,7 @@ class SolvDataset(Dataset):
             # Baseline workflow step.
             missing_cols = [col for col in label_cols if col not in self.data.columns]
             if missing_cols:
-                raise ValueError(f"以下标签列不存在于数据文件中: {missing_cols}")
+                raise ValueError(f" Below label column does not exist on data file in : {missing_cols}")
         
         self.label_cols = label_cols
     
@@ -233,11 +233,11 @@ def build_tokenizer(
     # Load the input data.
     if vocab_path and os.path.exists(vocab_path):
         try:
-            print(f"从本地路径加载tokenizer: {vocab_path}")
+            print(f" from Local path load tokenizer: {vocab_path}")
             tokenizer = AutoTokenizer.from_pretrained(vocab_path, local_files_only=True)
             return tokenizer
         except Exception as e:
-            print(f"警告: 无法从 {vocab_path} 加载tokenizer: {e}")
+            print(f" warning : unable to from {vocab_path} load tokenizer: {e}")
     
     # Load the input data.
     # Save the generated artifacts.
@@ -254,43 +254,43 @@ def build_tokenizer(
             vocab_file_path = os.path.join(base_path, 'vocab.txt')
             if os.path.exists(tokenizer_config_path) or os.path.exists(vocab_file_path):
                 try:
-                    print(f"从 {base_path} 加载已保存的tokenizer")
+                    print(f" from {base_path} load saved tokenizer")
                     tokenizer = AutoTokenizer.from_pretrained(base_path, local_files_only=True)
                     return tokenizer
                 except Exception as e:
-                    print(f"警告: 无法从 {base_path} 加载tokenizer: {e}")
+                    print(f" warning : unable to from {base_path} load tokenizer: {e}")
                     continue
     
     # Baseline workflow step.
     try:
         if local_files_only:
-            print(f"尝试从本地缓存加载tokenizer: {model_name}")
+            print(f" attempt from Local Cache load tokenizer: {model_name}")
             tokenizer = AutoTokenizer.from_pretrained(model_name, local_files_only=True)
         else:
-            print(f"从HuggingFace加载tokenizer: {model_name}")
+            print(f" from HuggingFace load tokenizer: {model_name}")
             tokenizer = AutoTokenizer.from_pretrained(model_name)
     except Exception as e:
         if local_files_only:
             # Load the input data.
-            print(f"警告: 无法在离线模式下加载tokenizer '{model_name}'")
-            print(f"错误: {e}")
-            print("创建简单的字符级tokenizer作为后备方案...")
+            print(f" warning : unable to at Offline Mode load tokenizer '{model_name}'")
+            print(f" error : {e}")
+            print(" create Easy Character Level tokenizer as a fallback ...")
             tokenizer = create_simple_tokenizer(vocab_size=vocab_size)
-            print("已创建简单的字符级tokenizer")
+            print(" Already create Easy Character Level tokenizer")
             return tokenizer
         else:
             # Baseline workflow step.
-            print(f"在线下载失败，尝试使用本地缓存: {e}")
+            print(f" online download failed , trying the local cache : {e}")
             try:
                 tokenizer = AutoTokenizer.from_pretrained(model_name, local_files_only=True)
-                print("成功从本地缓存加载tokenizer")
+                print(" successful from Local Cache load tokenizer")
             except Exception as e2:
                 # Baseline workflow step.
-                print(f"警告: 无法加载预训练tokenizer，创建简单的字符级tokenizer作为后备方案")
-                print(f"在线下载失败: {e}")
-                print(f"本地缓存也不存在: {e2}")
+                print(f" warning : unable to load pretraining tokenizer, create Easy Character Level tokenizer as a fallback ")
+                print(f" online download failed : {e}")
+                print(f" local cache is also unavailable : {e2}")
                 tokenizer = create_simple_tokenizer(vocab_size=vocab_size)
-                print("已创建简单的字符级tokenizer")
+                print(" Already create Easy Character Level tokenizer")
     
     # Run the training step.
     if train_data_path:
@@ -300,7 +300,7 @@ def build_tokenizer(
         elif train_data_path.endswith('.tsv'):
             df = pd.read_csv(train_data_path, sep='\t')
         else:
-            raise ValueError(f"不支持的文件格式: {train_data_path}")
+            raise ValueError(f" unsupported file format : {train_data_path}")
         
         # Baseline workflow step.
         smiles_col = 'smiles' if 'smiles' in df.columns else df.columns[0]
@@ -308,7 +308,7 @@ def build_tokenizer(
         
         # Run the training step.
         # Run the training step.
-        print(f"使用预训练tokenizer: {model_name}")
+        print(f" use pretraining tokenizer: {model_name}")
     
     return tokenizer
 

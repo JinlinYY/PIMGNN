@@ -10,7 +10,7 @@
   ],
   "sum_tolerance": 1e-06,
   "negative_tolerance": 1e-12,
-  "nrtl_params_path": "D:\\GGNN\\YXFL\\datasets\\parameters\\nrtl_params_all.json",
+  "nrtl_params_path": "datasets/parameters/nrtl_params_all.json",
   "nrtl_meta": {
     "alpha": 0.3,
     "R": 8.314462618,
@@ -20,7 +20,7 @@
   "models": [
     {
       "label": "physics_informed",
-      "predictions_path": "D:\\GGNN\\YXFL\\experiments\\03_physics_constraints\\runs\\lle_run_混合物图-Cross-s3-tf-化学势约束\\predictions\\test_df_raw_pointwise_predictions.csv",
+      "predictions_path": "experiments/paper_historical/table3_physics_informed/predictions/test_df_raw_pointwise_predictions.csv",
       "total_predictions": 803,
       "evaluated_predictions": 803,
       "nrtl_parameter_coverage": 1.0,
@@ -44,7 +44,7 @@
     },
     {
       "label": "data_driven_baseline",
-      "predictions_path": "D:\\GGNN\\YXFL\\experiments\\03_physics_constraints\\runs\\lle_run_混合物图-Cross-s3-tf-纯数据驱动test2\\predictions\\test_df_raw_pointwise_predictions.csv",
+      "predictions_path": "experiments/paper_historical/figure2a_psmi/predictions/test_df_raw_pointwise_predictions.csv",
       "total_predictions": 803,
       "evaluated_predictions": 803,
       "nrtl_parameter_coverage": 1.0,

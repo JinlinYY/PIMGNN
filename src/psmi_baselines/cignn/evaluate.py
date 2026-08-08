@@ -111,11 +111,11 @@ def evaluate_model(model, dataloader, device, save_plot=False, plot_path=None):
     rmse_per_output = np.sqrt(np.mean((predictions_array - labels_array) ** 2, axis=0))
     mae_per_output = np.mean(np.abs(predictions_array - labels_array), axis=0)
     
-    print(f"\n评估结果:")
-    print(f"总体 RMSE: {rmse:.4f}")
-    print(f"总体 MAE: {mae:.4f}")
-    print(f"总体 R²: {r2:.4f}")
-    print(f"\n各输出指标:")
+    print(f"\n evaluation results :")
+    print(f" overall RMSE: {rmse:.4f}")
+    print(f" overall MAE: {mae:.4f}")
+    print(f" overall R²: {r2:.4f}")
+    print(f"\n Each output metrics :")
     output_names = ['Ex1', 'Ex2', 'Ex3', 'Rx1', 'Rx2', 'Rx3']
     for i, name in enumerate(output_names):
         print(f"  {name}: RMSE={rmse_per_output[i]:.4f}, MAE={mae_per_output[i]:.4f}")
@@ -138,7 +138,7 @@ def evaluate_model(model, dataloader, device, save_plot=False, plot_path=None):
         
         plt.tight_layout()
         plt.savefig(plot_path, dpi=300)
-        print(f"\n预测图已保存到: {plot_path}")
+        print(f"\n prediction graph saved to : {plot_path}")
     
     return {
         'predictions': predictions_array,
@@ -232,7 +232,7 @@ def main():
             'rmse_per_output': results.get('rmse_per_output', []).tolist() if 'rmse_per_output' in results else None,
             'mae_per_output': results.get('mae_per_output', []).tolist() if 'mae_per_output' in results else None
         }, f, indent=2)
-    print(f"\n结果已保存到: {results_path}")
+    print(f"\n results saved to : {results_path}")
 
 
 if __name__ == '__main__':

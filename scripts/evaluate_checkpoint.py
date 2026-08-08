@@ -15,7 +15,7 @@ from psmi.reproduction import evaluate_saved_checkpoint
 
 
 def parse_args() -> argparse.Namespace:
-    """Parse an inference-only checkpoint evaluation command."""
+    """Parse a checkpoint evaluation command."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", action="append", required=True)
     parser.add_argument("--checkpoint", required=True)

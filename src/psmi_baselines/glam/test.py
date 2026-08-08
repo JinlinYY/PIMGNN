@@ -95,7 +95,7 @@ def plot_predictions(predictions, labels, save_path=None):
     
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        print(f"预测对比图已保存到: {save_path}")
+        print(f" prediction for Ratio graph saved to : {save_path}")
     else:
         plt.show()
     
@@ -134,7 +134,7 @@ def plot_training_history(history, save_path=None):
     
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        print(f"训练历史图已保存到: {save_path}")
+        print(f" training history graph saved to : {save_path}")
     else:
         plt.show()
     
@@ -146,28 +146,28 @@ def main(model_path=None, test_only=False):
     # Configure the runtime device.
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print("=" * 80)
-    print("GLAM模型测试 - LLE预测")
+    print("GLAM model Test - LLE prediction ")
     print("=" * 80)
-    print(f"使用设备: {device}")
+    print(f" use device : {device}")
     
     # Configure the baseline model.
     if model_path is None:
         model_path = os.path.join(default_config.model_save_dir, 'best_model.pth')
     
     if not os.path.exists(model_path):
-        print(f"错误: 模型文件不存在: {model_path}")
-        print("请先运行 train.py 训练模型")
+        print(f" error : model file does not exist : {model_path}")
+        print(" First run train.py Training model ")
         return
     
     # Load the input data.
-    print(f"\n加载模型: {model_path}")
+    print(f"\n load model : {model_path}")
     model, config, checkpoint = load_model(model_path, device)
     
-    print(f"模型训练epoch: {checkpoint.get('epoch', 'N/A')}")
-    print(f"最佳验证损失: {checkpoint.get('val_loss', 'N/A'):.6f}")
+    print(f" model training epoch: {checkpoint.get('epoch', 'N/A')}")
+    print(f" best validation loss : {checkpoint.get('val_loss', 'N/A'):.6f}")
     
     # Load the input data.
-    print("\n加载数据集...")
+    print("\n load dataset ...")
     datasets = load_LLE_dataset(
         config.data.csv_path,
         test_size=config.data.test_size,
@@ -194,21 +194,21 @@ def main(model_path=None, test_only=False):
     )
     
     # Configure the baseline model.
-    print("\n评估模型...")
+    print("\n Assessment model ...")
     criterion = nn.MSELoss()
     test_metrics = evaluate(model, test_loader, criterion, device)
     
     # Baseline workflow step.
     print("\n" + "=" * 80)
-    print("测试集结果:")
+    print(" test-set results :")
     print("=" * 80)
-    print(f"  测试损失: {test_metrics['loss']:.6f}")
-    print(f"  测试MSE: {test_metrics['mse']:.6f}")
-    print(f"  测试MAE: {test_metrics['mae']:.6f}")
-    print(f"  测试RMSE: {test_metrics['rmse']:.6f}")
-    print(f"  测试R²: {test_metrics['r2']:.6f}")
+    print(f" test loss : {test_metrics['loss']:.6f}")
+    print(f" Test MSE: {test_metrics['mse']:.6f}")
+    print(f" Test MAE: {test_metrics['mae']:.6f}")
+    print(f" Test RMSE: {test_metrics['rmse']:.6f}")
+    print(f" Test R²: {test_metrics['r2']:.6f}")
     
-    print("\n各组分详细指标:")
+    print("\n Each component Detail metrics :")
     for comp_name, comp_metrics in test_metrics['component_metrics'].items():
         print(f"  {comp_name}:")
         print(f"    MSE: {comp_metrics['mse']:.6f}")
@@ -217,7 +217,7 @@ def main(model_path=None, test_only=False):
         print(f"    R²: {comp_metrics['r2']:.6f}")
     
     # Generate model predictions.
-    print("\n生成预测对比图...")
+    print("\n generate prediction for Ratio graph ...")
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     plot_path = os.path.join(config.result_dir, f'predictions_{timestamp}.png')
     plot_predictions(test_metrics['predictions'], test_metrics['labels'], plot_path)
@@ -226,7 +226,7 @@ def main(model_path=None, test_only=False):
     if not test_only:
         # Load the input data.
         if 'train_history' in checkpoint:
-            print("\n生成训练历史图...")
+            print("\n generate training-history plot ...")
             history_path = os.path.join(config.result_dir, f'training_history_{timestamp}.png')
             plot_training_history(checkpoint['train_history'], history_path)
         else:
@@ -240,11 +240,11 @@ def main(model_path=None, test_only=False):
                         with open(result_file_path, 'r', encoding='utf-8') as f:
                             result_data = json.load(f)
                             if 'train_history' in result_data.get('results', {}):
-                                print("\n生成训练历史图...")
+                                print("\n generate training-history plot ...")
                                 history_path = os.path.join(config.result_dir, f'training_history_{timestamp}.png')
                                 plot_training_history(result_data['results']['train_history'], history_path)
                     except Exception as e:
-                        print(f"无法加载训练历史: {e}")
+                        print(f" unable to load training history : {e}")
     
     # Save the generated artifacts.
     test_results = {
@@ -265,7 +265,7 @@ def main(model_path=None, test_only=False):
     with open(result_path, 'w', encoding='utf-8') as f:
         json.dump(test_results, f, indent=2, ensure_ascii=False)
     
-    print(f"\n测试结果已保存到: {result_path}")
+    print(f"\n Test results saved to : {result_path}")
     print("=" * 80)
 
 def test_data_loading(csv_path=str(TOTAL_CSV)):
@@ -288,9 +288,9 @@ def test_data_loading(csv_path=str(TOTAL_CSV)):
 def run_model_test():
         import argparse
     
-        parser = argparse.ArgumentParser(description='测试GLAM模型')
-        parser.add_argument('--model', type=str, default=None, help='模型文件路径')
-        parser.add_argument('--test-only', action='store_true', help='仅测试，不绘制训练历史')
+        parser = argparse.ArgumentParser(description=' Test GLAM model ')
+        parser.add_argument('--model', type=str, default=None, help=' model file path ')
+        parser.add_argument('--test-only', action='store_true', help=' Test Only , No plot training history ')
     
         args = parser.parse_args()
     

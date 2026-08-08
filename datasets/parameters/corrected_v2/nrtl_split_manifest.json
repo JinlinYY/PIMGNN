@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "dataset_path": "D:\\GGNN\\YXFL\\datasets\\processed\\update-LLE-all-with-smiles.xlsx",
+  "dataset_path": "datasets/processed/update-LLE-all-with-smiles.xlsx",
   "dataset_sha256": "76812d7a9ba8c6e6660e1acbf15817ff0725664d7fcf69b0fb0a84e133529f06",
   "dataset_rows_after_filtering": 7683,
   "dataset_system_count_after_filtering": 765,
@@ -789,6 +789,6 @@
     "validation": 75,
     "test": 78
   },
-  "source_split_manifest_path": "D:\\GGNN\\YXFL\\datasets\\splits\\main_benchmark_corrected_v2.json",
-  "source_split_manifest_sha256": "02f72c1f275a675e42acf12731be5b5f3f39b7e9b12e28ecf7e969f298e5fe0f"
+  "source_split_manifest_path": "datasets/splits/main_benchmark_corrected_v2.json",
+  "source_split_manifest_sha256": "c5730584a7713d284ed25c4007aed27e5958987844bb114f7e847fc3aaaa852a"
 }

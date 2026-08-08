@@ -204,7 +204,7 @@ def _infer_ckpt_path(ckpt_arg: str, out_dir: str) -> str:
         if os.path.isfile(p):
             return p
     raise FileNotFoundError(
-        f"[CKPT] auto 未找到 checkpoint。请显式指定 --ckpt 路径。已尝试：\n" + "\n".join(cand)
+        f"[CKPT] auto not found checkpoint. specify explicitly --ckpt path . Already attempt :\n" + "\n".join(cand)
     )
 
 
@@ -323,7 +323,7 @@ def load_model_and_scaler(ckpt_path: str, device: torch.device) -> LoadedModel:
     elif "model" in ckpt:
         model.load_state_dict(ckpt["model"], strict=True)
     else:
-        raise KeyError(f"[CKPT] 未找到 state_dict 或 model: {ckpt_path}，可用键: {list(ckpt.keys())}")
+        raise KeyError(f"[CKPT] not found state_dict or model: {ckpt_path}, available Key : {list(ckpt.keys())}")
     model.eval()
 
     
@@ -973,7 +973,7 @@ def _objective(pred: torch.Tensor, y: Optional[torch.Tensor], objective: str, ta
 
     # default: loss (MSE)
     if y is None:
-        raise ValueError("objective=loss 需要 y")
+        raise ValueError("objective=loss requires y")
     if kind == "slice":
         return torch.mean((pred[:, spec] - y[:, spec]) ** 2)
     return torch.mean((pred[:, int(spec)] - y[:, int(spec)]) ** 2)
@@ -1700,7 +1700,7 @@ def explain_system_and_plot(
     # Build caches
     use_graph = bool(getattr(C, "USE_GRAPH", False))
     if not use_graph:
-        raise RuntimeError("当前配置 USE_GRAPH=False，无法做节点/边级可解释性（仅能做 FP/FG 级）。")
+        raise RuntimeError(" current configuration USE_GRAPH=False, unable to DO node / edge-level interpretability ( supports only FP/FG level ).")
 
     # FG cache
     fg_cache = None
@@ -1881,7 +1881,7 @@ def explain_system_and_plot(
         n_points += 1
 
     if n_points <= 0:
-        raise RuntimeError("system 数据为空或 explain 失败。")
+        raise RuntimeError("system data are empty or explain failed .")
 
     # average
     for gi in ["g1", "g2", "g3"]:
@@ -2067,7 +2067,7 @@ def run_mode_test(args: argparse.Namespace) -> None:
     # Explain on sampled test set (only saliency/IG/...) 
     if args.explain and args.explain.lower().strip() != "none":
         if not bool(getattr(C, "USE_GRAPH", False)):
-            print("[Explain] USE_GRAPH=False：跳过节点/边解释（仍可做 FG/FP 级别，但本脚本主要面向 graph 模式）。")
+            print("[Explain] USE_GRAPH=False: skip node / edge interpret ( Can still be done FG/FP Level , but This script focuses on graph Mode ).")
             return
 
         tag = _now_tag()
@@ -2229,10 +2229,10 @@ def run_mode_test(args: argparse.Namespace) -> None:
                         prefix=f"target_{tgt}",
                         font_scale=args.font_scale
                     )
-                    print(f"  [OK] 高级可视化已保存到: {adv_out_dir}")
+                    print(f" [OK] advanced visualizations saved to : {adv_out_dir}")
             except Exception as e:
                 import traceback
-                print(f"  [WARN] 高级可视化生成失败: {e}")
+                print(f" [WARN] advanced visualization failed : {e}")
                 traceback.print_exc()
             
             
@@ -2289,19 +2289,19 @@ def run_mode_system(args: argparse.Namespace) -> None:
     # pick system
     sid = args.system_id
     if sid is None:
-        raise ValueError("--mode system 需要 --system_id")
+        raise ValueError("--mode system requires --system_id")
 
     # support numeric or string ids
     df_sys = df_raw[df_raw["system_id"].astype(str) == str(sid)].copy()
     if len(df_sys) == 0:
-        raise ValueError(f"在 df_raw 中未找到 system_id={sid}")
+        raise ValueError(f" at df_raw in not found system_id={sid}")
 
     # Optionally filter a single temperature
     if args.temperature is not None:
         T = _safe_float(args.temperature)
         df_sys = df_sys[np.isclose(df_sys["temperature"].astype(float).values, T, atol=1e-6)].copy()
         if len(df_sys) == 0:
-            raise ValueError(f"system_id={sid} 中没有 temperature={T}")
+            raise ValueError(f"system_id={sid} in None temperature={T}")
 
     tag = _now_tag()
     sys_dir = os.path.join(out_root, f"system_{sid}_{tag}")
@@ -2336,29 +2336,29 @@ def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser()
 
     p.add_argument("--mode", type=str, default="test", choices=["test", "system"],
-                   help="test: 整体测试集评估；system: 单体系评估 + 解释")
-    p.add_argument("--ckpt", type=str, default="auto", help="checkpoint 路径，或 auto")
+                   help="test: overall test-set evaluation ;system: single-system evaluation + interpret ")
+    p.add_argument("--ckpt", type=str, default="auto", help="checkpoint path , or auto")
     p.add_argument("--out_dir", type=str, default="eval_output",
-                   help="输出目录")
+                   help=" output directory ")
 
     p.add_argument("--split_mode", type=str, default="stratified", choices=["stratified", "random"],
-                   help="在 df_aug 上进行 system split 的方式（test mode 用）")
+                   help=" at df_aug Up rows system split How (test mode for )")
 
     p.add_argument("--seed", type=int, default=getattr(C, "SEED", 42))
 
     # explain
     p.add_argument("--explain", type=str, default="saliency",
                    choices=["none", "saliency", "ig", "gexplainer", "shap_fg"],
-                   help="解释方法")
+                   help=" interpretation method ")
     p.add_argument("--objective", type=str, default="loss", choices=["loss", "pred"],
-                   help="解释目标：loss=MSE(pred,y)；pred=pred[target]（注意 sum-to-constant 的 target 会导致梯度弱）")
+                   help=" interpretation target :loss=MSE(pred,y);pred=pred[target]( note sum-to-constant target will Weak gradient due to )")
     p.add_argument("--target", type=str, default="ALL",
-                   help="解释目标：ALL=整体6维；也可用 BOTH(ER)/E/R 或单分量 Ex1..Rx3，支持逗号分隔")
+                   help=" interpretation target :ALL= Overall 6 dimensions ; also available BOTH(ER)/E/R or Single Component Ex1..Rx3, supports Comma delimited ")
     p.add_argument("--topk", type=int, default=10)
 
     # test explain sampling
     p.add_argument("--max_explain_samples", type=int, default=256,
-                   help="test 模式下解释采样多少个样本（越大越慢）")
+                   help="test Mode interpret sampling multiple Less samples ( Larger is slower )")
 
     # IG
     p.add_argument("--ig_steps", type=int, default=32)
@@ -2372,11 +2372,11 @@ def parse_args() -> argparse.Namespace:
     # system mode
     p.add_argument("--system_id", type=str, default=None)
     p.add_argument("--temperature", type=float, default=None,
-                   help="system mode 下可选：只解释某个温度（精确匹配）")
+                   help="system mode Optional Below : Only interpret A temperature ( exact match )")
     
     # visualization parameters
     p.add_argument("--font_scale", type=float, default=1.0,
-                   help="字体缩放因子（默认1.0，建议范围0.8-1.5）")
+                   help=" font scale ( default 1.0, recommendation range 0.8-1.5)")
 
     return p.parse_args()
 

@@ -1,6 +1,6 @@
 {
-  "dataset": "D:\\GGNN\\YXFL\\datasets\\processed\\update-LLE-all-with-smiles_min3.xlsx",
-  "checkpoint": "D:\\GGNN\\YXFL\\models\\03_physics_constraints\\lle_run_混合物图-Cross-s3-tf-纯数据驱动test2\\best_model.pt",
+  "dataset": "datasets/processed/update-LLE-all-with-smiles_min3.xlsx",
+  "checkpoint": "models/paper_historical/figure2a_psmi/best_model.pt",
   "models": [
     "data_only",
     "margules",

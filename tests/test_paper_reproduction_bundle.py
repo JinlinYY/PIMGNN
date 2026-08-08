@@ -1,4 +1,4 @@
-"""Tests for the inference-only paper reproduction package."""
+"""Tests for the paper checkpoint reproduction package."""
 
 import json
 from pathlib import Path
@@ -21,7 +21,7 @@ def test_registered_reproduction_inputs_exist() -> None:
                     assert (PROJECT_ROOT / run[field]).is_file(), (registry_path, run["id"], field)
 
 
-def test_reproduction_entry_points_are_inference_only() -> None:
+def test_reproduction_entry_points_are_checkpoint_evaluators() -> None:
     """The public reproduction commands must not invoke the training entry point."""
     for relative in ("scripts/evaluate_checkpoint.py", "scripts/reproduce_current_weights.py"):
         content = (PROJECT_ROOT / relative).read_text(encoding="utf-8")

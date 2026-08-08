@@ -8,7 +8,7 @@
   },
   "seed": 42,
   "strategy": "locked_historical_test_then_seeded_train_validation",
-  "test_lock_source": "experiments\\03_physics_constraints\\runs\\lle_run_混合物图-Cross-s3-tf-纯数据驱动test2\\predictions\\test_df_raw_pointwise_predictions.csv",
+  "test_lock_source": "experiments\\paper_historical\\figure2a_psmi\\predictions\\test_df_raw_pointwise_predictions.csv",
   "test_lock_source_sha256": "18fe725c7d9d60ea294c2ce54b3a979a3d6b03185f59b937d74977d4082e1b86",
   "selection_policy": "The historical 78-system test set is locked for comparability. Corrected-model selection must use validation data only; the test set is evaluated once.",
   "counts": {

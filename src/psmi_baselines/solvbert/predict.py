@@ -87,7 +87,7 @@ def predict_batch(model, tokenizer, data_path, output_path, device, max_length=5
     predictions = []
     
     # Baseline workflow step.
-    for i in tqdm(range(0, len(df), batch_size), desc="预测中"):
+    for i in tqdm(range(0, len(df), batch_size), desc=" prediction in "):
         batch_df = df.iloc[i:i+batch_size]
         
         batch_smiles = []
@@ -118,41 +118,41 @@ def predict_batch(model, tokenizer, data_path, output_path, device, max_length=5
     # Save the generated artifacts.
     df['prediction'] = predictions
     df.to_csv(output_path, index=False)
-    print(f"预测结果已保存到: {output_path}")
+    print(f" predictions saved to : {output_path}")
 
 
 def main():
-    parser = argparse.ArgumentParser(description='SolvBERT预测')
-    parser.add_argument('--model_path', type=str, required=True, help='模型路径')
-    parser.add_argument('--tokenizer_path', type=str, required=True, help='tokenizer路径')
-    parser.add_argument('--solvent', type=str, default=None, help='溶剂SMILES(单样本预测)')
-    parser.add_argument('--solute', type=str, default=None, help='溶质SMILES(单样本预测)')
-    parser.add_argument('--input_data', type=str, default=None, help='输入数据路径(批量预测)')
-    parser.add_argument('--output_data', type=str, default='predictions.csv', help='输出数据路径')
-    parser.add_argument('--solvent_col', type=str, default='solvent', help='溶剂列名')
-    parser.add_argument('--solute_col', type=str, default='solute', help='溶质列名')
-    parser.add_argument('--batch_size', type=int, default=32, help='批次大小')
-    parser.add_argument('--max_length', type=int, default=512, help='最大序列长度')
-    parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', help='设备')
+    parser = argparse.ArgumentParser(description='SolvBERT prediction ')
+    parser.add_argument('--model_path', type=str, required=True, help=' model path ')
+    parser.add_argument('--tokenizer_path', type=str, required=True, help='tokenizer path ')
+    parser.add_argument('--solvent', type=str, default=None, help=' solvent SMILES( single-sample prediction )')
+    parser.add_argument('--solute', type=str, default=None, help=' solute SMILES( single-sample prediction )')
+    parser.add_argument('--input_data', type=str, default=None, help=' input data path ( batch prediction )')
+    parser.add_argument('--output_data', type=str, default='predictions.csv', help=' output data path ')
+    parser.add_argument('--solvent_col', type=str, default='solvent', help=' solvent column First Name ')
+    parser.add_argument('--solute_col', type=str, default='solute', help=' solute column First Name ')
+    parser.add_argument('--batch_size', type=int, default=32, help=' batch size ')
+    parser.add_argument('--max_length', type=int, default=512, help=' maximum sequence length ')
+    parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', help=' device ')
     
     args = parser.parse_args()
     
     device = torch.device(args.device)
-    print(f"使用设备: {device}")
+    print(f" use device : {device}")
     
     # Load the input data.
-    print("加载模型...")
+    print(" load model ...")
     model, tokenizer = load_model(args.model_path, args.tokenizer_path, device)
-    print("模型加载完成")
+    print(" model load complete ")
     
     # Generate model predictions.
     if args.solvent and args.solute:
         prediction = predict_single(
             model, tokenizer, args.solvent, args.solute, device, args.max_length
         )
-        print(f"\n溶剂: {args.solvent}")
-        print(f"溶质: {args.solute}")
-        print(f"预测值: {prediction:.4f}")
+        print(f"\n solvent : {args.solvent}")
+        print(f" solute : {args.solute}")
+        print(f" prediction : {prediction:.4f}")
     
     # Generate model predictions.
     elif args.input_data:
@@ -162,7 +162,7 @@ def main():
         )
     
     else:
-        print("错误: 请提供 --solvent 和 --solute (单样本预测) 或 --input_data (批量预测)")
+        print(" error : Please provide --solvent and --solute ( single-sample prediction ) or --input_data ( batch prediction )")
 
 
 if __name__ == '__main__':

@@ -127,13 +127,13 @@ def format_temp(t: float) -> str:
 
 def main():
     ap = argparse.ArgumentParser("Plot all LLE systems (name by LLE system NO.)")
-    ap.add_argument("--excel_path", type=str, required=True, help="输入 Excel 路径")
-    ap.add_argument("--out_dir", type=str, required=True, help="输出目录")
+    ap.add_argument("--excel_path", type=str, required=True, help=" input Excel path ")
+    ap.add_argument("--out_dir", type=str, required=True, help=" output directory ")
     ap.add_argument("--group_by_temp", action="store_true",
-                    help="是否把 (体系编号 + 温度) 当作不同体系（推荐开启，避免同编号多温度覆盖）")
-    ap.add_argument("--draw_curve", action="store_true", help="是否画 Ex/Rx 边界曲线（PCA排序连线）")
-    ap.add_argument("--make_pdf", action="store_true", help="是否合并导出多页 PDF")
-    ap.add_argument("--max_systems", type=int, default=-1, help="最多导出多少个体系（-1=全部）")
+                    help=" whether put ( system identifier + temperature ) Treat as Different system ( Referral On , Avoid the same identifier multiple temperature Override )")
+    ap.add_argument("--draw_curve", action="store_true", help=" whether to plot Ex/Rx boundary curve (PCA ordered polyline )")
+    ap.add_argument("--make_pdf", action="store_true", help=" whether to export a multipage document PDF")
+    ap.add_argument("--max_systems", type=int, default=-1, help=" maximum number of systems to export (-1= all )")
     args = ap.parse_args()
 
     df = pd.read_excel(Path(args.excel_path))
@@ -152,7 +152,7 @@ def main():
     need_cols = ["LLE system NO.", "T/K", "Ex1", "Ex2", "Ex3", "Rx1", "Rx2", "Rx3"]
     for c in need_cols:
         if c not in df.columns:
-            raise ValueError(f"缺少列：{c}，请确认你的 Excel 列名已更新为 Ex*/Rx*")
+            raise ValueError(f" missing columns :{c}, verify You Excel column First Name Already update is Ex*/Rx*")
 
     keys = ["LLE system NO.", "T/K"] if args.group_by_temp else ["LLE system NO."]
     grouped = df.groupby(keys, dropna=False, sort=False)

@@ -36,7 +36,7 @@ def load_best_model(seed_dir: str, model_name: str, device: str, fp_bits: int = 
     checkpoint_files = glob.glob(checkpoint_pattern)
     
     if not checkpoint_files:
-        raise FileNotFoundError(f"未找到检查点文件: {seed_dir}")
+        raise FileNotFoundError(f" checkpoint file not found : {seed_dir}")
     
     # Baseline workflow step.
     def extract_epoch(fpath):
@@ -47,7 +47,7 @@ def load_best_model(seed_dir: str, model_name: str, device: str, fp_bits: int = 
     checkpoint_files.sort(key=extract_epoch, reverse=True)
     checkpoint_path = checkpoint_files[0]
     
-    print(f"  加载检查点: {os.path.basename(checkpoint_path)}")
+    print(f" load checkpoint : {os.path.basename(checkpoint_path)}")
     checkpoint = torch.load(checkpoint_path, map_location=device)
     
     # Configure the baseline model.
@@ -70,13 +70,13 @@ def load_best_model(seed_dir: str, model_name: str, device: str, fp_bits: int = 
         model.load_state_dict(checkpoint['state_dict'])
         best_epoch = checkpoint.get('epoch', -1)
     else:
-        raise ValueError("检查点中未找到模型权重")
+        raise ValueError(" model state not found in checkpoint ")
     
     # Load the input data.
     if 'T_scaler' in checkpoint:
         T_scaler = Scaler.from_state_dict(checkpoint['T_scaler'])
     else:
-        raise ValueError("检查点中未找到T_scaler")
+        raise ValueError(" not found in checkpoint T_scaler")
     
     return model, T_scaler, best_epoch
 
@@ -89,15 +89,15 @@ def predict_test_set(seed: int, results_dir: str, data_path: str, model_name: st
     seed_dir = os.path.join(results_dir, f"seed_{seed}")
     
     if not os.path.exists(seed_dir):
-        print(f"警告: 种子 {seed} 的目录不存在: {seed_dir}")
+        print(f" warning : Seeds {seed} directory does not exist : {seed_dir}")
         return None
     
     print(f"\n{'='*80}")
-    print(f"Seed {seed}: 加载最佳模型并预测测试集")
+    print(f"Seed {seed}: load the best model and predict the test set ")
     print(f"{'='*80}")
     
     # Set the random seed.
-    print("  加载数据集...")
+    print(" load dataset ...")
     train_df, val_df, test_df = load_bigsolvdb_data(
         csv_path=data_path,
         target_col="LogS(mol/L)",
@@ -105,7 +105,7 @@ def predict_test_set(seed: int, results_dir: str, data_path: str, model_name: st
     )
     
     # Load the input data.
-    print("  加载最佳模型...")
+    print(" load the best model ...")
     model, T_scaler, best_epoch = load_best_model(
         seed_dir=seed_dir,
         model_name=model_name,
@@ -121,10 +121,10 @@ def predict_test_set(seed: int, results_dir: str, data_path: str, model_name: st
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=0)
     
     # Generate model predictions.
-    print("  对测试集进行预测...")
+    print(" for test set Into rows prediction ...")
     test_metrics, test_preds, test_targets = evaluate(model, test_loader, device)
     
-    print(f"  测试集指标:")
+    print(f" test metrics :")
     print(f"    MAE:  {test_metrics['mae']:.6f}")
     print(f"    RMSE: {test_metrics['rmse']:.6f}")
     print(f"    R²:   {test_metrics['r2']:.6f}")
@@ -133,11 +133,11 @@ def predict_test_set(seed: int, results_dir: str, data_path: str, model_name: st
     summary_txt_path = os.path.join(seed_dir, "results_summary.txt")
     with open(summary_txt_path, 'w', encoding='utf-8') as f:
         f.write("="*80 + "\n")
-        f.write(f"测试集预测结果 (Seed: {seed})\n")
+        f.write(f" test-set predictions (Seed: {seed})\n")
         f.write("="*80 + "\n\n")
-        f.write(f"最佳epoch: {best_epoch}\n")
-        f.write(f"使用最佳权重进行测试集预测\n\n")
-        f.write("测试集指标:\n")
+        f.write(f" best epoch: {best_epoch}\n")
+        f.write(f" generate test predictions with the best checkpoint \n\n")
+        f.write(" test metrics :\n")
         f.write("-"*80 + "\n")
         f.write(f"MAE:  {test_metrics['mae']:.6f}\n")
         f.write(f"RMSE: {test_metrics['rmse']:.6f}\n")
@@ -146,23 +146,23 @@ def predict_test_set(seed: int, results_dir: str, data_path: str, model_name: st
         # Set the random seed.
         if all_results_stats:
             f.write("\n" + "="*80 + "\n")
-            f.write("所有种子的测试集预测结果统计（均值±标准差）\n")
+            f.write(" test-prediction statistics across all seeds ( mean ± standard deviation )\n")
             f.write("="*80 + "\n\n")
-            f.write("测试集指标统计:\n")
+            f.write(" test metrics statistics :\n")
             f.write("-"*80 + "\n")
             if 'test_mae_format' in all_results_stats:
                 f.write(f"MAE:  {all_results_stats['test_mae_format']}\n")
-                f.write(f"      (均值: {all_results_stats['test_mae_mean']:.4f}, 标准差: {all_results_stats['test_mae_std']:.4f})\n")
+                f.write(f" ( mean : {all_results_stats['test_mae_mean']:.4f}, standard deviation : {all_results_stats['test_mae_std']:.4f})\n")
             if 'test_rmse_format' in all_results_stats:
                 f.write(f"RMSE: {all_results_stats['test_rmse_format']}\n")
-                f.write(f"      (均值: {all_results_stats['test_rmse_mean']:.4f}, 标准差: {all_results_stats['test_rmse_std']:.4f})\n")
+                f.write(f" ( mean : {all_results_stats['test_rmse_mean']:.4f}, standard deviation : {all_results_stats['test_rmse_std']:.4f})\n")
             if 'test_r2_format' in all_results_stats:
                 f.write(f"R²:   {all_results_stats['test_r2_format']}\n")
-                f.write(f"      (均值: {all_results_stats['test_r2_mean']:.4f}, 标准差: {all_results_stats['test_r2_std']:.4f})\n")
+                f.write(f" ( mean : {all_results_stats['test_r2_mean']:.4f}, standard deviation : {all_results_stats['test_r2_std']:.4f})\n")
         
         f.write("="*80 + "\n")
     
-    print(f"  结果已保存到: {summary_txt_path}")
+    print(f" results saved to : {summary_txt_path}")
     
     return {
         'seed': seed,
@@ -176,7 +176,7 @@ def predict_test_set(seed: int, results_dir: str, data_path: str, model_name: st
 def main():
     import argparse
     
-    parser = argparse.ArgumentParser(description='使用最佳权重对测试集进行预测')
+    parser = argparse.ArgumentParser(description=' evaluate the test set with the best checkpoint ')
     parser.add_argument('--data_path', type=str, default=str(BIGSOLVDB_CSV),
                        help='BigSolvDB dataset path.')
     parser.add_argument('--results_dir', type=str,
@@ -184,23 +184,23 @@ def main():
                        help='Directory containing trained seed runs.')
     parser.add_argument('--model_name', type=str, default='mlp',
                        choices=['mlp', 'ann', 'lstm', 'transformer', 'tabknet'],
-                       help='模型名称')
+                       help=' model name ')
     parser.add_argument('--seeds', type=int, nargs='+',
                        default=[42, 123, 456, 789, 2024],
-                       help='随机种子列表')
-    parser.add_argument('--batch_size', type=int, default=1024, help='批次大小')
+                       help=' random-seed list ')
+    parser.add_argument('--batch_size', type=int, default=1024, help=' batch size ')
     
     args = parser.parse_args()
     
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print("="*80)
-    print("使用最佳权重对测试集进行预测")
+    print(" evaluate the test set with the best checkpoint ")
     print("="*80)
-    print(f"数据集: {args.data_path}")
-    print(f"结果目录: {args.results_dir}")
-    print(f"模型: {args.model_name}")
-    print(f"随机种子: {args.seeds}")
-    print(f"设备: {device}")
+    print(f" dataset : {args.data_path}")
+    print(f" result directory : {args.results_dir}")
+    print(f" model : {args.model_name}")
+    print(f" random seed : {args.seeds}")
+    print(f" device : {device}")
     print("="*80)
     
     all_results = []
@@ -219,7 +219,7 @@ def main():
             if result:
                 all_results.append(result)
         except Exception as e:
-            print(f"\n错误: Seed {seed} 预测失败: {e}")
+            print(f"\n error : Seed {seed} prediction failed : {e}")
             import traceback
             traceback.print_exc()
     
@@ -243,7 +243,7 @@ def main():
                     stats[f'{metric}_format'] = f"{mean_val:.4f}±{std_val:.4f}"
         
         # Set the random seed.
-        print("\n更新各种子文件夹下的results_summary.txt，添加统计信息...")
+        print("\n update each seed directory results_summary.txt, add statistics information ...")
         for seed in args.seeds:
             seed_dir = os.path.join(args.results_dir, f"seed_{seed}")
             summary_txt_path = os.path.join(seed_dir, "results_summary.txt")
@@ -254,27 +254,27 @@ def main():
                     content = f.read()
                 
                 # Baseline workflow step.
-                if "所有种子的测试集预测结果统计" not in content:
+                if " test-prediction statistics across all seeds " not in content:
                     with open(summary_txt_path, 'a', encoding='utf-8') as f:
                         f.write("\n" + "="*80 + "\n")
-                        f.write("所有种子的测试集预测结果统计（均值±标准差）\n")
+                        f.write(" test-prediction statistics across all seeds ( mean ± standard deviation )\n")
                         f.write("="*80 + "\n\n")
-                        f.write("测试集指标统计:\n")
+                        f.write(" test metrics statistics :\n")
                         f.write("-"*80 + "\n")
                         if 'test_mae_format' in stats:
                             f.write(f"MAE:  {stats['test_mae_format']}\n")
-                            f.write(f"      (均值: {stats['test_mae_mean']:.4f}, 标准差: {stats['test_mae_std']:.4f})\n")
+                            f.write(f" ( mean : {stats['test_mae_mean']:.4f}, standard deviation : {stats['test_mae_std']:.4f})\n")
                         if 'test_rmse_format' in stats:
                             f.write(f"RMSE: {stats['test_rmse_format']}\n")
-                            f.write(f"      (均值: {stats['test_rmse_mean']:.4f}, 标准差: {stats['test_rmse_std']:.4f})\n")
+                            f.write(f" ( mean : {stats['test_rmse_mean']:.4f}, standard deviation : {stats['test_rmse_std']:.4f})\n")
                         if 'test_r2_format' in stats:
                             f.write(f"R²:   {stats['test_r2_format']}\n")
-                            f.write(f"      (均值: {stats['test_r2_mean']:.4f}, 标准差: {stats['test_r2_std']:.4f})\n")
+                            f.write(f" ( mean : {stats['test_r2_mean']:.4f}, standard deviation : {stats['test_r2_std']:.4f})\n")
                         f.write("="*80 + "\n")
     
     if all_results:
         print("\n" + "="*80)
-        print("所有种子的测试集预测结果统计（均值±标准差）")
+        print(" test-prediction statistics across all seeds ( mean ± standard deviation )")
         print("="*80)
         
         df = pd.DataFrame(all_results)
@@ -294,33 +294,33 @@ def main():
                     stats[f'{metric}_std'] = round(std_val, 4)
                     stats[f'{metric}_format'] = f"{mean_val:.4f}±{std_val:.4f}"
         
-        print("\n测试集指标:")
+        print("\n test metrics :")
         print("-"*80)
         if 'test_mae_format' in stats:
             print(f"MAE:  {stats['test_mae_format']}")
-            print(f"      (均值: {stats['test_mae_mean']:.4f}, 标准差: {stats['test_mae_std']:.4f})")
+            print(f" ( mean : {stats['test_mae_mean']:.4f}, standard deviation : {stats['test_mae_std']:.4f})")
         if 'test_rmse_format' in stats:
             print(f"RMSE: {stats['test_rmse_format']}")
-            print(f"      (均值: {stats['test_rmse_mean']:.4f}, 标准差: {stats['test_rmse_std']:.4f})")
+            print(f" ( mean : {stats['test_rmse_mean']:.4f}, standard deviation : {stats['test_rmse_std']:.4f})")
         if 'test_r2_format' in stats:
             print(f"R²:   {stats['test_r2_format']}")
-            print(f"      (均值: {stats['test_r2_mean']:.4f}, 标准差: {stats['test_r2_std']:.4f})")
+            print(f" ( mean : {stats['test_r2_mean']:.4f}, standard deviation : {stats['test_r2_std']:.4f})")
         print("-"*80)
         
-        print("\n各种子详细结果:")
+        print("\n per-seed results :")
         print("-"*80)
         for _, row in df.iterrows():
             print(f"\nSeed {row['seed']}:")
-            print(f"  最佳epoch: {row['best_epoch']}")
-            print(f"  测试集MAE:  {row['test_mae']:.6f}")
-            print(f"  测试集RMSE: {row['test_rmse']:.6f}")
-            print(f"  测试集R²:   {row['test_r2']:.6f}")
+            print(f" best epoch: {row['best_epoch']}")
+            print(f" test set MAE: {row['test_mae']:.6f}")
+            print(f" test set RMSE: {row['test_rmse']:.6f}")
+            print(f" test set R²: {row['test_r2']:.6f}")
         
         print("\n" + "="*80)
-        print("预测完成！")
+        print(" prediction complete !")
         print("="*80)
     else:
-        print("\n错误: 没有成功完成任何预测")
+        print("\n error : None successful complete Any prediction ")
 
 
 if __name__ == "__main__":

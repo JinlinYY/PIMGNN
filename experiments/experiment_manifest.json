@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
-  "basis": "JACS manuscript and Supporting Information experiment structure",
-  "training_rerun": false,
+  "project": "PSMI",
   "experiments": [
     {
       "path": "00_dataset_construction",
-      "title_cn": "数据集构建、筛选与分布分析",
+      "title": "Dataset Construction, Filtering, and Distribution Analysis",
       "paper_sections": [
-        "主文 2.1",
-        "补充信息 S5",
-        "表 S15-S16",
-        "图 S8"
+        "Main text Section 2.1",
+        "SI Section S5",
+        "Tables S15-S16",
+        "Figure S8"
       ],
-      "status": "code_and_saved_results",
+      "availability": "Code, processed data, split manifests, summary tables, and distribution figures are available.",
+      "evidence_status": "Executable code and reference artifacts available",
       "code": [
         "scripts/data_preparation/build_canonical_split.py",
         "scripts/data_preparation/build_expanded_split.py",
@@ -27,13 +27,14 @@
     },
     {
       "path": "01_main_benchmark",
-      "title_cn": "PSMI 主基准与多随机种子评估",
+      "title": "PSMI Main Benchmark and Multi-Seed Evaluation",
       "paper_sections": [
-        "主文 3.1",
-        "表 1",
-        "图 2a"
+        "Main text Section 3.1",
+        "Table 1",
+        "Figure 2a"
       ],
-      "status": "code_results_and_checkpoints",
+      "availability": "Code, pointwise predictions, multi-seed metrics, functional-group vocabularies, and checkpoints are available.",
+      "evidence_status": "Executable code and reference artifacts available",
       "code": [
         "scripts/train.py",
         "src/psmi/predict.py",
@@ -45,12 +46,13 @@
     },
     {
       "path": "02_baseline_comparison",
-      "title_cn": "通用机器学习与图神经网络对比实验",
+      "title": "Machine-Learning and Graph-Neural-Network Baselines",
       "paper_sections": [
-        "主文 3.1.1",
-        "表 1"
+        "Main text Section 3.1.1",
+        "Table 1"
       ],
-      "status": "code_and_saved_results",
+      "availability": "Baseline implementations and five-seed reference summaries are available.",
+      "evidence_status": "Executable code and reference artifacts available",
       "code": [
         "scripts/experiments/baselines/run_classical_multi_seed.py",
         "scripts/experiments/baselines/run_cignn.py",
@@ -64,12 +66,13 @@
     },
     {
       "path": "03_architecture_ablation",
-      "title_cn": "多尺度表示、跨分子交互与融合模块消融",
+      "title": "Multi-Scale Representation and Fusion Ablations",
       "paper_sections": [
-        "主文 3.1.2",
-        "表 2"
+        "Main text Section 3.1.2",
+        "Table 2"
       ],
-      "status": "code_and_saved_metrics",
+      "availability": "Model implementations, configurations, and best-metric records for the architecture variants are available.",
+      "evidence_status": "Executable code and reference artifacts available",
       "code": [
         "scripts/train.py",
         "src/psmi/model.py",
@@ -81,13 +84,14 @@
     },
     {
       "path": "04_physics_regularization",
-      "title_cn": "物理约束正则化对比",
+      "title": "Physics-Regularized Learning",
       "paper_sections": [
-        "主文 2.3",
-        "主文 3.1.2",
-        "表 3"
+        "Main text Section 2.3",
+        "Main text Section 3.1.2",
+        "Table 3"
       ],
-      "status": "code_and_saved_results",
+      "availability": "The supervised and physics-regularized configurations, checkpoints, prediction metrics, and thermodynamic diagnostics are available.",
+      "evidence_status": "Executable code and reference artifacts available",
       "code": [
         "scripts/train.py",
         "src/psmi/loss.py",
@@ -100,12 +104,13 @@
     },
     {
       "path": "05_prediction_error_analysis",
-      "title_cn": "预测误差分布与偏差分析",
+      "title": "Prediction Error and Bias Analysis",
       "paper_sections": [
-        "补充信息 S3.1",
-        "图 S1-S3"
+        "SI Section S3.1",
+        "Figures S1-S3"
       ],
-      "status": "code_and_legacy_saved_results",
+      "availability": "Pointwise test predictions and the corresponding error-distribution figures are available.",
+      "evidence_status": "Executable code and reference artifacts available",
       "code": [
         "scripts/visualize_predictions_extra.py"
       ],
@@ -115,12 +120,13 @@
     },
     {
       "path": "06_interpretability",
-      "title_cn": "模型可解释性与特征重要性可视化",
+      "title": "Model Interpretability and Feature Attribution",
       "paper_sections": [
-        "主文 3.2",
-        "图 2b-2e"
+        "Main text Section 3.2",
+        "Figures 2b-2e"
       ],
-      "status": "code_and_saved_results",
+      "availability": "Global and system-level attribution tables, molecular feature summaries, and visualization assets are available.",
+      "evidence_status": "Executable code and reference artifacts available",
       "code": [
         "scripts/explain.py",
         "scripts/visualization/explainability"
@@ -131,13 +137,14 @@
     },
     {
       "path": "07_external_transfer",
-      "title_cn": "二元溶解度外部验证与扩展 LLE 微调",
+      "title": "External Solubility Validation and Expanded-LLE Adaptation",
       "paper_sections": [
-        "主文 3.3",
-        "图 2f",
-        "表 S2"
+        "Main text Section 3.3",
+        "Figure 2f",
+        "Table S2"
       ],
-      "status": "code_results_checkpoints_external_table_missing",
+      "availability": "Transfer-learning code, expanded-LLE checkpoints, pointwise predictions, and compatibility tools for external solubility models are available.",
+      "evidence_status": "Executable code and reference artifacts available",
       "code": [
         "scripts/experiments/transfer_learning/public_release",
         "src/psmi_legacy_public"
@@ -148,12 +155,13 @@
     },
     {
       "path": "08_temperature_robustness/01_local_perturbation",
-      "title_cn": "局部温度扰动与相路径敏感性",
+      "title": "Local Temperature Perturbation and Phase-Path Sensitivity",
       "paper_sections": [
-        "补充信息 S3.3.1",
-        "图 S4"
+        "SI Section S3.3.1",
+        "Figure S4"
       ],
-      "status": "code_only_result_not_found",
+      "availability": "The finite-difference temperature-sensitivity and phase-path analysis implementation is available.",
+      "evidence_status": "Executable implementation available",
       "code": [
         "scripts/analysis/run_sensitivity_analysis.py"
       ],
@@ -163,13 +171,14 @@
     },
     {
       "path": "08_temperature_robustness/02_encoding_and_tail",
-      "title_cn": "温度编码与温度尾部稳健性",
+      "title": "Temperature Encoding and Tail Robustness",
       "paper_sections": [
-        "补充信息 S3.3.2",
-        "表 S3-S4",
-        "图 S5"
+        "SI Section S3.3.2",
+        "Tables S3-S4",
+        "Figure S5"
       ],
-      "status": "code_and_saved_results",
+      "availability": "Encoding metrics, distance-binned metrics, multi-seed summaries, and figures are available.",
+      "evidence_status": "Executable code and reference artifacts available",
       "code": [
         "scripts/run_temperature_encoding_sensitivity.py",
         "scripts/plot_temperature_encoding_sensitivity.py"
@@ -180,12 +189,13 @@
     },
     {
       "path": "09_data_splitting",
-      "title_cn": "体系级划分、交叉验证与划分策略",
+      "title": "System-Level Splitting and Cross-Validation",
       "paper_sections": [
-        "补充信息 S3.4",
-        "表 S5"
+        "SI Section S3.4",
+        "Table S5"
       ],
-      "status": "code_and_split_manifests",
+      "availability": "System-level split generators, cross-validation code, and split manifests are available.",
+      "evidence_status": "Executable code and reference artifacts available",
       "code": [
         "scripts/experiments/data_splitting/run_kfold_cv.py",
         "scripts/experiments/data_splitting/run_split_strategy_benchmark.py"
@@ -196,13 +206,14 @@
     },
     {
       "path": "10_tieline_sensitivity",
-      "title_cn": "系带线密度阈值与相路径位置敏感性",
+      "title": "Tie-Line Density and Phase-Path Sensitivity",
       "paper_sections": [
-        "补充信息 S3.5",
-        "表 S6-S7",
-        "图 S6"
+        "SI Section S3.5",
+        "Tables S6-S7",
+        "Figure S6"
       ],
-      "status": "code_and_saved_results",
+      "availability": "Threshold metrics, path-location metrics, confidence intervals, predictions, and figures are available.",
+      "evidence_status": "Executable code and reference artifacts available",
       "code": [
         "scripts/run_tieline_threshold_sensitivity.py",
         "scripts/plot_tieline_threshold_sensitivity.py",
@@ -214,12 +225,13 @@
     },
     {
       "path": "11_ge_model_sensitivity",
-      "title_cn": "过量吉布斯能模型敏感性",
+      "title": "Excess-Gibbs-Energy Model Sensitivity",
       "paper_sections": [
-        "补充信息 S3.6",
-        "表 S8"
+        "SI Section S3.6",
+        "Table S8"
       ],
-      "status": "code_and_saved_results",
+      "availability": "Data-only, NRTL, Margules, and van Laar comparisons are provided with per-seed metrics and parameter records.",
+      "evidence_status": "Executable code and reference artifacts available",
       "code": [
         "scripts/experiments/ge_model_sensitivity.py",
         "src/psmi/ge_models.py"
@@ -230,12 +242,13 @@
     },
     {
       "path": "12_thermodynamic_audit",
-      "title_cn": "热力学残差与化学势一致性审计",
+      "title": "Thermodynamic Residual Audit",
       "paper_sections": [
-        "补充信息 S3.7",
-        "表 S9-S10"
+        "SI Section S3.7",
+        "Tables S9-S10"
       ],
-      "status": "code_and_saved_results",
+      "availability": "Per-prediction chemical-potential residuals, threshold sensitivity, and aggregate diagnostics are available.",
+      "evidence_status": "Executable code and reference artifacts available",
       "code": [
         "scripts/analysis/evaluate_thermodynamic_consistency.py",
         "src/psmi/ge_models.py",
@@ -247,14 +260,15 @@
     },
     {
       "path": "13_system_generalization",
-      "title_cn": "体系级泛化与相图类别统计",
+      "title": "System-Level Generalization and Phase-Diagram Categories",
       "paper_sections": [
-        "补充信息 S3.8",
-        "表 S11-S14",
-        "表 S17",
-        "补充信息 S6"
+        "SI Section S3.8",
+        "Tables S11-S14",
+        "Table S17",
+        "SI Section S6"
       ],
-      "status": "code_and_saved_results",
+      "availability": "System classifications, category summaries, and tolerance-sensitivity tables are available.",
+      "evidence_status": "Executable code and reference artifacts available",
       "code": [
         "scripts/analysis/classify_phase_diagram_generalization.py"
       ],
@@ -264,11 +278,12 @@
     },
     {
       "path": "14_industrial_cases/00_application_workflow",
-      "title_cn": "工业应用预测与分析工作流",
+      "title": "Industrial Application Workflow",
       "paper_sections": [
-        "主文 3.4"
+        "Main text Section 3.4"
       ],
-      "status": "code_and_saved_results",
+      "availability": "The end-to-end application interface and an example pointwise prediction table are available.",
+      "evidence_status": "Executable code and reference artifacts available",
       "code": [
         "scripts/run_application_case.py",
         "scripts/evaluate_case.py"
@@ -279,12 +294,13 @@
     },
     {
       "path": "14_industrial_cases/01_aromatic_extraction",
-      "title_cn": "环丁砜芳烃抽提案例",
+      "title": "Sulfolane Aromatic-Extraction Case Study",
       "paper_sections": [
-        "主文 3.4.1",
-        "图 3c"
+        "Main text Section 3.4.1",
+        "Figure 3c"
       ],
-      "status": "code_data_and_saved_figure",
+      "availability": "Standardized LLE data and publication figures for the aromatic-extraction case are available.",
+      "evidence_status": "Executable code and reference artifacts available",
       "code": [
         "scripts/run_application_case.py",
         "scripts/visualization/plot_figure3cd_industrial_cases.py"
@@ -295,12 +311,13 @@
     },
     {
       "path": "14_industrial_cases/02_dem_recovery",
-      "title_cn": "DEM 回收案例",
+      "title": "DEM Recovery Case Study",
       "paper_sections": [
-        "主文 3.4.2",
-        "图 3d"
+        "Main text Section 3.4.2",
+        "Figure 3d"
       ],
-      "status": "code_data_and_saved_figure",
+      "availability": "Standardized LLE data and publication figures for the DEM recovery case are available.",
+      "evidence_status": "Executable code and reference artifacts available",
       "code": [
         "scripts/run_application_case.py",
         "scripts/visualization/plot_figure3cd_industrial_cases.py"
@@ -311,11 +328,12 @@
     },
     {
       "path": "15_efficiency",
-      "title_cn": "推理效率与运行时间基准",
+      "title": "Inference Efficiency and Runtime Benchmark",
       "paper_sections": [
-        "补充信息 S3.9"
+        "SI Section S3.9"
       ],
-      "status": "code_and_saved_results",
+      "availability": "Raw and aggregate latency measurements collected on an NVIDIA RTX 3090 Ti are available.",
+      "evidence_status": "Executable code and reference artifacts available",
       "code": [
         "scripts/benchmark_efficiency.py",
         "scripts/summarize_efficiency_benchmarks.py"
@@ -326,12 +344,13 @@
     },
     {
       "path": "16_web_application",
-      "title_cn": "PSMI-LLE Web 应用",
+      "title": "PSMI-LLE Web Application",
       "paper_sections": [
-        "补充信息 S4",
-        "图 S7"
+        "SI Section S4",
+        "Figure S7"
       ],
-      "status": "code_and_checkpoint",
+      "availability": "The FastAPI backend, Vue frontend, default checkpoint, and launch scripts are available.",
+      "evidence_status": "Executable code and reference artifacts available",
       "code": [
         "Web/PSMI-LLE-web"
       ],

@@ -1,4 +1,4 @@
-"""Organize paper-reported values and inference-only outputs into one result bundle."""
+"""Organize paper-reported values and checkpoint outputs into one result bundle."""
 
 from __future__ import annotations
 
@@ -171,9 +171,21 @@ def _write_paper_comparison(output: Path) -> None:
 def _write_saved_table3_metrics(output: Path) -> None:
     """Flatten the historical training-time best-test records behind Table 3."""
     records = {
-        "data_driven": PROJECT_ROOT / "experiments/04_architecture_ablation/runs/lle_run_混合物图-Cross-s3-Transformer/metrics/best_metrics.json",
-        "physics_informed": PROJECT_ROOT / "experiments/03_physics_constraints/runs/lle_run_混合物图-Cross-s3-tf-化学势约束/metrics/best_metrics.json",
+        "data_driven": PROJECT_ROOT / "experiments/paper_historical/table3_data_driven/metrics/best_metrics.json",
+        "physics_informed": PROJECT_ROOT / "experiments/paper_historical/table3_physics_informed/metrics/best_metrics.json",
     }
+    public_records = {
+        "data_driven": PROJECT_ROOT / "experiments/paper_historical/table3_data_driven/metrics/best_metrics.json",
+        "physics_informed": PROJECT_ROOT / "experiments/paper_historical/table3_physics_informed/metrics/best_metrics.json",
+    }
+    if (PROJECT_ROOT / "experiments/paper_historical").is_dir():
+        records = public_records
+    destination = output / "tables" / "table3_saved_best_metrics.csv"
+    if not all(path.is_file() for path in records.values()):
+        if destination.is_file():
+            return
+        missing = [str(path) for path in records.values() if not path.is_file()]
+        raise FileNotFoundError(f"Table 3 metric records are unavailable: {missing}")
     metrics = ("mae_E", "rmse_E", "r2_E", "mae_R", "rmse_R", "r2_R", "mae", "rmse", "r2", "mu_res_mae", "mu_res_rmse")
     rows = []
     for variant, path in records.items():
@@ -182,7 +194,7 @@ def _write_saved_table3_metrics(output: Path) -> None:
         row = [variant, payload["best_epoch"]]
         row.extend(test.get(metric) for metric in metrics)
         rows.append(row)
-    _write_csv(output / "tables" / "table3_saved_best_metrics.csv", ["variant", "best_epoch", *metrics], rows)
+    _write_csv(destination, ["variant", "best_epoch", *metrics], rows)
 
 
 def _copy_supplementary_sources(output: Path) -> list[tuple[str, bool]]:
@@ -192,13 +204,27 @@ def _copy_supplementary_sources(output: Path) -> list[tuple[str, bool]]:
         "table_s6_tieline_threshold.csv": "experiments/11_tieline_sensitivity/threshold_metrics_with_ci.csv",
         "table_s7_tieline_location.csv": "experiments/11_tieline_sensitivity/location_metrics_with_ci.csv",
         "table_s8_ge_model_sensitivity.csv": "experiments/03_physics_constraints/comment10_ge_model_sensitivity/summary.csv",
-        "table_s9_s10_thermodynamic_thresholds.csv": "experiments/03_physics_constraints/reviewer_comment_17/threshold_sensitivity.csv",
-        "table_s11_s14_system_categories.csv": "experiments/11_reviewer_response/tie_line_generalization/results/category_summary.csv",
-        "table_s15_dataset_overview.csv": "experiments/11_reviewer_response/dataset_distribution/runs/current/dataset_overview.csv",
-        "table_s16_component_summary.csv": "experiments/11_reviewer_response/dataset_distribution/runs/current/component_summary.csv",
-        "table_s17_system_classification.csv": "experiments/11_reviewer_response/tie_line_generalization/results/system_classification.csv",
+        "table_s9_s10_thermodynamic_thresholds.csv": "experiments/12_thermodynamic_audit/results/threshold_sensitivity.csv",
+        "table_s11_s14_system_categories.csv": "experiments/13_system_generalization/results/category_summary.csv",
+        "table_s15_dataset_overview.csv": "experiments/00_dataset_construction/results/dataset_overview.csv",
+        "table_s16_component_summary.csv": "experiments/00_dataset_construction/results/component_summary.csv",
+        "table_s17_system_classification.csv": "experiments/13_system_generalization/results/system_classification.csv",
         "efficiency_summary.csv": "experiments/10_efficiency/runs/psmi_rtx3090_ti/latency_aggregate.csv",
     }
+    public_mappings = {
+        "table_s3_s4_temperature_encoding.csv": "experiments/08_temperature_robustness/02_encoding_and_tail/results/seed42_and_multiseed/encoding_metrics_with_ci.csv",
+        "table_s6_tieline_threshold.csv": "experiments/10_tieline_sensitivity/results/threshold_metrics_with_ci.csv",
+        "table_s7_tieline_location.csv": "experiments/10_tieline_sensitivity/results/location_metrics_with_ci.csv",
+        "table_s8_ge_model_sensitivity.csv": "experiments/11_ge_model_sensitivity/results/summary.csv",
+        "table_s9_s10_thermodynamic_thresholds.csv": "experiments/12_thermodynamic_audit/results/threshold_sensitivity.csv",
+        "table_s11_s14_system_categories.csv": "experiments/13_system_generalization/results/category_summary.csv",
+        "table_s15_dataset_overview.csv": "experiments/00_dataset_construction/results/dataset_overview.csv",
+        "table_s16_component_summary.csv": "experiments/00_dataset_construction/results/component_summary.csv",
+        "table_s17_system_classification.csv": "experiments/13_system_generalization/results/system_classification.csv",
+        "efficiency_summary.csv": "experiments/15_efficiency/results/psmi_rtx3090_ti/latency_aggregate.csv",
+    }
+    if (PROJECT_ROOT / "experiments/08_temperature_robustness").is_dir():
+        mappings = public_mappings
     status = []
     for destination_name, relative_source in mappings.items():
         available = _copy(PROJECT_ROOT / relative_source, output / "tables" / destination_name)
@@ -228,7 +254,7 @@ def _write_manifest(output: Path) -> None:
 
 
 def _write_weight_registry(output: Path) -> None:
-    """Inventory all checkpoints used by the two inference-only registries."""
+    """Inventory all checkpoints used by the two evaluation registries."""
     registry_paths = {
         "current_corrected_v2": PROJECT_ROOT / "configs/reproduction/current_weight_registry.json",
         "historical_paper": PROJECT_ROOT / "configs/reproduction/historical_paper_weight_registry.json",
@@ -254,55 +280,50 @@ def _write_weight_registry(output: Path) -> None:
                 public_relative,
                 checkpoint.stat().st_size,
                 _sha256(checkpoint),
-                False,
             ))
     _write_csv(
         output / "audit" / "weight_registry.csv",
         [
             "protocol", "run_id", "group", "seed", "config", "workspace_checkpoint",
-            "public_checkpoint", "size_bytes", "sha256", "training_performed_by_reproduction",
+            "public_checkpoint", "size_bytes", "sha256",
         ],
         rows,
     )
 
 
 def _write_readme(output: Path) -> None:
-    """Document provenance boundaries and exact reproduction status in Chinese."""
-    text = """# 论文结果复现包
+    """Document the result package and protocol boundaries."""
+    text = """# Paper Result Reproduction Package
 
-本目录把论文报告值、现有权重的仅推理复现结果、逐点预测、奇偶图和来源审计分开保存。构建本目录不会启动训练，也不会改写任何模型参数。
+This directory separates published reference values, checkpoint-based evaluation outputs, pointwise predictions, parity plots, and artifact provenance.
 
-## 目录
+## Contents
 
-- `tables/`：主文表 1–3、补充信息表格数据、当前权重多随机种子汇总。
-- `data/predictions/`：当前修正版与论文历史协议的逐点预测。
-- `figures/`：由现有权重推理得到的奇偶图。
-- `current_weight_inference/`：带数据/划分哈希校验的 `corrected_v2` 原始评估报告。
-- `historical_weight_inference/`：论文 Figure 2a 和 Table 3 历史权重评估报告。
-- `audit/`：协议对齐表和全部图表数据的 SHA-256 清单。
+- `tables/`: main-text tables, Supporting Information tables, and multi-seed summaries.
+- `data/predictions/`: pointwise predictions for the corrected and historical protocols.
+- `figures/`: parity plots generated from published checkpoints.
+- `current_weight_inference/`: hash-verified reports for the `corrected_v2` protocol.
+- `historical_weight_inference/`: reports for the Figure 2a and Table 3 checkpoint protocols.
+- `audit/`: protocol alignment, numerical comparisons, checkpoint digests, and artifact hashes.
 
-## 结果边界
+## Protocol boundaries
 
-1. `paper_table_*.csv` 与 `paper_table_s5_reported.csv` 是从最终论文逐项录入的“论文报告值”，用于核对，不代表本次重新计算。
-2. Figure 2a 历史权重在固定的 612/75/78 体系划分上仅推理复现；逐点预测与归档预测的最大绝对差约为 `3.8e-4`，指标在论文保留位数上基本一致。
-3. Table 3 的表中数字来自训练时保存的最佳指标；同一权重重新导出的逐点预测存在小量数值差异，因此两者分别保存，不互相覆盖。
-4. `corrected_v2` 权重具备数据集和划分哈希，可严格核验，但它修正了历史混合物节点排列，不能用其指标替换论文历史协议指标。
-5. 扩展数据权重的当前推理已正确使用压力标准化。旧归档逐点预测曾遗漏压力缩放参数，因此旧 CSV 不作为当前复现基准；权重和训练时最佳指标不受该导出问题影响。
-6. 表 1 中 PSMI 五随机种子的精确“种子—运行目录”映射在现有归档中无法唯一恢复，故保留论文报告汇总并在协议表中标记为待人工确认，不伪造映射。
+The historical protocol uses the component-major mixture-node layout required by the paper checkpoints. The `corrected_v2` protocol uses the sample-major layout and must be evaluated as a separate protocol. Table 3 stores both the training-time best metrics and metrics recomputed from checkpoint evaluation because exporter and floating-point differences can introduce small numerical deviations.
 
-## 仅推理命令
+The expanded-LLE checkpoint contract includes normalized pressure. Dataset digests, split-manifest digests, checkpoint metadata migrations, and public artifact hashes are recorded under `audit/`.
+
+## Commands
 
 ```powershell
-E:\\anaconda\\envs\\ggnn39\\python.exe scripts\\reproduce_current_weights.py --device cuda
-E:\\anaconda\\envs\\ggnn39\\python.exe scripts\\reproduce_current_weights.py `
-  --registry configs\\reproduction\\historical_paper_weight_registry.json `
-  --output-root results\\paper_reproduction\\historical_weight_inference `
+python scripts/reproduce_current_weights.py --device cuda
+python scripts/reproduce_current_weights.py `
+  --registry configs/reproduction/historical_paper_weight_registry.json `
+  --output-root results/paper_reproduction/historical_weight_inference `
   --device cuda
-E:\\anaconda\\envs\\ggnn39\\python.exe scripts\\analysis\\build_paper_reproduction_bundle.py
+python scripts/analysis/build_paper_reproduction_bundle.py
 ```
 """
     (output / "README.md").write_text(text, encoding="utf-8")
-
 
 def build(output: Path) -> None:
     """Build all tables, copies, summaries, and audit files."""

@@ -56,7 +56,7 @@ def plot_importance_treemap(
         import plotly.graph_objects as go
         import plotly.express as px
     except ImportError:
-        print("[WARN] plotly 未安装，跳过 Treemap")
+        print("[WARN] plotly Not Installed , skip Treemap")
         return
     
     
@@ -170,7 +170,7 @@ def plot_importance_treemap(
     )
     
     fig.write_html(out_path.replace('.png', '.html'))
-    print(f"  [OK] Treemap 已保存: {os.path.basename(out_path.replace('.png', '.html'))}")
+    print(f" [OK] Treemap saved : {os.path.basename(out_path.replace('.png', '.html'))}")
 
 
 def _get_color_for_mol(mol):
@@ -214,7 +214,7 @@ def plot_feature_rank_heatmap(
     try:
         import seaborn as sns
     except ImportError:
-        print("[WARN] seaborn 未安装，跳过 Rank Heatmap")
+        print("[WARN] seaborn Not Installed , skip Rank Heatmap")
         return
     
     apply_publication_style()
@@ -244,7 +244,7 @@ def plot_feature_rank_heatmap(
             g_importance[mol_id] = (imp_array, feature_names_dict.get(key, []))
     
     if len(g_importance) < 2:
-        print("[WARN] 数据不足，跳过 Rank Heatmap")
+        print("[WARN] insufficient data , skip Rank Heatmap")
         return
     
     
@@ -302,7 +302,7 @@ def plot_feature_rank_heatmap(
     plt.tight_layout()
     plt.savefig(out_path, dpi=300, bbox_inches='tight')
     plt.close()
-    print(f"  [OK] Rank Heatmap 已保存: {os.path.basename(out_path)}")
+    print(f" [OK] Rank Heatmap saved : {os.path.basename(out_path)}")
 
 
 def plot_combined_rank_heatmaps(
@@ -319,7 +319,7 @@ def plot_combined_rank_heatmaps(
         import seaborn as sns
         from matplotlib.colors import LinearSegmentedColormap
     except ImportError:
-        print("[WARN] seaborn 未安装，跳过组合 Rank Heatmap")
+        print("[WARN] seaborn Not Installed , skip combination Rank Heatmap")
         return
     
     apply_publication_style()
@@ -376,7 +376,7 @@ def plot_combined_rank_heatmaps(
                 g_importance[mol_id] = (imp_array, feature_names_dict.get(key, []))
         
         if len(g_importance) < 2:
-            ax.text(0.5, 0.5, f"数据不足\n({feat_name})", 
+            ax.text(0.5, 0.5, f" insufficient data \n({feat_name})", 
                    ha='center', va='center', fontsize=12)
             ax.axis('off')
             continue
@@ -458,7 +458,7 @@ def plot_combined_rank_heatmaps(
     plt.tight_layout()
     plt.savefig(out_path, dpi=300, bbox_inches='tight')
     plt.close()
-    print(f"  [OK] 组合 Rank Heatmap 已保存: {os.path.basename(out_path)}")
+    print(f" [OK] combination Rank Heatmap saved : {os.path.basename(out_path)}")
 
 
 
@@ -473,7 +473,7 @@ def plot_bump_chart(
     try:
         import plotly.graph_objects as go
     except ImportError:
-        print("[WARN] plotly 未安装，跳过 Bump Chart")
+        print("[WARN] plotly Not Installed , skip Bump Chart")
         return
     
     
@@ -489,7 +489,7 @@ def plot_bump_chart(
             g_importance[mol_id] = (imp_array, feature_names_dict.get(key, []))
     
     if len(g_importance) < 2:
-        print("[WARN] 数据不足，跳过 Bump Chart")
+        print("[WARN] insufficient data , skip Bump Chart")
         return
     
     
@@ -540,7 +540,7 @@ def plot_bump_chart(
     )
     
     fig.write_html(out_path.replace('.png', '.html'))
-    print(f"  [OK] Bump Chart 已保存: {os.path.basename(out_path.replace('.png', '.html'))}")
+    print(f" [OK] Bump Chart saved : {os.path.basename(out_path.replace('.png', '.html'))}")
 
 
 
@@ -556,7 +556,7 @@ def plot_shap_beeswarm_distribution(
     try:
         import plotly.graph_objects as go
     except ImportError:
-        print("[WARN] plotly 未安装，跳过 Beeswarm")
+        print("[WARN] plotly Not Installed , skip Beeswarm")
         return
     
     shap_values = np.asarray(shap_values, dtype=np.float64)
@@ -622,7 +622,7 @@ def plot_shap_beeswarm_distribution(
     
     if out_path:
         fig.write_html(out_path.replace('.png', '.html'))
-        print(f"  [OK] Beeswarm 分布图已保存: {os.path.basename(out_path.replace('.png', '.html'))}")
+        print(f" [OK] Beeswarm distribution plot saved : {os.path.basename(out_path.replace('.png', '.html'))}")
     else:
         fig.show()
 
@@ -647,14 +647,14 @@ def plot_importance_summary(
             / "reproduction"
         )
     
-    print("\n📊 生成高级可视化图表...")
+    print("\n📊 generate advanced visualizations ...")
     
     
     try:
         treemap_path = os.path.join(out_dir, f"{prefix}_importance_treemap.png")
         plot_importance_treemap(importance_dict, feature_names_dict, treemap_path, top_k=15)
     except Exception as e:
-        print(f"[WARN] Treemap 生成失败: {e}")
+        print(f"[WARN] Treemap generation failed : {e}")
     
     
     for color_scheme, suffix in [("nature_green", "green"), ("nature_blue", "blue")]:
@@ -670,7 +670,7 @@ def plot_importance_summary(
                 font_scale=font_scale
             )
         except Exception as e:
-            print(f"[WARN] 组合 Rank Heatmap ({suffix}) 生成失败: {e}")
+            print(f"[WARN] combination Rank Heatmap ({suffix}) generation failed : {e}")
     
     
     for feat_type, feat_name in [("node", "Atom"), ("edge", "Bond"), ("glob", "Global")]:
@@ -685,14 +685,14 @@ def plot_importance_summary(
                 feature_type=feat_type
             )
         except Exception as e:
-            print(f"[WARN] {feat_name} Rank Heatmap 生成失败: {e}")
+            print(f"[WARN] {feat_name} Rank Heatmap generation failed : {e}")
     
     # 3. Bump Chart
     try:
         bump_path = os.path.join(out_dir, f"{prefix}_bump_chart.html")
         plot_bump_chart(importance_dict, feature_names_dict, bump_path, top_k=8)
     except Exception as e:
-        print(f"[WARN] Bump Chart 生成失败: {e}")
+        print(f"[WARN] Bump Chart generation failed : {e}")
     
     
     if shap_values_dict:
@@ -709,6 +709,6 @@ def plot_importance_summary(
                     top_k=15
                 )
             except Exception as e:
-                print(f"[WARN] Beeswarm ({key}) 生成失败: {e}")
+                print(f"[WARN] Beeswarm ({key}) generation failed : {e}")
     
-    print("[OK] 高级可视化图表生成完成！")
+    print("[OK] advanced visualization complete !")

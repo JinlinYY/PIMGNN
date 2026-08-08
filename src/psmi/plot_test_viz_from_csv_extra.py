@@ -135,9 +135,9 @@ def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
             df = df.rename(columns={k: v})
 
     if "T" not in df.columns:
-        raise ValueError("CSV 缺少温度列：需要 'T' 或 'temperature'/'temperature_raw'。")
+        raise ValueError("CSV missing temperature column : requires 'T' or 'temperature'/'temperature_raw'.")
     if "system_id" not in df.columns:
-        raise ValueError("CSV 缺少 system_id 列，无法按体系画相图。")
+        raise ValueError("CSV missing system_id column , unable to by system Painting phase diagram .")
 
     if "t" not in df.columns:
         df["t"] = df.groupby(["system_id", "T"]).cumcount().astype(np.float32)
@@ -151,7 +151,7 @@ def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
     ]
     miss = [c for c in need if c not in df.columns]
     if miss:
-        raise ValueError(f"CSV 缺少必要列: {miss}")
+        raise ValueError(f"CSV missing required columns : {miss}")
 
     return df
 
@@ -891,19 +891,19 @@ def plot_group_ternary_from_csv(
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--csv", type=str, required=True, help="test_df_raw_pointwise_predictions.csv 路径")
-    ap.add_argument("--out_dir", type=str, default="", help="输出目录（默认自动创建）")
-    ap.add_argument("--system_id", type=int, default=None, help="只画某个 system（可选）")
-    ap.add_argument("--max_groups", type=int, default=0, help="最多画多少个(system,T)组；0=全画")
-    ap.add_argument("--font_scale", type=float, default=1.7, help="字体整体放大倍数（建议 1.6~2.2）")
-    ap.add_argument("--skip_ternary", action="store_true", help="只画 parity + 额外统计图，不画相图（ternary）")
-    ap.add_argument("--skip_extra", action="store_true", help="只画 parity/ternary，跳过额外统计图")
-    ap.add_argument("--tielines_max", type=int, default=18, help="每张相图最多画多少条 tie-line（抽样）")
+    ap.add_argument("--csv", type=str, required=True, help="test_df_raw_pointwise_predictions.csv path ")
+    ap.add_argument("--out_dir", type=str, default="", help=" output directory ( default Auto create )")
+    ap.add_argument("--system_id", type=int, default=None, help=" plot only A system( Optional )")
+    ap.add_argument("--max_groups", type=int, default=0, help=" maximum number to plot (system,T) Group ;0= plot all ")
+    ap.add_argument("--font_scale", type=float, default=1.7, help=" global font scale ( recommendation 1.6~2.2)")
+    ap.add_argument("--skip_ternary", action="store_true", help=" plot only parity + additional statistical plots , skip phase diagrams (ternary)")
+    ap.add_argument("--skip_extra", action="store_true", help=" plot only parity/ternary, skip additional statistical plots ")
+    ap.add_argument("--tielines_max", type=int, default=18, help=" per Zhang phase diagram most multiple Painting multiple Few tie-line( sampling )")
 
-    ap.add_argument("--scatter_max", type=int, default=8000, help="散点图最多点数（下采样），0=不下采样")
-    ap.add_argument("--top_categories", type=int, default=12, help="类别箱线/小提琴图展示 top-N 类别")
-    ap.add_argument("--cat_kind", type=str, default="violin", choices=["violin", "box"], help="类别误差图类型")
-    ap.add_argument("--seed", type=int, default=0, help="下采样随机种子")
+    ap.add_argument("--scatter_max", type=int, default=8000, help=" maximum scatter points ( down sampling ),0= not down sampling ")
+    ap.add_argument("--top_categories", type=int, default=12, help=" category Box Lines / Violin graph Showcase top-N category ")
+    ap.add_argument("--cat_kind", type=str, default="violin", choices=["violin", "box"], help=" category Error graph type ")
+    ap.add_argument("--seed", type=int, default=0, help=" downsampling seed ")
 
     args = ap.parse_args()
 
@@ -974,7 +974,7 @@ def main():
     if args.system_id is not None:
         df_plot = df_plot[df_plot["system_id"] == args.system_id].copy()
         if len(df_plot) == 0:
-            raise RuntimeError(f"system_id={args.system_id} 在CSV中不存在。")
+            raise RuntimeError(f"system_id={args.system_id} at CSV in does not exist .")
 
     groups = list(df_plot.groupby(["system_id", "T"], sort=True))
     if args.max_groups and args.max_groups > 0:
