@@ -1,0 +1,38 @@
+{
+  "encoding": "inverse",
+  "best_epoch": 60,
+  "elapsed_seconds": 385.7286913,
+  "interpolation_metrics": {
+    "mae": 0.08657485831037076,
+    "rmse": 0.13701644700467328,
+    "r2": 0.8351214372706683,
+    "mae_extract": 0.07727191134305593,
+    "mae_raffinate": 0.0958778052776856,
+    "group_balanced_mae": 0.08647082813734518
+  },
+  "extrapolation_metrics": {
+    "mae": 0.08740295068411613,
+    "rmse": 0.13697843275643348,
+    "r2": 0.830700461688159,
+    "mae_extract": 0.07923711079185067,
+    "mae_raffinate": 0.0955687905763816,
+    "group_balanced_mae": 0.08613728699993627
+  },
+  "table_row": {
+    "encoding": "inverse",
+    "best_epoch": 60,
+    "elapsed_seconds": 385.7286913,
+    "interpolation_mae": 0.08657485831037076,
+    "interpolation_rmse": 0.13701644700467328,
+    "interpolation_r2": 0.8351214372706683,
+    "interpolation_mae_extract": 0.07727191134305593,
+    "interpolation_mae_raffinate": 0.0958778052776856,
+    "interpolation_group_balanced_mae": 0.08647082813734518,
+    "extrapolation_mae": 0.08740295068411613,
+    "extrapolation_rmse": 0.13697843275643348,
+    "extrapolation_r2": 0.830700461688159,
+    "extrapolation_mae_extract": 0.07923711079185067,
+    "extrapolation_mae_raffinate": 0.0955687905763816,
+    "extrapolation_group_balanced_mae": 0.08613728699993627
+  }
+}

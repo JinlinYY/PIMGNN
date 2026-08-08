@@ -1,0 +1,5 @@
+﻿dataset_id,dataset_name,stage,n_systems,mean_points_per_system,std_points_per_system,min_points_per_system,q1_points_per_system,median_points_per_system,q3_points_per_system,max_points_per_system,iqr_points_per_system
+Curated IL-LLE,Curated ionic-liquid LLE workbook,raw_workbook,818,9.69437652811736,3.365458157091701,3,8.0,9.0,11.0,30,3.0
+Curated IL-LLE,Curated ionic-liquid LLE workbook,filtered_min6_no_aug,765,10.04313725490196,3.188981453410168,6,8.0,10.0,11.0,30,3.0
+Expanded literature LLE,Expanded literature-collected LLE workbook,raw_workbook,830,8.595180722891566,4.350170292257816,1,7.0,8.0,10.0,52,3.0
+Expanded literature LLE,Expanded literature-collected LLE workbook,filtered_min6_no_aug,719,9.331015299026426,4.134106114850752,6,8.0,8.0,10.0,52,2.0

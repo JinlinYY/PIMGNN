@@ -1,0 +1,12 @@
+﻿scheme,run_id,split_seed,train_seed,min_points_per_group,component_permutation_augmented,train_systems,val_systems,test_systems,train_points,val_points,test_points,split_unit,leakage_note,train_groups,val_groups,test_groups,train_T_mean_min,train_T_mean_max,test_T_mean_min,test_T_mean_max
+point_random,rep01,42,42,6,True,765,654,654,12293,1537,1536,equilibrium_point,systems may appear in multiple subsets,,,,,,,
+point_random,rep02,7,7,6,True,765,647,661,12293,1537,1536,equilibrium_point,systems may appear in multiple subsets,,,,,,,
+point_random,rep03,13,13,6,True,765,659,645,12293,1537,1536,equilibrium_point,systems may appear in multiple subsets,,,,,,,
+system_random,rep01,42,42,6,True,612,76,77,12404,1480,1482,system_id,system-exclusive,,,,,,,
+system_random,rep02,7,7,6,True,612,76,77,12356,1532,1478,system_id,system-exclusive,,,,,,,
+system_random,rep03,13,13,6,True,612,76,77,12356,1430,1580,system_id,system-exclusive,,,,,,,
+structure_family_triple,rep01,42,42,6,True,616,75,75,12276,1546,1544,rdkit_structure_family_triple,three-component RDKit-derived structure-family triples are exclusive,116.0,13.0,13.0,,,,
+structure_family_triple,rep02,7,7,6,True,608,75,83,12276,1546,1544,rdkit_structure_family_triple,three-component RDKit-derived structure-family triples are exclusive,116.0,13.0,13.0,,,,
+structure_family_triple,rep03,13,13,6,True,614,76,75,12276,1546,1544,rdkit_structure_family_triple,three-component RDKit-derived structure-family triples are exclusive,116.0,13.0,13.0,,,,
+temperature_high,run01,42,42,6,True,613,76,76,12324,1614,1428,system_id_ordered_by_mean_temperature,system-exclusive; high-temperature systems held out for test,,,,278.15,308.15,313.2,353.2
+temperature_low,run01,42,42,6,True,613,76,76,12476,1434,1456,system_id_ordered_by_mean_temperature,system-exclusive; low-temperature systems held out for test,,,,298.15,353.2,278.15,298.15

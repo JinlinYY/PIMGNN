@@ -1,0 +1,126 @@
+# -*- coding: utf-8 -*-
+"""Implement the bigsolvdb data_loader baseline module."""
+import os
+import warnings
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from typing import Tuple
+from rdkit import Chem
+from rdkit.Chem import AllChem
+
+# Baseline workflow step.
+warnings.filterwarnings('ignore', category=DeprecationWarning)
+
+
+def canonicalize_smiles(smi: str) -> str:
+    """Run the canonicalize smiles baseline operation."""
+    if not isinstance(smi, str) or not smi.strip():
+        return ""
+    try:
+        mol = Chem.MolFromSmiles(smi)
+        if mol is None:
+            return ""
+        return Chem.MolToSmiles(mol, canonical=True)
+    except:
+        return ""
+
+
+def morgan_fp(smi: str, radius: int = 2, n_bits: int = 2048) -> np.ndarray:
+    """Run the morgan fp baseline operation."""
+    mol = Chem.MolFromSmiles(smi)
+    if mol is None:
+        return np.zeros((n_bits,), dtype=np.float32)
+    
+    # Baseline workflow step.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        warnings.simplefilter("ignore", UserWarning)
+        fp = AllChem.GetMorganFingerprintAsBitVect(mol, radius, nBits=n_bits)
+    
+    arr = np.zeros((n_bits,), dtype=np.int8)
+    from rdkit.DataStructs import ConvertToNumpyArray
+    ConvertToNumpyArray(fp, arr)
+    return arr.astype(np.float32)
+
+
+def load_bigsolvdb_data(
+    csv_path: str,
+    target_col: str = "LogS(mol/L)",
+    test_size: float = 0.1,
+    val_size: float = 0.1,
+    random_state: int = 42,
+    fp_bits: int = 2048,
+    fp_radius: int = 2
+) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Run the load bigsolvdb data baseline operation."""
+    print(f"加载数据集: {csv_path}")
+    df = pd.read_csv(csv_path)
+    
+    print(f"原始数据量: {len(df)}")
+    
+    # Process the experiment data.
+    df = df.copy()
+    df['SMILES_Solute'] = df['SMILES_Solute'].astype(str).map(canonicalize_smiles)
+    df['SMILES_Solvent'] = df['SMILES_Solvent'].astype(str).map(canonicalize_smiles)
+    
+    # Baseline workflow step.
+    df = df[(df['SMILES_Solute'] != "") & (df['SMILES_Solvent'] != "")].copy()
+    
+    # Baseline workflow step.
+    if target_col not in df.columns:
+        raise ValueError(f"目标列 '{target_col}' 不存在。可用列: {list(df.columns)}")
+    
+    # Baseline workflow step.
+    df = df.dropna(subset=[target_col, 'Temperature_K']).copy()
+    
+    print(f"清理后数据量: {len(df)}")
+    
+    # Baseline workflow step.
+    print("生成分子指纹...")
+    solute_fps = []
+    solvent_fps = []
+    
+    # Baseline workflow step.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        warnings.simplefilter("ignore", UserWarning)
+        for idx, row in df.iterrows():
+            solute_fp = morgan_fp(row['SMILES_Solute'], radius=fp_radius, n_bits=fp_bits)
+            solvent_fp = morgan_fp(row['SMILES_Solvent'], radius=fp_radius, n_bits=fp_bits)
+            solute_fps.append(solute_fp)
+            solvent_fps.append(solvent_fp)
+    
+    df['solute_fp'] = solute_fps
+    df['solvent_fp'] = solvent_fps
+    
+    # Save the generated artifacts.
+    df['T'] = df['Temperature_K'].astype(np.float32)
+    df['target'] = df[target_col].astype(np.float32)
+    
+    # Run the training step.
+    print(f"划分数据集: 测试集{test_size:.1%}, 验证集{val_size:.1%}")
+    
+    # Run the training step.
+    train_val_df, test_df = train_test_split(
+        df,
+        test_size=test_size,
+        random_state=random_state,
+        shuffle=True
+    )
+    
+    # Run the training step.
+    val_ratio = val_size / (1 - test_size)  # Baseline workflow step.
+    train_df, val_df = train_test_split(
+        train_val_df,
+        test_size=val_ratio,
+        random_state=random_state,
+        shuffle=True
+    )
+    
+    print(f"训练集: {len(train_df)} 样本")
+    print(f"验证集: {len(val_df)} 样本")
+    print(f"测试集: {len(test_df)} 样本")
+    
+    return train_df, val_df, test_df
+

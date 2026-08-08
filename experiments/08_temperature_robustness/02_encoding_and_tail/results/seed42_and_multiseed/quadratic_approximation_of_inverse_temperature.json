@@ -1,0 +1,29 @@
+{
+  "original_seed42_training_range": {
+    "temperature_interval_k": [
+      283.15,
+      353.2
+    ],
+    "quadratic_coefficients_descending": [
+      3.137154596855676e-08,
+      -2.9913719465377753e-05,
+      0.00948477324068607
+    ],
+    "maximum_relative_error_percent": 0.05645323177396667,
+    "rms_relative_error_percent": 0.02041697874575885
+  },
+  "controlled_central_training_range": {
+    "temperature_interval_k": [
+      293.15,
+      323.2
+    ],
+    "quadratic_coefficients_descending": [
+      3.4236839742199176e-08,
+      -3.164635996521943e-05,
+      0.009745989608970088
+    ],
+    "maximum_relative_error_percent": 0.004740856056974219,
+    "rms_relative_error_percent": 0.0017567550445698312
+  },
+  "interpretation": "Numerical approximation only; this does not make the learned polynomial channel a thermodynamic law."
+}

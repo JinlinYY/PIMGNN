@@ -1,0 +1,9 @@
+USE_GRAPH: true
+USE_MIX_GRAPH: true
+MIXTURE_NODE_LAYOUT: legacy_component_major
+USE_FG: true
+FG_TOKEN_MODE: true
+FG_CROSS_ATTN: true
+S3_EQUIVARIANT: true
+FUSION_MODE: concat
+

@@ -1,0 +1,8 @@
+USE_GRAPH: true
+USE_MIX_GRAPH: true
+MIXTURE_NODE_LAYOUT: sample_major
+USE_FG: true
+FG_TOKEN_MODE: true
+FG_CROSS_ATTN: true
+USE_S3_COMPONENT_EMBEDDING: true
+FUSION_MODE: concat

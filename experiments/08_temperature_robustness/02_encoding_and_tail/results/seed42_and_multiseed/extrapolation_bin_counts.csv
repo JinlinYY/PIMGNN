@@ -1,0 +1,9 @@
+﻿distance_bin,temperature_side,n_tielines
+0–5 K,above,158
+0–5 K,below,33
+5–10 K,above,201
+5–10 K,below,163
+10–20 K,above,26
+10–20 K,below,26
+>20 K,above,105
+>20 K,below,0

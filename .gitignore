@@ -1,0 +1,26 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+tmp/
+
+# Local editor and operating-system files.
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Private manuscript and revision materials must never be committed.
+private/
+*.doc
+*.docx
+*.zip
+*.7z
+
+# Local experiment reruns; curated public results are already tracked.
+*_reproduction/

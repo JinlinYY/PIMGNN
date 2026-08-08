@@ -1,0 +1,47 @@
+{
+  "threshold": 7,
+  "seed": 42,
+  "train_stats": {
+    "rows_tielines": 5945,
+    "equilibrium_endpoints": 11890,
+    "systems": 571,
+    "system_temperature_groups": 572,
+    "mean_tielines_per_group": 10.393356643356643,
+    "median_tielines_per_group": 10.0,
+    "min_tielines_per_group": 7,
+    "max_tielines_per_group": 30
+  },
+  "train_rows_after_augmentation": 11890,
+  "validation_stats": {
+    "rows_tielines": 581,
+    "equilibrium_endpoints": 1162,
+    "systems": 54,
+    "system_temperature_groups": 54,
+    "mean_tielines_per_group": 10.75925925925926,
+    "median_tielines_per_group": 10.0,
+    "min_tielines_per_group": 9,
+    "max_tielines_per_group": 19
+  },
+  "test_stats": {
+    "rows_tielines": 583,
+    "equilibrium_endpoints": 1166,
+    "systems": 53,
+    "system_temperature_groups": 53,
+    "mean_tielines_per_group": 11.0,
+    "median_tielines_per_group": 10.0,
+    "min_tielines_per_group": 9,
+    "max_tielines_per_group": 19
+  },
+  "test_metrics": {
+    "mae": 0.08738255377732428,
+    "rmse": 0.13979406297732652,
+    "r2": 0.8337129091410549,
+    "mae_extract": 0.07422166617051458,
+    "mae_raffinate": 0.10054344138413397,
+    "group_balanced_mae": 0.08571840661578353,
+    "endpoint_l2_mean": 0.1779846797256733,
+    "tieline_vector_l2_mean": 0.2402913984868251
+  },
+  "best_epoch": 60,
+  "elapsed_seconds": 424.3080461999998
+}

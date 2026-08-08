@@ -1,187 +1,106 @@
-# PIMGNN
+# PSMI：三元液液相平衡预测
 
+本仓库公开 PSMI 的数据处理、图神经网络模型、热力学约束、论文实验、已有结果、最佳权重、结果绘图和 Web 应用。公开模型名称统一为 **PSMI**。
 
-This repository contains the code and datasets used in the manuscript:
+## 项目结构
 
-> **Physics-informed framework of liquid–liquid phase diagrams for extraction process design**.
-
-![image](https://github.com/JinlinYY/PIMGNN/blob/main/Method.png).
-
-
-# Commands & Script Overview
-
-This project is intended to be run from the project root.
-
-
-PowerShell:
-
-```powershell
-cd <project_root>
+```text
+PSMI/
+├─ configs/                 数据、模型与实验配置
+├─ datasets/                处理后数据、固定划分和热力学参数
+├─ src/psmi/                PSMI 模型与训练实现
+├─ src/psmi_baselines/      对比模型实现
+├─ scripts/                 训练、评估、分析和绘图入口
+├─ experiments/             按论文顺序整理的代码入口与已有结果
+├─ models/                  主模型、迁移模型和兼容权重
+├─ Web/PSMI-LLE-web/        FastAPI + Vue Web 应用
+├─ tests/                   单元测试和回归测试
+└─ docs/                    模型、结果与使用说明
 ```
 
----
+## 论文实验
 
-## 0) One-time setup
+论文主文和补充信息中的实验统一列在 [实验索引](experiments/README.md)。每个实验子目录均说明：
 
-### Configure paths in `src\config.py`
+- 对应的论文章节、表格或图；
+- 实际代码入口和运行命令；
+- 已归档的指标、预测表、结果图或最佳权重；
+- 当前证据状态和需要人工确认的历史缺口。
 
-- Required:
+所有归档结果均来自工程中已有文件，本次代码整理没有重新训练模型。主基准、扩展 LLE、多模型对比、架构消融、物理正则化、误差分析、可解释性、温度编码、系带线敏感性、过量吉布斯能模型敏感性、热力学审计、体系泛化、工业案例和效率实验均提供相应代码及现有证据。局部温度扰动和数据划分部分缺少可确认的完整历史结果，目录中已如实标注。
 
-  - `EXCEL_PATH`: path to your Excel dataset
-  - `OUT_DIR`: output directory, either relative or absolute
-- Common dataset files:
+## 环境
 
-  - `D:\GGNN\YXFL-github\data_update\update-LLE-all-with-smiles_min3.xlsx`: dataset from Sun et al. literature
-  - `D:\GGNN\YXFL-github\data_update\LLE-literature-data-boosted.xlsx`: literature-collected LLE dataset
-  - `D:\GGNN\YXFL-github\data_update\case12.xlsx`: two application-case datasets
-
----
-
-## 1) Main pipeline
-
-### `src\main.py`
-
-- Purpose: end-to-end pipeline for loading Excel data, splitting train/val/test sets, training or loading a model, evaluating it, running pointwise prediction, and generating parity and ternary plots.
-- Run:
+推荐使用 `ggnn39`：
 
 ```powershell
-python .\src\main.py
+conda env create -f environment.yml
+conda activate ggnn39
 ```
 
-- Outputs: written to `OUT_DIR`, such as prediction CSV files, parity PNGs, ternary PDFs/PNGs, and checkpoints.
-
----
-
-## 2) Fit NRTL parameters for mechanistic / physics loss
-
-### `src\fit_nrtl_params.py`
-
-- Purpose: fit per-system NRTL interaction parameters and save them as JSON.
-- Run:
+也可以在现有环境中安装依赖：
 
 ```powershell
-python .\src\fit_nrtl_params.py --excel_path <excel_path> --out_dir ".\nrtl_param"
+python -m pip install -r requirements.txt
 ```
 
-- Output: `.\nrtl_param\nrtl_params_all.json`
-- Next step: set `NRTL_PARAMS_PATH` in `src\config.py` to the generated JSON, or continue using `src\nrtl_params_train.json`.
+## 主模型运行入口
 
----
-
-## 3) Evaluation and explainability
-
-### `src\eval_explain.py`
-
-- Purpose: evaluate the model and run explanation methods such as saliency, Integrated Gradients, GraphExplainer, and SHAP-FG, depending on installed dependencies.
-- Important: this script reads the dataset path from `src\config.py` via `EXCEL_PATH`.
-
-Run in overall test mode:
+仅使用已发布权重核对结果（不会训练或修改权重）：
 
 ```powershell
-python .\src\eval_explain.py --mode test --ckpt auto --out_dir ".\eval_output" --explain saliency --objective loss --target ALL --max_explain_samples 256
+python scripts/reproduce_current_weights.py --device cuda
+python scripts/reproduce_current_weights.py `
+  --registry configs/reproduction/historical_paper_weight_registry.json `
+  --output-root results/paper_reproduction/historical_weight_inference `
+  --device cuda
+python scripts/analysis/build_paper_reproduction_bundle.py
 ```
 
-Run for a single system:
+整理后的论文报告表、逐点预测、结果图和协议说明见
+[`results/paper_reproduction/`](results/paper_reproduction/README.md)。论文历史协议和
+`corrected_v2` 修正协议分别归档，不能混用指标。
+
+下列入口用于确实需要重新训练的情形：
+
+监督训练：
 
 ```powershell
-python .\src\eval_explain.py --mode system --system_id 123 --ckpt auto --out_dir ".\eval_output" --explain saliency --objective loss --target ALL
+python scripts/train.py --config configs/experiments/main_benchmark_stage1.yaml
 ```
 
-If `--ckpt auto` cannot find a checkpoint, use an explicit checkpoint path:
+物理约束微调：
 
 ```powershell
-python .\src\eval_explain.py --mode test --ckpt <ckpt_path> --out_dir ".\eval_output" --explain saliency --objective loss --target ALL --max_explain_samples 256
+python scripts/train.py --config configs/experiments/main_benchmark_stage2.yaml
 ```
 
----
-
-## 4) Visualize from an existing prediction CSV
-
-These scripts do not require editing `EXCEL_PATH`.
-
-### `src\plot_test_viz_from_csv.py`
-
-- Purpose: generate parity and ternary plots from a prediction CSV, grouped by `system_id` and `T`.
-- Run:
+扩展 LLE 数据微调：
 
 ```powershell
-python .\src\plot_test_viz_from_csv.py --csv <prediction_csv> --out_dir ".\eval_output\viz_from_csv"
+python scripts/train.py --config configs/experiments/expanded_lle_finetune.yaml
 ```
 
-### `src\plot_test_viz_from_csv_extra.py`
+固定划分清单位于 `datasets/splits/`。推荐主科学版本为 `corrected_v2`；历史权重与修正版权重不可混用。
 
-- Purpose: generate enhanced plots, including combined parity plots, error statistics, and optional ternary PNGs.
-- Run:
+## 测试
 
 ```powershell
-python .\src\plot_test_viz_from_csv_extra.py --csv <prediction_csv> --out_dir ".\eval_output\viz_from_csv_extra"
+$env:PYTHONPATH='src'
+python -m pytest -q
 ```
 
-- Skip ternary plots for faster execution:
+公开版本应在 `ggnn39` 中运行完整测试，并通过公开目录安全审计；实际通过数量以当前测试输出为准。
+
+## Web 应用
 
 ```powershell
-python .\src\plot_test_viz_from_csv_extra.py --csv <prediction_csv> --out_dir ".\eval_output\viz_from_csv_extra" --skip_ternary
+Web/PSMI-LLE-web/scripts/run_backend.ps1
+Web/PSMI-LLE-web/scripts/run_frontend.ps1
 ```
 
----
+详细说明见 [Web 使用文档](Web/PSMI-LLE-web/README.md)。
 
-## 5) One-off utility scripts
+## 科学边界
 
-### `src\case_predict_draw.py` (recommended)
-
-- Purpose: unified application-case workflow for prediction, metrics export, and ternary overlay plotting.
-- This script replaces the typical two-step usage of `testcase.py` + `draw.py`.
-
-Predict + metrics + ternary plots:
-
-```powershell
-python .\src\case_predict_draw.py --ckpt <ckpt_path> --excel <excel_path>
-```
-
-Predict + metrics only (skip ternary plots):
-
-```powershell
-python .\src\case_predict_draw.py --ckpt <ckpt_path> --excel <excel_path> --skip_draw
-```
-
-Draw-only mode from an existing prediction CSV:
-
-```powershell
-python .\src\case_predict_draw.py --draw_only --csv <prediction_csv>
-```
-
-- Main outputs (under `out_dir`):
-  - `application_case_predictions.csv/.xlsx`
-  - `application_case_metrics.json/.txt`
-  - `application_case_metrics_by_system.csv/.xlsx/.json`
-  - `ternary_overlay/png/*.png`
-  - `ternary_overlay/ternary_overlay_all.pdf`
-
----
-
-## Module files
-
-These files are usually imported by other scripts rather than run directly.
-
-- `src\config.py`: configuration, including paths, hyperparameters, and feature switches
-- `src\data.py`: Excel loading, preprocessing, dataset splitting, caches, and datasets
-- `src\utils.py`: utilities such as RDKit featurization, batching, and scalers
-- `src\model.py`: model architectures
-- `src\train.py`: training loop, checkpointing, and training-curve plotting
-- `src\predict.py`: inference helpers used by the main pipeline
-- `src\metrics.py`: evaluation metrics and physics-consistency metrics
-- `src\loss.py`: mechanistic NRTL-based physics loss
-- `src\viz.py` / `src\viz_advanced.py`: visualization utilities
-
----
-
-## Quick start
-
-1. Edit `EXCEL_PATH` and `OUT_DIR` in `src\config.py`.
-2. Run:
-
-```powershell
-python .\src\main.py
-```
-
-3. Outputs will be written to `OUT_DIR`.
+当前主配置通过统一的 NRTL 过量 Gibbs 自由能形式计算活度系数，并约束两相化学势一致性，但没有启用独立的 Gibbs–Duhem 残差损失。相关科学表述和代码边界见 [科学模型契约](docs/architecture/scientific_model_contract_cn.md)。

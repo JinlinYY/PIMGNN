@@ -1,0 +1,8 @@
+EXCEL_PATH: datasets/processed/update-LLE-all-with-smiles.xlsx
+MIN_POINTS_PER_GROUP: 6
+PERMUTE_23_AUG: true
+SPLIT_STRATEGY: manifest
+SPLIT_MANIFEST_PATH: datasets/splits/main_benchmark_corrected_v2.json
+SCALAR_DIM: 2
+NRTL_TRAIN_PARAMS_PATH: datasets/parameters/corrected_v2/nrtl_params_train.json
+NRTL_EVAL_PARAMS_PATH: datasets/parameters/corrected_v2/nrtl_params_all.json

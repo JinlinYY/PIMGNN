@@ -1,0 +1,8 @@
+include:
+  - ../data/expanded_lle.yaml
+  - ../model/psmi_corrected_v2.yaml
+  - ../training/expanded_full_finetune.yaml
+SEED: 42
+LOAD_CKPT_PATH: results/main_benchmark/corrected_v2/seed42/stage2_physics/best_model.pt
+OUT_DIR: results/transfer_evaluation/expanded_lle/corrected_v2/seed42
+

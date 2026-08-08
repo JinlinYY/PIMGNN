@@ -1,0 +1,344 @@
+{
+  "schema_version": 1,
+  "basis": "JACS manuscript and Supporting Information experiment structure",
+  "training_rerun": false,
+  "experiments": [
+    {
+      "path": "00_dataset_construction",
+      "title_cn": "数据集构建、筛选与分布分析",
+      "paper_sections": [
+        "主文 2.1",
+        "补充信息 S5",
+        "表 S15-S16",
+        "图 S8"
+      ],
+      "status": "code_and_saved_results",
+      "code": [
+        "scripts/data_preparation/build_canonical_split.py",
+        "scripts/data_preparation/build_expanded_split.py",
+        "scripts/data_preparation/filter_sparse_systems.py",
+        "scripts/analysis/analyze_dataset_distribution.py",
+        "scripts/analysis/export_temperature_range_audit.py"
+      ],
+      "commands": [
+        "python scripts/analysis/analyze_dataset_distribution.py --help",
+        "python scripts/data_preparation/build_canonical_split.py --help"
+      ]
+    },
+    {
+      "path": "01_main_benchmark",
+      "title_cn": "PSMI 主基准与多随机种子评估",
+      "paper_sections": [
+        "主文 3.1",
+        "表 1",
+        "图 2a"
+      ],
+      "status": "code_results_and_checkpoints",
+      "code": [
+        "scripts/train.py",
+        "src/psmi/predict.py",
+        "scripts/experiments/run_corrected_multiseed.py"
+      ],
+      "commands": [
+        "python scripts/experiments/run_corrected_multiseed.py --help"
+      ]
+    },
+    {
+      "path": "02_baseline_comparison",
+      "title_cn": "通用机器学习与图神经网络对比实验",
+      "paper_sections": [
+        "主文 3.1.1",
+        "表 1"
+      ],
+      "status": "code_and_saved_results",
+      "code": [
+        "scripts/experiments/baselines/run_classical_multi_seed.py",
+        "scripts/experiments/baselines/run_cignn.py",
+        "scripts/experiments/baselines/run_cgib.py",
+        "scripts/experiments/baselines/run_glam.py",
+        "src/psmi_baselines"
+      ],
+      "commands": [
+        "python scripts/experiments/baselines/run_classical_multi_seed.py --help"
+      ]
+    },
+    {
+      "path": "03_architecture_ablation",
+      "title_cn": "多尺度表示、跨分子交互与融合模块消融",
+      "paper_sections": [
+        "主文 3.1.2",
+        "表 2"
+      ],
+      "status": "code_and_saved_metrics",
+      "code": [
+        "scripts/train.py",
+        "src/psmi/model.py",
+        "configs/experiments"
+      ],
+      "commands": [
+        "python scripts/train.py --help"
+      ]
+    },
+    {
+      "path": "04_physics_regularization",
+      "title_cn": "物理约束正则化对比",
+      "paper_sections": [
+        "主文 2.3",
+        "主文 3.1.2",
+        "表 3"
+      ],
+      "status": "code_and_saved_results",
+      "code": [
+        "scripts/train.py",
+        "src/psmi/loss.py",
+        "src/psmi/ge_models.py",
+        "src/psmi/nrtl_flash.py"
+      ],
+      "commands": [
+        "python scripts/train.py --help"
+      ]
+    },
+    {
+      "path": "05_prediction_error_analysis",
+      "title_cn": "预测误差分布与偏差分析",
+      "paper_sections": [
+        "补充信息 S3.1",
+        "图 S1-S3"
+      ],
+      "status": "code_and_legacy_saved_results",
+      "code": [
+        "scripts/visualize_predictions_extra.py"
+      ],
+      "commands": [
+        "python scripts/visualize_predictions_extra.py --help"
+      ]
+    },
+    {
+      "path": "06_interpretability",
+      "title_cn": "模型可解释性与特征重要性可视化",
+      "paper_sections": [
+        "主文 3.2",
+        "图 2b-2e"
+      ],
+      "status": "code_and_saved_results",
+      "code": [
+        "scripts/explain.py",
+        "scripts/visualization/explainability"
+      ],
+      "commands": [
+        "python scripts/explain.py --help"
+      ]
+    },
+    {
+      "path": "07_external_transfer",
+      "title_cn": "二元溶解度外部验证与扩展 LLE 微调",
+      "paper_sections": [
+        "主文 3.3",
+        "图 2f",
+        "表 S2"
+      ],
+      "status": "code_results_checkpoints_external_table_missing",
+      "code": [
+        "scripts/experiments/transfer_learning/public_release",
+        "src/psmi_legacy_public"
+      ],
+      "commands": [
+        "python scripts/experiments/transfer_learning/public_release/evaluate_predictions.py --help"
+      ]
+    },
+    {
+      "path": "08_temperature_robustness/01_local_perturbation",
+      "title_cn": "局部温度扰动与相路径敏感性",
+      "paper_sections": [
+        "补充信息 S3.3.1",
+        "图 S4"
+      ],
+      "status": "code_only_result_not_found",
+      "code": [
+        "scripts/analysis/run_sensitivity_analysis.py"
+      ],
+      "commands": [
+        "python scripts/analysis/run_sensitivity_analysis.py --help"
+      ]
+    },
+    {
+      "path": "08_temperature_robustness/02_encoding_and_tail",
+      "title_cn": "温度编码与温度尾部稳健性",
+      "paper_sections": [
+        "补充信息 S3.3.2",
+        "表 S3-S4",
+        "图 S5"
+      ],
+      "status": "code_and_saved_results",
+      "code": [
+        "scripts/run_temperature_encoding_sensitivity.py",
+        "scripts/plot_temperature_encoding_sensitivity.py"
+      ],
+      "commands": [
+        "python scripts/plot_temperature_encoding_sensitivity.py --help"
+      ]
+    },
+    {
+      "path": "09_data_splitting",
+      "title_cn": "体系级划分、交叉验证与划分策略",
+      "paper_sections": [
+        "补充信息 S3.4",
+        "表 S5"
+      ],
+      "status": "code_and_split_manifests",
+      "code": [
+        "scripts/experiments/data_splitting/run_kfold_cv.py",
+        "scripts/experiments/data_splitting/run_split_strategy_benchmark.py"
+      ],
+      "commands": [
+        "python scripts/experiments/data_splitting/run_kfold_cv.py --help"
+      ]
+    },
+    {
+      "path": "10_tieline_sensitivity",
+      "title_cn": "系带线密度阈值与相路径位置敏感性",
+      "paper_sections": [
+        "补充信息 S3.5",
+        "表 S6-S7",
+        "图 S6"
+      ],
+      "status": "code_and_saved_results",
+      "code": [
+        "scripts/run_tieline_threshold_sensitivity.py",
+        "scripts/plot_tieline_threshold_sensitivity.py",
+        "scripts/data_preparation/filter_sparse_systems.py"
+      ],
+      "commands": [
+        "python scripts/plot_tieline_threshold_sensitivity.py --help"
+      ]
+    },
+    {
+      "path": "11_ge_model_sensitivity",
+      "title_cn": "过量吉布斯能模型敏感性",
+      "paper_sections": [
+        "补充信息 S3.6",
+        "表 S8"
+      ],
+      "status": "code_and_saved_results",
+      "code": [
+        "scripts/experiments/ge_model_sensitivity.py",
+        "src/psmi/ge_models.py"
+      ],
+      "commands": [
+        "python scripts/experiments/ge_model_sensitivity.py --help"
+      ]
+    },
+    {
+      "path": "12_thermodynamic_audit",
+      "title_cn": "热力学残差与化学势一致性审计",
+      "paper_sections": [
+        "补充信息 S3.7",
+        "表 S9-S10"
+      ],
+      "status": "code_and_saved_results",
+      "code": [
+        "scripts/analysis/evaluate_thermodynamic_consistency.py",
+        "src/psmi/ge_models.py",
+        "src/psmi/nrtl_flash.py"
+      ],
+      "commands": [
+        "python scripts/analysis/evaluate_thermodynamic_consistency.py --help"
+      ]
+    },
+    {
+      "path": "13_system_generalization",
+      "title_cn": "体系级泛化与相图类别统计",
+      "paper_sections": [
+        "补充信息 S3.8",
+        "表 S11-S14",
+        "表 S17",
+        "补充信息 S6"
+      ],
+      "status": "code_and_saved_results",
+      "code": [
+        "scripts/analysis/classify_phase_diagram_generalization.py"
+      ],
+      "commands": [
+        "python scripts/analysis/classify_phase_diagram_generalization.py --help"
+      ]
+    },
+    {
+      "path": "14_industrial_cases/00_application_workflow",
+      "title_cn": "工业应用预测与分析工作流",
+      "paper_sections": [
+        "主文 3.4"
+      ],
+      "status": "code_and_saved_results",
+      "code": [
+        "scripts/run_application_case.py",
+        "scripts/evaluate_case.py"
+      ],
+      "commands": [
+        "python scripts/run_application_case.py --help"
+      ]
+    },
+    {
+      "path": "14_industrial_cases/01_aromatic_extraction",
+      "title_cn": "环丁砜芳烃抽提案例",
+      "paper_sections": [
+        "主文 3.4.1",
+        "图 3c"
+      ],
+      "status": "code_data_and_saved_figure",
+      "code": [
+        "scripts/run_application_case.py",
+        "scripts/visualization/plot_figure3cd_industrial_cases.py"
+      ],
+      "commands": [
+        "python scripts/visualization/plot_figure3cd_industrial_cases.py --help"
+      ]
+    },
+    {
+      "path": "14_industrial_cases/02_dem_recovery",
+      "title_cn": "DEM 回收案例",
+      "paper_sections": [
+        "主文 3.4.2",
+        "图 3d"
+      ],
+      "status": "code_data_and_saved_figure",
+      "code": [
+        "scripts/run_application_case.py",
+        "scripts/visualization/plot_figure3cd_industrial_cases.py"
+      ],
+      "commands": [
+        "python scripts/visualization/plot_figure3cd_industrial_cases.py --help"
+      ]
+    },
+    {
+      "path": "15_efficiency",
+      "title_cn": "推理效率与运行时间基准",
+      "paper_sections": [
+        "补充信息 S3.9"
+      ],
+      "status": "code_and_saved_results",
+      "code": [
+        "scripts/benchmark_efficiency.py",
+        "scripts/summarize_efficiency_benchmarks.py"
+      ],
+      "commands": [
+        "python scripts/summarize_efficiency_benchmarks.py --help"
+      ]
+    },
+    {
+      "path": "16_web_application",
+      "title_cn": "PSMI-LLE Web 应用",
+      "paper_sections": [
+        "补充信息 S4",
+        "图 S7"
+      ],
+      "status": "code_and_checkpoint",
+      "code": [
+        "Web/PSMI-LLE-web"
+      ],
+      "commands": [
+        "Web/PSMI-LLE-web/scripts/run_backend.ps1",
+        "Web/PSMI-LLE-web/scripts/run_frontend.ps1"
+      ]
+    }
+  ]
+}

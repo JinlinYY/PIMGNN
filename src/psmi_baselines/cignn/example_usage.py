@@ -1,0 +1,47 @@
+"""Implement the cignn example_usage baseline module."""
+import torch
+from .model import CIGIN
+from .data_utils import smiles_to_graph, batch_graphs
+
+# Configure the runtime device.
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+# Configure the baseline model.
+node_dim = 33  # Baseline workflow step.
+edge_dim = 10  # Baseline workflow step.
+model = CIGIN(
+    node_dim=node_dim,
+    edge_dim=edge_dim,
+    hidden_dim=64,
+    num_mp_layers=3,
+    use_set2set=False
+).to(device)
+
+# Generate model predictions.
+solute_smiles = "CCO"  # Baseline workflow step.
+solvent_smiles = "O"   # Baseline workflow step.
+
+# Baseline workflow step.
+solute_graph = smiles_to_graph(solute_smiles)
+solvent_graph = smiles_to_graph(solvent_smiles)
+
+if solute_graph is not None and solvent_graph is not None:
+    # Baseline workflow step.
+    solute_batch = batch_graphs([solute_graph])
+    solvent_batch = batch_graphs([solvent_graph])
+    
+    # Configure the runtime device.
+    solute_batch = solute_batch.to(device)
+    solvent_batch = solvent_batch.to(device)
+    
+    # Generate model predictions.
+    model.eval()
+    with torch.no_grad():
+        prediction, interaction_map = model(solute_batch, solvent_batch)
+        print(f"溶质: {solute_smiles}")
+        print(f"溶剂: {solvent_smiles}")
+        print(f"预测的溶剂化自由能: {prediction.item():.4f} kcal/mol")
+        print(f"交互映射形状: {interaction_map.shape}")
+else:
+    print("无法解析SMILES字符串")
+

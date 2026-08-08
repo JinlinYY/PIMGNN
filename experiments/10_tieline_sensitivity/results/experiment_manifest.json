@@ -1,0 +1,57 @@
+{
+  "dataset": "D:\\GGNN\\YXFL\\datasets\\processed\\update-LLE-all-with-smiles_no-missing-smiles.xlsx",
+  "thresholds": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "split_threshold": 3,
+  "common_eval_threshold": 9,
+  "seed": 42,
+  "system_split": {
+    "train_systems": 654,
+    "validation_systems": 82,
+    "test_systems": 82
+  },
+  "common_validation_stats": {
+    "rows_tielines": 581,
+    "equilibrium_endpoints": 1162,
+    "systems": 54,
+    "system_temperature_groups": 54,
+    "mean_tielines_per_group": 10.75925925925926,
+    "median_tielines_per_group": 10.0,
+    "min_tielines_per_group": 9,
+    "max_tielines_per_group": 19
+  },
+  "common_test_stats": {
+    "rows_tielines": 583,
+    "equilibrium_endpoints": 1166,
+    "systems": 53,
+    "system_temperature_groups": 53,
+    "mean_tielines_per_group": 11.0,
+    "median_tielines_per_group": 10.0,
+    "min_tielines_per_group": 9,
+    "max_tielines_per_group": 19
+  },
+  "training": {
+    "epochs": 60,
+    "learning_rate": 5e-05,
+    "batch_size": 512,
+    "patience": 10,
+    "min_delta": 0.0002,
+    "component_23_augmentation": true,
+    "initialization": "from scratch; identical seed for every threshold",
+    "loss": "supervised MSE"
+  },
+  "software_hardware": {
+    "python": "3.9.25",
+    "torch": "2.6.0+cu126",
+    "cuda_available": true,
+    "cuda_runtime": "12.6",
+    "gpu": "NVIDIA GeForce RTX 3090 Ti"
+  }
+}
