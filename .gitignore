@@ -9,6 +9,10 @@ htmlcov/
 venv/
 tmp/
 
+# Frontend dependencies and build output.
+node_modules/
+dist/
+
 # Local editor and operating-system files.
 .vscode/
 .idea/

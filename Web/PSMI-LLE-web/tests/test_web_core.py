@@ -40,5 +40,5 @@ def test_legacy_checkpoint_loads_through_psmi_compatibility_layer() -> None:
     predictor = ModelPredictor(device="cpu")
     assert predictor.model is not None
     assert predictor.temperature_scaler.std > 0
-    assert any("appended zero input column" in note for note in predictor.compatibility_notes)
-
+    assert predictor.model.scalar_dim == 2
+    assert predictor.pressure_supported is False

@@ -64,6 +64,8 @@ Web/PSMI-LLE-web/scripts/run_frontend.ps1
 
 Open `http://localhost:3000` for the interface and `http://localhost:8000/docs` for the API schema.
 
+See `Web/PSMI-LLE-web/README.md` for the complete local deployment guide, environment variables, API checks, GPU configuration, and troubleshooting.
+
 ## Scientific scope
 
 The main physics-regularized configuration uses an NRTL excess-Gibbs-energy model to evaluate phase-wise activity coefficients and penalize chemical-potential mismatch. The current configuration does not add a separate Gibbs-Duhem residual term. The distinction between thermodynamic model consistency and an explicit neural-network loss term is documented in `docs/architecture/scientific_model_contract.md`.

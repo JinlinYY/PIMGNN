@@ -1,0 +1,9 @@
+# Web service dependencies; the core PSMI dependencies are shared with the repository.
+fastapi>=0.104,<1
+uvicorn[standard]>=0.24,<1
+torch>=2.1
+rdkit>=2023.9
+pandas>=2.1
+matplotlib>=3.8
+numpy>=1.26
+pydantic>=2.5,<3
