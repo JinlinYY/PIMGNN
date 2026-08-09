@@ -37,12 +37,12 @@ npm --version
 ### 2. Obtain the repository
 
 ```powershell
-$repositoryUrl = "https://github.com/JinlinYY/PIMGNN.git"
+$repositoryUrl = "https://github.com/JinlinYY/PSMI.git"
 git clone $repositoryUrl PSMI
 cd PSMI
 ```
 
-The remote repository currently retains its historical URL, while the cloned directory and all public application content use the PSMI project name.
+The command checks out the repository into a local directory named `PSMI`.
 
 ### 3. Create the Python environment
 
