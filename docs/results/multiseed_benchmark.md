@@ -1,19 +1,28 @@
-# PSMI Multi-Seed Benchmarks
+# Auxiliary Sample-Major Multi-Seed Benchmarks
 
 ## Scope
 
-This document summarizes the maintained sample-major multi-seed protocol for
-seeds 42, 43, and 44. It is distinct from the component-major manuscript
-checkpoint registry used to reproduce Figure 2a and Table 3.
+This document summarizes maintained `sample_major` runs for seeds 42, 43, and
+44. These values are auxiliary repository benchmarks. They are not the
+numerical source for main-text Tables 1-3.
 
-All seeds use the same fixed system-level partition. Component permutation is
-applied only to the training partition. Checkpoints are selected by validation
-performance and the test partition is evaluated after selection.
+The manuscript uses several experiment-specific replication protocols:
 
-## Main benchmark dataset
+| Paper item | Replication protocol |
+| --- | --- |
+| Table 1 | Five independent runs; reported as mean and sample standard deviation |
+| Table 2 | Validation-selected historical architecture-ablation records |
+| Table 3 | Historical data-driven and physics-informed checkpoint records |
+| Tables S3-S4 | Seeds 7, 42, and 2024 |
+| Table S8 | Five system splits with seeds 42-46 |
+| Section S3.9 efficiency | Seeds 42, 43, and 44 |
 
-The filtered main dataset contains 7,683 unaugmented tie-line records from 765
-systems. The fixed partition is:
+Never combine uncertainty estimates from these protocols.
+
+## Main sample-major benchmark
+
+The filtered main dataset contains 7,683 unaugmented records from 765 systems.
+The fixed partition is:
 
 | Partition | Systems | Records |
 | --- | ---: | ---: |
@@ -21,20 +30,23 @@ systems. The fixed partition is:
 | Validation | 75 | 788 |
 | Test | 78 | 803 |
 
-## Main benchmark results
+All three auxiliary seeds use this fixed system-level partition. Component
+permutation is restricted to the training partition, checkpoints are selected
+by validation performance, and the unaugmented test partition is evaluated
+after selection.
 
 | Stage | Test MAE | Test RMSE | Test R2 | Chemical-potential residual MAE | TPD violation rate |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | Supervised | 0.05145 +/- 0.00089 | 0.09270 +/- 0.00136 | 0.92674 +/- 0.00216 | 1.45072 +/- 0.03246 | 20.96% +/- 0.73% |
 | NRTL regularized | 0.05176 +/- 0.00127 | 0.09264 +/- 0.00129 | 0.92682 +/- 0.00204 | 1.36934 +/- 0.12601 | 20.63% +/- 2.21% |
 
-Values are mean plus or minus sample standard deviation across the three seeds.
-Predictive and thermodynamic changes should be read separately: a smaller
-chemical-potential residual does not necessarily imply a smaller composition
-MAE, and the stage-2 public objective does not directly optimize the reported
-TPD diagnostic.
+Values are arithmetic mean plus or minus sample standard deviation across
+seeds 42, 43, and 44. Predictive and thermodynamic changes answer different
+questions: a smaller chemical-potential residual does not imply a smaller
+composition MAE, and the auxiliary stage-2 objective does not directly optimize
+the reported TPD diagnostic.
 
-The per-seed archived metric records for the main stages are located at:
+Per-seed metric records are under:
 
 ```text
 experiments/section_3_results/3_1_lle_prediction/
@@ -42,12 +54,11 @@ experiments/section_3_results/3_1_lle_prediction/
   results/stage_comparison/seed*/
 ```
 
-The cleaned public release retains these metrics as evidence. It does not
-present missing main-stage sample-major checkpoints as downloadable artifacts.
-For executable manuscript checkpoints, use the published component-major
-registry described in the [checkpoint reference](../reference/checkpoints_and_artifacts.md).
+These metric files document maintained training behavior. For executable
+manuscript checkpoints, use the component-major registry described in
+[Checkpoint and Artifact Reference](../reference/checkpoints_and_artifacts.md).
 
-## Expanded-LLE dataset
+## Expanded-LLE auxiliary benchmark
 
 The expanded dataset contains 6,709 filtered unaugmented records from 719
 systems:
@@ -58,7 +69,7 @@ systems:
 | Validation | 72 | 707 |
 | Test | 72 | 632 |
 
-## Expanded-LLE results
+The auxiliary three-seed summary is:
 
 | Test MAE | Test RMSE | Test R2 |
 | ---: | ---: | ---: |
@@ -72,7 +83,7 @@ experiments/section_3_results/3_4_industrial_extraction_design/
   expanded_lle_adaptation/results/multiseed_reference/
 ```
 
-List these checkpoints with:
+List the associated checkpoints with:
 
 ```bash
 python scripts/evaluate_checkpoint_registry.py \
@@ -80,38 +91,26 @@ python scripts/evaluate_checkpoint_registry.py \
   --list
 ```
 
-## Protocol differences that prevent direct pooling
+The expanded input adds pressure as a third scalar and uses full-parameter
+supervised adaptation. Its metrics must not be pooled with the main benchmark.
 
-The main and expanded rows should not be pooled into one performance estimate:
+## Recomputing an auxiliary summary
 
-- they use different source workbooks and system populations;
-- the expanded input adds pressure as a third scalar;
-- the expanded profile performs supervised full-network fine-tuning;
-- output errors reflect different test-system distributions.
-
-Likewise, sample-major multi-seed results and component-major manuscript
-checkpoint results belong to separate compatibility tracks.
-
-## Recomputing a summary
-
-The summarization entry point is:
+Inspect the summarization interface with:
 
 ```bash
 python scripts/analysis/summarize_multiseed_benchmark.py --help
 ```
 
-Run it on a new output tree rather than overwriting the archived summary. A
-valid summary should identify included seeds, checkpoint-selection metric,
-missing runs, aggregation convention, and source metric files.
+Write new summaries to a new output directory. A valid report identifies:
 
-## Reporting guidance
+- included and missing seeds;
+- exact checkpoint-selection metric;
+- node layout and scalar dimension;
+- fixed split manifest;
+- augmented training and unaugmented evaluation counts;
+- arithmetic mean and sample standard deviation;
+- source metric files and software environment.
 
-When citing these results, include:
-
-- sample-major protocol name;
-- seeds 42, 43, and 44;
-- fixed system-level split;
-- unaugmented test counts;
-- mean and sample standard deviation;
-- whether a value is predictive or thermodynamic;
-- availability status of the associated checkpoint.
+See [Main-Text Result Mapping](main_text_results.md) before comparing an
+auxiliary value with a manuscript table.

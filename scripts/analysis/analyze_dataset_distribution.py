@@ -7,9 +7,10 @@ Run from the repository root:
     python scripts/analysis/analyze_dataset_distribution.py
 
 The script intentionally separates:
-1. raw workbook records, i.e. experimental tie-line/equilibrium-point rows;
-2. filtered analysis records after psmi.data.load_and_prepare_excel(...);
-3. training augmentation, which is reported separately from experimental data.
+1. raw workbook rows;
+2. validated records immediately before the tie-line-density filter;
+3. filtered analysis records after psmi.data.load_and_prepare_excel(...);
+4. training augmentation, which is reported separately from experimental data.
 """
 
 from __future__ import annotations
@@ -43,6 +44,7 @@ except Exception:
     pass
 
 from psmi.data import load_and_prepare_excel  # noqa: E402
+from psmi.utils import canonicalize_smiles  # noqa: E402
 
 
 DATASETS = [
@@ -139,6 +141,7 @@ class PreparedDataset:
     dataset_name: str
     source_file: Path
     raw: pd.DataFrame
+    validated: pd.DataFrame
     filtered: pd.DataFrame
     raw_cols: dict[str, str | None]
 
@@ -199,9 +202,78 @@ def normalize_filtered(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+def validate_before_density_filter(
+    raw: pd.DataFrame,
+    raw_cols: dict[str, str | None],
+) -> pd.DataFrame:
+    """Reproduce loader validation immediately before density filtering."""
+    required = {
+        "system_id": raw_cols["system"],
+        "T": raw_cols["T"],
+        "smiles1": raw_cols["component1_smiles"],
+        "smiles2": raw_cols["component2_smiles"],
+        "smiles3": raw_cols["component3_smiles"],
+    }
+    for name in ["Ex1", "Ex2", "Ex3", "Rx1", "Rx2", "Rx3"]:
+        candidates = [
+            name,
+            name.upper(),
+            name.lower(),
+            name.replace("x", "X"),
+            name.replace("X", "x"),
+            name.replace("x", "").replace("X", ""),
+        ]
+        required[name] = find_col(raw.columns, candidates)
+
+    missing = [name for name, source in required.items() if source is None]
+    if missing:
+        raise KeyError(f"Cannot validate pre-density records; missing columns: {missing}")
+
+    work = raw.rename(columns={source: name for name, source in required.items()}).copy()
+    pressure_col = find_col(
+        raw.columns,
+        [
+            "P/kPa",
+            "P / kPa",
+            "P(kPa)",
+            "P",
+            "Pressure",
+            "Pressure/kPa",
+            "Pressure (kPa)",
+            "P/bar",
+            "P(bar)",
+            "P / bar",
+        ],
+    )
+    if pressure_col is not None:
+        if pressure_col != "P":
+            work = work.rename(columns={pressure_col: "P"})
+        work["P"] = pd.to_numeric(work["P"], errors="coerce")
+        if work["P"].isnull().all():
+            work["P"] = 101.325
+        else:
+            work["P"] = work["P"].fillna(101.325)
+    else:
+        work["P"] = 101.325
+
+    for column in ["smiles1", "smiles2", "smiles3"]:
+        work[column] = work[column].astype(str).map(canonicalize_smiles)
+    work = work[
+        (work["smiles1"] != "")
+        & (work["smiles2"] != "")
+        & (work["smiles3"] != "")
+    ].copy()
+
+    numeric_columns = ["T", "P", "Ex1", "Ex2", "Ex3", "Rx1", "Rx2", "Rx3"]
+    for column in numeric_columns:
+        work[column] = pd.to_numeric(work[column], errors="coerce")
+    return work.dropna(subset=numeric_columns).copy()
+
+
 def prepare_dataset(spec: dict[str, object], min_points_per_group: int) -> PreparedDataset:
     path = Path(spec["path"])
     raw, cols = read_raw_excel(path)
+    validated = validate_before_density_filter(raw, cols)
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
@@ -216,6 +288,7 @@ def prepare_dataset(spec: dict[str, object], min_points_per_group: int) -> Prepa
         dataset_name=str(spec["dataset_name"]),
         source_file=path,
         raw=raw,
+        validated=validated,
         filtered=normalize_filtered(filtered),
         raw_cols=cols,
     )
@@ -263,7 +336,11 @@ def filtered_system_counts(prepared: PreparedDataset) -> pd.Series:
 
 def overview_rows(prepared: PreparedDataset, min_points_per_group: int) -> list[dict[str, object]]:
     rows = []
-    for stage, df in [("raw_workbook", prepared.raw), ("filtered_min6_no_aug", prepared.filtered)]:
+    for stage, df in [
+        ("raw_workbook", prepared.raw),
+        ("validated_pre_density", prepared.validated),
+        ("filtered_min6_no_aug", prepared.filtered),
+    ]:
         if stage == "raw_workbook":
             system_col = prepared.raw_cols["system"]
             t_col = prepared.raw_cols["T"]
@@ -275,7 +352,9 @@ def overview_rows(prepared: PreparedDataset, min_points_per_group: int) -> list[
             "dataset_name": prepared.dataset_name,
             "stage": stage,
             "source_file": str(prepared.source_file.relative_to(ROOT)),
-            "min_points_per_system_temperature_group": min_points_per_group if stage != "raw_workbook" else "",
+            "min_points_per_system_temperature_group": (
+                min_points_per_group if stage == "filtered_min6_no_aug" else ""
+            ),
             "experimental_or_analysis_rows": int(len(df)),
             "training_rows_if_component23_swap_augmented": int(len(df) * 2) if stage == "filtered_min6_no_aug" else "",
         }
@@ -298,6 +377,39 @@ def overview_rows(prepared: PreparedDataset, min_points_per_group: int) -> list[
             row["unique_temperatures"] = ""
         rows.append(row)
     return rows
+
+
+def manuscript_table_s15(overview: pd.DataFrame) -> pd.DataFrame:
+    """Map repository counting stages to the final manuscript Table S15."""
+    selections = [
+        ("Curated IL-LLE", "Before filtering", "validated_pre_density"),
+        ("Curated IL-LLE", "After filtering", "filtered_min6_no_aug"),
+        ("Expanded literature LLE", "Before filtering", "raw_workbook"),
+        ("Expanded literature LLE", "After filtering", "filtered_min6_no_aug"),
+    ]
+    rows: list[dict[str, object]] = []
+    for dataset_id, paper_stage, repository_stage in selections:
+        match = overview[
+            (overview["dataset_id"] == dataset_id)
+            & (overview["stage"] == repository_stage)
+        ]
+        if len(match) != 1:
+            raise ValueError(
+                f"Expected one overview row for {dataset_id}/{repository_stage}, got {len(match)}"
+            )
+        source = match.iloc[0]
+        rows.append(
+            {
+                "paper_item": "Table S15",
+                "dataset_id": dataset_id,
+                "paper_stage": paper_stage,
+                "repository_stage": repository_stage,
+                "records": int(source["experimental_or_analysis_rows"]),
+                "systems": int(source["unique_system_id"]),
+                "system_temperature_groups": int(source["unique_system_temperature_groups"]),
+            }
+        )
+    return pd.DataFrame(rows)
 
 
 def points_summary_rows(prepared: PreparedDataset) -> list[dict[str, object]]:
@@ -792,6 +904,7 @@ def save_family_plot(family_distribution: pd.DataFrame, out_dir: Path) -> Path |
 def write_markdown_report(
     out_dir: Path,
     overview: pd.DataFrame,
+    table_s15: pd.DataFrame,
     points_summary_df: pd.DataFrame,
     component_summary: pd.DataFrame,
     family_distribution: pd.DataFrame,
@@ -799,13 +912,15 @@ def write_markdown_report(
     min_points_per_group: int,
 ) -> Path:
     def rel(path: Path) -> str:
-        return str(path.relative_to(ROOT)).replace("\\", "/")
+        return str(path.resolve().relative_to(ROOT.resolve())).replace("\\", "/")
 
     curated_overview = overview[overview["dataset_id"] == "Curated IL-LLE"]
     expanded_overview = overview[overview["dataset_id"] == "Expanded literature LLE"]
     curated_raw = curated_overview[curated_overview["stage"] == "raw_workbook"].iloc[0]
+    curated_validated = curated_overview[curated_overview["stage"] == "validated_pre_density"].iloc[0]
     curated_filtered = curated_overview[curated_overview["stage"] == "filtered_min6_no_aug"].iloc[0]
     expanded_raw = expanded_overview[expanded_overview["stage"] == "raw_workbook"].iloc[0]
+    expanded_validated = expanded_overview[expanded_overview["stage"] == "validated_pre_density"].iloc[0]
     expanded_filtered = expanded_overview[expanded_overview["stage"] == "filtered_min6_no_aug"].iloc[0]
 
     comp_filtered = component_summary[component_summary["stage"] == "filtered_min6_no_aug"]
@@ -860,6 +975,23 @@ def write_markdown_report(
             ]
         ),
         "",
+        "## Manuscript Table S15",
+        "",
+        markdown_table(
+            table_s15[
+                [
+                    "dataset_id",
+                    "paper_stage",
+                    "repository_stage",
+                    "records",
+                    "systems",
+                    "system_temperature_groups",
+                ]
+            ]
+        ),
+        "",
+        "The final manuscript's `Before filtering` row maps to `validated_pre_density` for the curated benchmark and to `raw_workbook` for the expanded literature dataset. This explicit mapping preserves the reported Table S15 values without conflating workbook ingestion with molecular-record validation.",
+        "",
         "## Points Per System",
         "",
         markdown_table(
@@ -892,9 +1024,9 @@ def write_markdown_report(
             "",
             "## Counting Contract",
             "",
-            "One workbook row is one experimental tie-line record. A `system_id` identifies one ternary chemical system, while `(system_id, T)` identifies that system at a specific temperature. The paired extract-phase (`Ex1-Ex3`) and raffinate-phase (`Rx1-Rx3`) compositions define the measured equilibrium point. Preprocessing assigns a continuous phase-path coordinate `t` within each `(system_id, T)` group and retains only groups meeting the configured minimum tie-line density.",
+            "One workbook row is one candidate experimental tie-line record. A `system_id` identifies one ternary chemical system, while `(system_id, T)` identifies that system at a specific temperature. The paired extract-phase (`Ex1-Ex3`) and raffinate-phase (`Rx1-Rx3`) compositions define the measured equilibrium point. Molecular-record validation canonicalizes all three SMILES strings and removes rows with an invalid component representation or missing required numerical field. Preprocessing then assigns a continuous phase-path coordinate `t` within each `(system_id, T)` group and retains only groups meeting the configured minimum tie-line density.",
             "",
-            f"The distributed main workbook contains {int(curated_raw['experimental_or_analysis_rows'])} raw tie-line records, {int(curated_raw['unique_system_id'])} unique `system_id` values, and {int(curated_raw['unique_system_temperature_groups'])} unique `(system_id, T)` groups over {curated_raw['temperature_min_K']:.2f}-{curated_raw['temperature_max_K']:.2f} K. Requiring at least {min_points_per_group} records per `(system_id, T)` group retains {int(curated_filtered['experimental_or_analysis_rows'])} records, {int(curated_filtered['unique_system_id'])} systems, and {int(curated_filtered['unique_system_temperature_groups'])} system-temperature groups. The distributed expanded workbook contains {int(expanded_raw['experimental_or_analysis_rows'])} raw records, {int(expanded_raw['unique_system_id'])} systems, and {int(expanded_raw['unique_system_temperature_groups'])} system-temperature groups over {expanded_raw['temperature_min_K']:.2f}-{expanded_raw['temperature_max_K']:.2f} K; the same filter retains {int(expanded_filtered['experimental_or_analysis_rows'])} records, {int(expanded_filtered['unique_system_id'])} systems, and {int(expanded_filtered['unique_system_temperature_groups'])} system-temperature groups.",
+            f"The distributed main workbook contains {int(curated_raw['experimental_or_analysis_rows'])} rows, {int(curated_raw['unique_system_id'])} unique `system_id` values, and {int(curated_raw['unique_system_temperature_groups'])} unique `(system_id, T)` groups. Molecular-record validation retains {int(curated_validated['experimental_or_analysis_rows'])} records, {int(curated_validated['unique_system_id'])} systems, and {int(curated_validated['unique_system_temperature_groups'])} groups. Requiring at least {min_points_per_group} records per group then retains {int(curated_filtered['experimental_or_analysis_rows'])} records, {int(curated_filtered['unique_system_id'])} systems, and {int(curated_filtered['unique_system_temperature_groups'])} groups. The expanded workbook contains {int(expanded_raw['experimental_or_analysis_rows'])} rows, {int(expanded_raw['unique_system_id'])} systems, and {int(expanded_raw['unique_system_temperature_groups'])} groups; validation retains {int(expanded_validated['experimental_or_analysis_rows'])} records, {int(expanded_validated['unique_system_id'])} systems, and {int(expanded_validated['unique_system_temperature_groups'])} groups; the density filter retains {int(expanded_filtered['experimental_or_analysis_rows'])} records, {int(expanded_filtered['unique_system_id'])} systems, and {int(expanded_filtered['unique_system_temperature_groups'])} groups.",
             "",
             "The component counts are computed from canonical SMILES. Component-2/component-3 permutation is a training-time symmetry augmentation: it can double training examples, but it does not create experimental tie-line records and is excluded from dataset-size reporting.",
             "",
@@ -903,6 +1035,7 @@ def write_markdown_report(
             "## Generated Tables",
             "",
             "- `dataset_overview.csv`",
+            "- `table_s15_counts.csv`",
             "- `points_per_system_summary.csv`",
             "- `points_per_system_counts.csv`",
             "- `component_summary.csv`",
@@ -964,12 +1097,14 @@ def main() -> None:
     prepared = [prepare_dataset(spec, args.min_points_per_group) for spec in DATASETS]
 
     overview = pd.DataFrame([row for item in prepared for row in overview_rows(item, args.min_points_per_group)])
+    table_s15 = manuscript_table_s15(overview)
     points_summary_df = pd.DataFrame([row for item in prepared for row in points_summary_rows(item)])
     points_counts = pd.DataFrame([row for item in prepared for row in points_count_rows(item)])
     component_summary = pd.DataFrame([row for item in prepared for row in component_summary_rows(item)])
     family_distribution = pd.DataFrame([row for item in prepared for row in family_distribution_rows(item)])
 
     overview.to_csv(results_dir / "dataset_overview.csv", index=False, encoding="utf-8-sig")
+    table_s15.to_csv(results_dir / "table_s15_counts.csv", index=False, encoding="utf-8-sig")
     points_summary_df.to_csv(results_dir / "points_per_system_summary.csv", index=False, encoding="utf-8-sig")
     points_counts.to_csv(results_dir / "points_per_system_counts.csv", index=False, encoding="utf-8-sig")
     component_summary.to_csv(results_dir / "component_summary.csv", index=False, encoding="utf-8-sig")
@@ -987,6 +1122,7 @@ def main() -> None:
     report_path = write_markdown_report(
         out_dir=results_dir,
         overview=overview,
+        table_s15=table_s15,
         points_summary_df=points_summary_df,
         component_summary=component_summary,
         family_distribution=family_distribution,
@@ -997,6 +1133,7 @@ def main() -> None:
     print("Generated dataset summary outputs:")
     for path in [
         results_dir / "dataset_overview.csv",
+        results_dir / "table_s15_counts.csv",
         results_dir / "points_per_system_summary.csv",
         results_dir / "points_per_system_counts.csv",
         results_dir / "component_summary.csv",
@@ -1004,7 +1141,7 @@ def main() -> None:
         report_path,
         *figure_paths,
     ]:
-        print(f"  {path.relative_to(ROOT)}")
+        print(f"  {path.resolve().relative_to(ROOT.resolve())}")
 
 
 if __name__ == "__main__":

@@ -26,14 +26,25 @@ composition, and assigns a continuous phase-path coordinate within each
 
 Dataset size is reported at three distinct stages:
 
-| Dataset | Raw workbook records | Raw systems | Raw `(system_id, T)` groups | Filtered records | Filtered systems | Filtered groups |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Main benchmark | 8,343 | 860 | 872 | 7,683 | 765 | 766 |
-| Expanded LLE | 7,134 | 830 | 883 | 6,709 | 719 | 764 |
+| Dataset | Workbook rows / systems / groups | Validated pre-density records / systems / groups | Filtered records / systems / groups |
+| --- | ---: | ---: | ---: |
+| Main benchmark | 8,343 / 860 / 872 | 7,953 / 830 / 842 | 7,683 / 765 / 766 |
+| Expanded LLE | 7,134 / 830 / 883 | 7,125 / 829 / 882 | 6,709 / 719 / 764 |
 
-The filtered stage retains only `(system_id, T)` groups containing at least six
-tie-line records. This threshold is encoded in both split manifests. Counts in
-the table exclude component-permutation augmentation.
+`Workbook rows` is a file-ingestion count. The `validated pre-density` stage
+requires valid canonical SMILES for all three components and non-missing
+temperature, pressure, and phase compositions. The filtered stage additionally
+retains only `(system_id, T)` groups containing at least six tie-line records.
+This threshold is encoded in both split manifests. All counts exclude
+component-permutation augmentation.
+
+The final manuscript Table S15 uses the main benchmark's validated pre-density
+count (7,953 / 830 / 842) and the expanded workbook count
+(7,134 / 830 / 883) for its two `Before filtering` rows. This exact mapping is
+stored in
+`experiments/supporting_information/s5_dataset_construction_and_distribution/results/table_s15_counts.csv`;
+the three-stage overview preserves the ingestion and validation boundary
+rather than treating the two quantities as interchangeable.
 
 The component-2/component-3 swap is applied only after the system-level split
 and only to the training partition. It doubles eligible training examples but

@@ -21,8 +21,9 @@ workflows from compatibility workflows for published checkpoints.
 | Run the browser interface | [Web application](guides/web_application.md) |
 | Create or override YAML profiles | [Configuration reference](reference/configuration.md) |
 | Select a compatible checkpoint | [Checkpoint and artifact reference](reference/checkpoints_and_artifacts.md) |
+| Match manuscript figures and tables to public artifacts | [Paper-aligned results index](results/README.md) |
 | Interpret predictive and physics diagnostics | [Evaluation metrics](results/evaluation_metrics.md) |
-| Inspect the multi-seed summaries | [Multi-seed benchmark](results/multiseed_benchmark.md) |
+| Inspect non-manuscript maintenance summaries | [Auxiliary multi-seed benchmarks](results/multiseed_benchmark.md) |
 | Resolve common setup or compatibility failures | [Troubleshooting](troubleshooting.md) |
 
 ## Scientific navigation

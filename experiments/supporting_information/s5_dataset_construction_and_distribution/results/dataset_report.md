@@ -12,12 +12,25 @@ The preprocessing summary reuses `psmi.data.load_and_prepare_excel(..., min_poin
 
 ## Dataset Overview
 
-| dataset_id              | stage                | experimental_or_analysis_rows | unique_system_id | unique_system_temperature_groups | temperature_min_K | temperature_max_K | unique_temperatures | training_rows_if_component23_swap_augmented |
-| ----------------------- | -------------------- | ----------------------------- | ---------------- | -------------------------------- | ----------------- | ----------------- | ------------------- | ------------------------------------------- |
-| Curated IL-LLE          | raw_workbook         | 8343                          | 860              | 872                              | 278.15            | 353.2             | 35                  |                                             |
-| Curated IL-LLE          | filtered_min6_no_aug | 7683                          | 765              | 766                              | 278.15            | 353.2             | 33                  | 15366                                       |
-| Expanded literature LLE | raw_workbook         | 7134                          | 830              | 883                              | 278.15            | 373.15            | 85                  |                                             |
-| Expanded literature LLE | filtered_min6_no_aug | 6709                          | 719              | 764                              | 278.15            | 373.15            | 66                  | 13418                                       |
+| dataset_id              | stage                 | experimental_or_analysis_rows | unique_system_id | unique_system_temperature_groups | temperature_min_K | temperature_max_K | unique_temperatures | training_rows_if_component23_swap_augmented |
+| ----------------------- | --------------------- | ----------------------------- | ---------------- | -------------------------------- | ----------------- | ----------------- | ------------------- | ------------------------------------------- |
+| Curated IL-LLE          | raw_workbook          | 8343                          | 860              | 872                              | 278.15            | 353.2             | 35                  |                                             |
+| Curated IL-LLE          | validated_pre_density | 7953                          | 830              | 842                              | 278.15            | 353.2             | 35                  |                                             |
+| Curated IL-LLE          | filtered_min6_no_aug  | 7683                          | 765              | 766                              | 278.15            | 353.2             | 33                  | 15366                                       |
+| Expanded literature LLE | raw_workbook          | 7134                          | 830              | 883                              | 278.15            | 373.15            | 85                  |                                             |
+| Expanded literature LLE | validated_pre_density | 7125                          | 829              | 882                              | 278.15            | 373.15            | 85                  |                                             |
+| Expanded literature LLE | filtered_min6_no_aug  | 6709                          | 719              | 764                              | 278.15            | 373.15            | 66                  | 13418                                       |
+
+## Manuscript Table S15
+
+| dataset_id              | paper_stage      | repository_stage      | records | systems | system_temperature_groups |
+| ----------------------- | ---------------- | --------------------- | ------- | ------- | ------------------------- |
+| Curated IL-LLE          | Before filtering | validated_pre_density | 7953    | 830     | 842                       |
+| Curated IL-LLE          | After filtering  | filtered_min6_no_aug  | 7683    | 765     | 766                       |
+| Expanded literature LLE | Before filtering | raw_workbook          | 7134    | 830     | 883                       |
+| Expanded literature LLE | After filtering  | filtered_min6_no_aug  | 6709    | 719     | 764                       |
+
+The final manuscript's `Before filtering` row maps to `validated_pre_density` for the curated benchmark and to `raw_workbook` for the expanded literature dataset. This explicit mapping preserves the reported Table S15 values without conflating workbook ingestion with molecular-record validation.
 
 ## Points Per System
 
@@ -37,18 +50,18 @@ The preprocessing summary reuses `psmi.data.load_and_prepare_excel(..., min_poin
 
 ## Figures
 
-- `tmp/open_source_audit/figures/dataset_distribution_combined.png`
-- `tmp/open_source_audit/figures/points_per_system_histograms.png`
-- `tmp/open_source_audit/figures/points_per_system_boxplots.png`
-- `tmp/open_source_audit/figures/temperature_distributions.png`
-- `tmp/open_source_audit/figures/component_unique_smiles_filtered.png`
-- `tmp/open_source_audit/figures/component_family_distributions.png`
+- `experiments/supporting_information/s5_dataset_construction_and_distribution/figures/dataset_distribution_combined.png`
+- `experiments/supporting_information/s5_dataset_construction_and_distribution/figures/points_per_system_histograms.png`
+- `experiments/supporting_information/s5_dataset_construction_and_distribution/figures/points_per_system_boxplots.png`
+- `experiments/supporting_information/s5_dataset_construction_and_distribution/figures/temperature_distributions.png`
+- `experiments/supporting_information/s5_dataset_construction_and_distribution/figures/component_unique_smiles_filtered.png`
+- `experiments/supporting_information/s5_dataset_construction_and_distribution/figures/component_family_distributions.png`
 
 ## Counting Contract
 
-One workbook row is one experimental tie-line record. A `system_id` identifies one ternary chemical system, while `(system_id, T)` identifies that system at a specific temperature. The paired extract-phase (`Ex1-Ex3`) and raffinate-phase (`Rx1-Rx3`) compositions define the measured equilibrium point. Preprocessing assigns a continuous phase-path coordinate `t` within each `(system_id, T)` group and retains only groups meeting the configured minimum tie-line density.
+One workbook row is one candidate experimental tie-line record. A `system_id` identifies one ternary chemical system, while `(system_id, T)` identifies that system at a specific temperature. The paired extract-phase (`Ex1-Ex3`) and raffinate-phase (`Rx1-Rx3`) compositions define the measured equilibrium point. Molecular-record validation canonicalizes all three SMILES strings and removes rows with an invalid component representation or missing required numerical field. Preprocessing then assigns a continuous phase-path coordinate `t` within each `(system_id, T)` group and retains only groups meeting the configured minimum tie-line density.
 
-The distributed main workbook contains 8343 raw tie-line records, 860 unique `system_id` values, and 872 unique `(system_id, T)` groups over 278.15-353.20 K. Requiring at least 6 records per `(system_id, T)` group retains 7683 records, 765 systems, and 766 system-temperature groups. The distributed expanded workbook contains 7134 raw records, 830 systems, and 883 system-temperature groups over 278.15-373.15 K; the same filter retains 6709 records, 719 systems, and 764 system-temperature groups.
+The distributed main workbook contains 8343 rows, 860 unique `system_id` values, and 872 unique `(system_id, T)` groups. Molecular-record validation retains 7953 records, 830 systems, and 842 groups. Requiring at least 6 records per group then retains 7683 records, 765 systems, and 766 groups. The expanded workbook contains 7134 rows, 830 systems, and 883 groups; validation retains 7125 records, 829 systems, and 882 groups; the density filter retains 6709 records, 719 systems, and 764 groups.
 
 The component counts are computed from canonical SMILES. Component-2/component-3 permutation is a training-time symmetry augmentation: it can double training examples, but it does not create experimental tie-line records and is excluded from dataset-size reporting.
 
@@ -57,6 +70,7 @@ Component-family annotations were available for at least one workbook and are su
 ## Generated Tables
 
 - `dataset_overview.csv`
+- `table_s15_counts.csv`
 - `points_per_system_summary.csv`
 - `points_per_system_counts.csv`
 - `component_summary.csv`

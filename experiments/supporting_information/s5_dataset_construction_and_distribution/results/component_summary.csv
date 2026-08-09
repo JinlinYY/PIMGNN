@@ -5,9 +5,9 @@ Curated IL-LLE,Curated ionic-liquid LLE workbook,raw_workbook,component3,32,38,C
 Curated IL-LLE,Curated ionic-liquid LLE workbook,filtered_min6_no_aug,component1,142,146,smiles1,IL (Component 1) full name,194,207
 Curated IL-LLE,Curated ionic-liquid LLE workbook,filtered_min6_no_aug,component2,33,38,smiles2,Component 2,194,207
 Curated IL-LLE,Curated ionic-liquid LLE workbook,filtered_min6_no_aug,component3,31,35,smiles3,Component 3,194,207
-Expanded literature LLE,Expanded literature-collected LLE workbook,raw_workbook,component1,69,85,Component1-SMILES,Component1,239,309
-Expanded literature LLE,Expanded literature-collected LLE workbook,raw_workbook,component2,107,124,Component2-SMILES,Component2,239,309
-Expanded literature LLE,Expanded literature-collected LLE workbook,raw_workbook,component3,129,151,Component3-SMILES,Component3,239,309
-Expanded literature LLE,Expanded literature-collected LLE workbook,filtered_min6_no_aug,component1,61,80,smiles1,Component1,186,289
-Expanded literature LLE,Expanded literature-collected LLE workbook,filtered_min6_no_aug,component2,83,121,smiles2,Component2,186,289
-Expanded literature LLE,Expanded literature-collected LLE workbook,filtered_min6_no_aug,component3,101,135,smiles3,Component3,186,289
+Expanded literature LLE,Expanded literature-collected LLE workbook,raw_workbook,component1,69,88,Component1-SMILES,Component1,239,299
+Expanded literature LLE,Expanded literature-collected LLE workbook,raw_workbook,component2,107,114,Component2-SMILES,Component2,239,299
+Expanded literature LLE,Expanded literature-collected LLE workbook,raw_workbook,component3,129,150,Component3-SMILES,Component3,239,299
+Expanded literature LLE,Expanded literature-collected LLE workbook,filtered_min6_no_aug,component1,61,83,smiles1,Component1,186,279
+Expanded literature LLE,Expanded literature-collected LLE workbook,filtered_min6_no_aug,component2,83,111,smiles2,Component2,186,279
+Expanded literature LLE,Expanded literature-collected LLE workbook,filtered_min6_no_aug,component3,101,133,smiles3,Component3,186,279

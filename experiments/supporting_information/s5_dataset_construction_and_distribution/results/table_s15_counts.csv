@@ -1,0 +1,5 @@
+﻿paper_item,dataset_id,paper_stage,repository_stage,records,systems,system_temperature_groups
+Table S15,Curated IL-LLE,Before filtering,validated_pre_density,7953,830,842
+Table S15,Curated IL-LLE,After filtering,filtered_min6_no_aug,7683,765,766
+Table S15,Expanded literature LLE,Before filtering,raw_workbook,7134,830,883
+Table S15,Expanded literature LLE,After filtering,filtered_min6_no_aug,6709,719,764

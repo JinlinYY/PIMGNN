@@ -18,6 +18,8 @@ to inspect reported evidence.
 ## Paper-aligned directory structure
 
 The authoritative mapping is [experiments/README.md](../../experiments/README.md).
+The result-by-result evidence status is summarized in the
+[Paper-Aligned Results Index](../results/README.md).
 The main branches are:
 
 ```text
@@ -101,7 +103,12 @@ reference input tables, checkpoint weights, and parity figures are under
 
 The top-level `results/data_driven/` and
 `results/chemical_potential_regularized/` directories are structured archival
-packages. Their manifests verify every distributed file in each package.
+packages. Their manifests verify every distributed file in each package. The
+physics-informed package rounds to the Table 3 row. The top-level data-driven
+package has different stored composition metrics from the manuscript
+data-driven row, so consult the
+[Table 3 provenance note](../results/main_text_results.md#table-3-chemical-potential-regularization)
+before citing it.
 
 ## Figure 2b-2e interaction analysis
 
@@ -110,6 +117,11 @@ Attribution tables and publication assets are located under:
 ```text
 experiments/section_3_results/3_2_molecular_interaction_mechanisms/
 ```
+
+The final Figure 2b and Figure 2c assets and the Figure 2d source predictions
+are distributed. System-22 attribution tables and component plots are present,
+but the exact assembled Figure 2e image is not separately identifiable. See
+the [panel mapping](../results/main_text_results.md#section-32-molecular-interaction-mechanisms).
 
 `scripts/explain.py` exposes saliency, integrated gradients, graph-explainer,
 and functional-group SHAP-style modes. Explainability methods can be
@@ -129,6 +141,10 @@ scripts/experiments/transfer_learning/public_release/
 
 Read that directory's README before running a transfer workflow. External
 datasets can have their own licenses and target conventions.
+
+The exact final Figure 2f asset and machine-readable Table S2 result table are
+not distributed; the available code and checkpoints form a partial rather than
+complete manuscript evidence package.
 
 ## Figure 3 industrial cases
 

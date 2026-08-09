@@ -1,5 +1,10 @@
 # Evaluation Metrics
 
+Metric definitions do not establish result identity. Before quoting a value,
+first locate its figure or table in the [Paper-Aligned Results Index](README.md)
+and confirm the dataset, split, checkpoint, seed aggregation, and stored versus
+recomputed status.
+
 ## Prediction vector
 
 For `N` records, the true and predicted arrays have shape `(N, 6)` with order:
@@ -112,7 +117,7 @@ This is a stochastic local diagnostic controlled by trial count, perturbation
 scale, margin, parameter coverage, and random state. The public stage-2 profile
 sets `MECH_W_STAB: 0`, so TPD is not an optimized loss in that profile.
 
-## Archived objective-comparison results
+## Top-level package metrics
 
 | Run | Best epoch | Test MAE | Test RMSE | Test R2 |
 | --- | ---: | ---: | ---: | ---: |
@@ -120,8 +125,13 @@ sets `MECH_W_STAB: 0`, so TPD is not an optimized loss in that profile.
 | Chemical-potential regularized | 29 | 0.034851 | 0.054381 | 0.974788 |
 
 These values come from the `best_metrics.json` files in the two top-level result
-packages. They describe specific archived checkpoints and their protocol; they
-are not the same aggregation as every table or multi-seed summary in the paper.
+packages. They describe specific archived checkpoints and must not be cited as
+the complete main-text Table 3 without checking provenance. The
+physics-informed values round to the manuscript Table 3 row, but the
+data-driven package's composition metrics differ from the data-driven
+composition metrics printed in that table. The exact boundary is documented in
+[Main-Text Result Mapping](main_text_results.md#table-3-chemical-potential-regularization)
+and [Artifact Status and Result Discrepancies](artifact_status_and_discrepancies.md#table-3-data-driven-row).
 
 ## Pointwise versus system-level reporting
 
@@ -140,10 +150,12 @@ When comparing to another work, document whether the metric is:
 
 ## Multi-seed uncertainty
 
-The multi-seed tables report arithmetic mean plus or minus the sample standard
-deviation across seeds 42, 43, and 44. Three seeds describe observed
-optimization variability under a fixed protocol; they are not a confidence
-interval over all possible datasets or chemical systems.
+The repository contains several experiment-specific seed sets. Table 1 uses
+five independent runs, Tables S3-S4 use seeds 7/42/2024, Table S8 uses split
+seeds 42-46, and the auxiliary sample-major and efficiency summaries use seeds
+42/43/44. In every case, the reported spread is a sample standard deviation
+under that fixed protocol; it is not a confidence interval over all possible
+datasets or chemical systems.
 
 ## Thermodynamic-threshold sensitivity
 
