@@ -45,6 +45,24 @@ PSMI-public/
 `- docs/                    Architecture, result, and usage documentation
 ```
 
+## Researcher documentation
+
+The [documentation hub](docs/README.md) provides task-oriented guides for:
+
+- installation and checkpoint-only evaluation;
+- the molecular, mixture-graph, and thermodynamic model pipeline;
+- dataset filtering, phase-path construction, fixed splits, and augmentation;
+- the shared-data, five-seed baseline comparison protocol;
+- paper-aligned figure, table, and checkpoint reproduction;
+- configuration profiles, checkpoint provenance, and artifact manifests;
+- industrial application cases and local Web deployment;
+- predictive metrics, thermodynamic diagnostics, and troubleshooting.
+
+New users should begin with the [installation guide](docs/getting_started/installation.md)
+and [quick start](docs/getting_started/quickstart.md). Researchers extending the
+model should also read the [scientific model contract](docs/architecture/scientific_model_contract.md)
+and [configuration reference](docs/reference/configuration.md).
+
 ## Installation
 
 The reference environment is named `ggnn39` and uses Python 3.9.
@@ -71,23 +89,11 @@ RDKit and PyTorch Geometric binary compatibility depends on the selected PyTorch
 
 ## Quick start
 
-List the distributed checkpoint entries:
+List the distributed checkpoint entries with the
+[canonical quick-start command](docs/getting_started/quickstart.md#2-inspect-available-manuscript-checkpoints).
 
-```bash
-python scripts/evaluate_checkpoint_registry.py \
-  --registry configs/reproduction/published_checkpoint_registry.json \
-  --list
-```
-
-Evaluate the Figure 2a checkpoint on the fixed test systems:
-
-```bash
-python scripts/evaluate_checkpoint_registry.py \
-  --registry configs/reproduction/published_checkpoint_registry.json \
-  --only figure2a_psmi \
-  --device cpu \
-  --no-plots
-```
+Evaluate the Figure 2a checkpoint on the fixed test systems by following the
+[canonical quick-start command](docs/getting_started/quickstart.md#3-evaluate-the-figure-2a-checkpoint).
 
 Export the canonical Figure 2a result bundle:
 

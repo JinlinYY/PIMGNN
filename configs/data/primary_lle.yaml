@@ -4,5 +4,5 @@ PERMUTE_23_AUG: true
 SPLIT_STRATEGY: manifest
 SPLIT_MANIFEST_PATH: datasets/splits/main_benchmark_system_split.json
 SCALAR_DIM: 2
-NRTL_TRAIN_PARAMS_PATH: datasets/parameters/sample_major/nrtl_params_train.json
-NRTL_EVAL_PARAMS_PATH: datasets/parameters/sample_major/nrtl_params_all.json
+NRTL_TRAIN_PARAMS_PATH: datasets/parameters/main_benchmark/nrtl_params_train.json
+NRTL_EVAL_PARAMS_PATH: datasets/parameters/main_benchmark/nrtl_params_all.json

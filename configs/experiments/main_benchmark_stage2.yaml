@@ -4,7 +4,6 @@ include:
   - ../training/stage2_physics.yaml
 SEED: 42
 LOAD_CKPT_PATH: results/main_benchmark/multiseed_reference/seed42/stage1_supervised/best_model.pt
-NRTL_TRAIN_PARAMS_PATH: datasets/parameters/sample_major/nrtl_params_train.json
-NRTL_EVAL_PARAMS_PATH: datasets/parameters/sample_major/nrtl_params_all.json
+NRTL_TRAIN_PARAMS_PATH: datasets/parameters/main_benchmark/nrtl_params_train.json
+NRTL_EVAL_PARAMS_PATH: datasets/parameters/main_benchmark/nrtl_params_all.json
 OUT_DIR: results/main_benchmark/multiseed_reference/seed42/stage2_physics
-
