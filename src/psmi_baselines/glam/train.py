@@ -1,4 +1,3 @@
-"""Implement the glam train baseline module."""
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -19,7 +18,6 @@ from psmi_baselines.paths import EXPERIMENT_ROOT
 
 
 class LLEDataset(Dataset):
-    """Represent the LLEDataset baseline component."""
     def __init__(self, data_dict):
         self.data = data_dict['data']
         self.labels = data_dict['labels']
@@ -32,7 +30,6 @@ class LLEDataset(Dataset):
 
 
 def set_seed(seed):
-    """Run the set seed baseline operation."""
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
     np.random.seed(seed)
@@ -43,7 +40,6 @@ def set_seed(seed):
 
 
 def get_device_info(device):
-    """Run the get device info baseline operation."""
     info = {'device': str(device)}
     if device.type == 'cuda':
         info['gpu_name'] = torch.cuda.get_device_name(0)
@@ -57,18 +53,14 @@ def get_device_info(device):
 
 
 def count_unique_systems(data_list):
-    """Run the count unique systems baseline operation."""
     system_nos = [item.get('system_no', idx) for idx, item in enumerate(data_list)]
     return len(set(system_nos))
 
 
 def calculate_metrics_E_R(predictions, labels):
-    """Run the calculate metrics E R baseline operation."""
-    # Baseline workflow step.
     pred_E = predictions[:, :3]
     true_E = labels[:, :3]
     
-    # Baseline workflow step.
     pred_R = predictions[:, 3:]
     true_R = labels[:, 3:]
     
@@ -76,14 +68,13 @@ def calculate_metrics_E_R(predictions, labels):
     mae_E = mean_absolute_error(true_E, pred_E)
     rmse_E = np.sqrt(mean_squared_error(true_E, pred_E))
     
-    # Baseline workflow step.
     r2_E_list = []
     for dim in range(3):
         y_true_dim = true_E[:, dim]
         y_pred_dim = pred_E[:, dim]
         ss_res = np.sum((y_true_dim - y_pred_dim) ** 2)
         ss_tot = np.sum((y_true_dim - np.mean(y_true_dim)) ** 2)
-        if ss_tot < 1e-10:  # Baseline workflow step.
+        if ss_tot < 1e-10:
             r2_dim = 0.0
         else:
             r2_dim = 1 - (ss_res / ss_tot)
@@ -94,14 +85,13 @@ def calculate_metrics_E_R(predictions, labels):
     mae_R = mean_absolute_error(true_R, pred_R)
     rmse_R = np.sqrt(mean_squared_error(true_R, pred_R))
     
-    # Baseline workflow step.
     r2_R_list = []
     for dim in range(3):
         y_true_dim = true_R[:, dim]
         y_pred_dim = pred_R[:, dim]
         ss_res = np.sum((y_true_dim - y_pred_dim) ** 2)
         ss_tot = np.sum((y_true_dim - np.mean(y_true_dim)) ** 2)
-        if ss_tot < 1e-10:  # Baseline workflow step.
+        if ss_tot < 1e-10:
             r2_dim = 0.0
         else:
             r2_dim = 1 - (ss_res / ss_tot)
@@ -115,7 +105,6 @@ def calculate_metrics_E_R(predictions, labels):
 
 
 def train_epoch(model, dataloader, criterion, optimizer, device, config):
-    """Run the train epoch baseline operation."""
     model.train()
     total_loss = 0.0
     
@@ -126,17 +115,14 @@ def train_epoch(model, dataloader, criterion, optimizer, device, config):
         comp3_graph = batch_data['comp3_graph'].to(device)
         temperature = batch_data['temperature'].to(device)
         
-        # Baseline workflow step.
         labels = torch.tensor(batch_labels, dtype=torch.float32).to(device)
         
-        # Baseline workflow step.
         optimizer.zero_grad()
         outputs = model(il_graph, comp2_graph, comp3_graph, temperature)
         
         # Compute the training loss.
         loss = criterion(outputs, labels)
         
-        # Baseline workflow step.
         loss.backward()
         
         # Update model gradients.
@@ -151,7 +137,6 @@ def train_epoch(model, dataloader, criterion, optimizer, device, config):
 
 
 def evaluate(model, dataloader, criterion, device):
-    """Run the evaluate baseline operation."""
     model.eval()
     total_loss = 0.0
     all_preds = []
@@ -165,10 +150,8 @@ def evaluate(model, dataloader, criterion, device):
             comp3_graph = batch_data['comp3_graph'].to(device)
             temperature = batch_data['temperature'].to(device)
             
-            # Baseline workflow step.
             labels = torch.tensor(batch_labels, dtype=torch.float32).to(device)
             
-            # Baseline workflow step.
             outputs = model(il_graph, comp2_graph, comp3_graph, temperature)
             
             # Compute the training loss.
@@ -190,7 +173,6 @@ def evaluate(model, dataloader, criterion, device):
         print(f"[ Commissioning ] target Each dimension mean : {all_labels.mean(axis=0)}")
         print(f"[ Commissioning ] prediction Each dimension standard deviation : {all_preds.std(axis=0)}")
         print(f"[ Commissioning ] target Each dimension standard deviation : {all_labels.std(axis=0)}")
-        # Baseline workflow step.
         print(f"[ Commissioning ] R phase target Variance : {np.var(all_labels[:, 3:], axis=0)}")
         print(f"[ Commissioning ] R phase prediction Variance : {np.var(all_preds[:, 3:], axis=0)}")
         evaluate._debug_printed = True
@@ -200,21 +182,19 @@ def evaluate(model, dataloader, criterion, device):
     mae = mean_absolute_error(all_labels, all_preds)
     rmse = np.sqrt(mse)
     
-    # Baseline workflow step.
     r2_list = []
     for dim in range(all_labels.shape[1]):
         y_true_dim = all_labels[:, dim]
         y_pred_dim = all_preds[:, dim]
         ss_res = np.sum((y_true_dim - y_pred_dim) ** 2)
         ss_tot = np.sum((y_true_dim - np.mean(y_true_dim)) ** 2)
-        if ss_tot < 1e-10:  # Baseline workflow step.
+        if ss_tot < 1e-10:
             r2_dim = 0.0
         else:
             r2_dim = 1 - (ss_res / ss_tot)
         r2_list.append(r2_dim)
     r2 = np.mean(r2_list)
     
-    # Baseline workflow step.
     # Configure the output artifacts.
     mae_per_dim = []
     rmse_per_dim = []
@@ -235,7 +215,6 @@ def evaluate(model, dataloader, criterion, device):
     metrics_E_R = calculate_metrics_E_R(all_preds, all_labels)
     
     # Compute evaluation metrics.
-    # Baseline workflow step.
     mae_E_per_dim = []
     rmse_E_per_dim = []
     for dim in range(3):
@@ -250,7 +229,6 @@ def evaluate(model, dataloader, criterion, device):
     rmse_E_mean = np.mean(rmse_E_per_dim)
     rmse_E_std = np.std(rmse_E_per_dim)
     
-    # Baseline workflow step.
     mae_R_per_dim = []
     rmse_R_per_dim = []
     for dim in range(3, 6):
@@ -295,7 +273,6 @@ def evaluate(model, dataloader, criterion, device):
 
 
 def get_optimizer(model, config):
-    """Run the get optimizer baseline operation."""
     if config.training.optimizer.lower() == 'adam':
         return optim.Adam(
             model.parameters(),
@@ -320,7 +297,6 @@ def get_optimizer(model, config):
 
 
 def get_scheduler(optimizer, config):
-    """Run the get scheduler baseline operation."""
     if config.training.scheduler.lower() == 'plateau':
         return optim.lr_scheduler.ReduceLROnPlateau(
             optimizer,
@@ -345,7 +321,6 @@ def get_scheduler(optimizer, config):
 
 
 def find_latest_checkpoint(checkpoint_dir):
-    """Run the find latest checkpoint baseline operation."""
     if not os.path.exists(checkpoint_dir):
         return None
     
@@ -362,13 +337,11 @@ def find_latest_checkpoint(checkpoint_dir):
     if not checkpoint_files:
         return None
     
-    # Baseline workflow step.
     checkpoint_files.sort(key=lambda x: x[0], reverse=True)
     return checkpoint_files[0][1]  # Configure repository paths.
 
 
 def load_checkpoint(checkpoint_path, model, optimizer, scheduler, device):
-    """Run the load checkpoint baseline operation."""
     if not os.path.exists(checkpoint_path):
         raise FileNotFoundError(f" checkpoint file does not exist : {checkpoint_path}")
     
@@ -387,9 +360,8 @@ def load_checkpoint(checkpoint_path, model, optimizer, scheduler, device):
         try:
             scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
         except:
-            print(" warning : unable to load Scheduler Status , will use current Scheduler Status ")
+            print("Warning: scheduler state could not be loaded; using a new scheduler.")
     
-    # Run the training step.
     resume_info = {
         'epoch': checkpoint.get('epoch', 0),
         'val_loss': checkpoint.get('val_loss', float('inf')),
@@ -408,7 +380,6 @@ def load_checkpoint(checkpoint_path, model, optimizer, scheduler, device):
 
 
 def save_checkpoint(model, optimizer, scheduler, epoch, val_loss, config, filepath):
-    """Run the save checkpoint baseline operation."""
     checkpoint = {
         'epoch': epoch,
         'model_state_dict': model.state_dict(),
@@ -428,12 +399,9 @@ def save_checkpoint(model, optimizer, scheduler, epoch, val_loss, config, filepa
 
 def save_results_csv(train_history, train_preds, train_labels, val_preds, val_labels, 
                      test_preds, test_labels, result_dir):
-    """Run the save results csv baseline operation."""
-    # Run the training step.
     df_history = pd.DataFrame(train_history)
     df_history.to_csv(os.path.join(result_dir, 'train_history.csv'), index=False)
     
-    # Run the training step.
     train_val_data = []
     for i in range(len(train_preds)):
         train_val_data.append({
@@ -469,7 +437,6 @@ def save_results_csv(train_history, train_preds, train_labels, val_preds, val_la
 
 def save_metrics_txt(best_epoch, best_val_mse, best_val_metrics, best_test_metrics,
                      total_time, avg_time_per_epoch, result_dir):
-    """Run the save metrics txt baseline operation."""
     with open(os.path.join(result_dir, 'training_metrics.txt'), 'w', encoding='utf-8') as f:
         f.write("=" * 100 + "\n")
         f.write(" training-metric summary \n")
@@ -488,11 +455,9 @@ def save_metrics_txt(best_epoch, best_val_mse, best_val_metrics, best_test_metri
 
 
 def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, auto_resume=False):
-    """Run the main baseline operation."""
     if config is None:
         config = default_config
     
-    # Baseline workflow step.
     if seed is not None:
         config.seed = seed
     
@@ -513,7 +478,6 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
     os.makedirs(config.result_dir, exist_ok=True)
     os.makedirs(best_model_dir, exist_ok=True)
     
-    # Baseline workflow step.
     resume_from_epoch = 0
     resume_train_history = []
     resume_best_val_mse = float('inf')
@@ -583,7 +547,6 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
     print(f" CUDA version : {device_info['cuda_version']}")
     print(f" GPU memory : {device_info['gpu_memory_gb']} GB")
     
-    # Run the training step.
     print("\n[ training parameters ]")
     print(f" random seed : {config.seed}")
     print(f" training epochs : {config.training.num_epochs}")
@@ -634,7 +597,6 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
     test_dataset = LLEDataset(datasets['test'])
     
     def custom_collate_fn(batch):
-        """Run the custom collate fn baseline operation."""
         data_items = [item[0] for item in batch]
         labels = np.array([item[1] for item in batch])
         graph_batch = collate_fn(data_items)
@@ -662,7 +624,6 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
         num_workers=config.data.num_workers
     )
     
-    # Baseline workflow step.
     sample_graph = datasets['train']['data'][0]['il_graph']
     node_dim = sample_graph.x.shape[1]
     config.model.node_dim = node_dim
@@ -693,7 +654,6 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
     optimizer = get_optimizer(model, config)
     scheduler = get_scheduler(optimizer, config)
     
-    # Run the training step.
     best_val_loss = float('inf')
     best_val_mse = float('inf')
     patience_counter = 0
@@ -711,7 +671,6 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
         resume_best_val_mse = resume_info.get('val_loss', float('inf'))
         resume_best_val_loss = resume_from_epoch
         
-        # Run the training step.
         train_history = resume_train_history
         
         # Compute evaluation metrics.
@@ -729,19 +688,15 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
     print("=" * 100)
     
     start_time = time.time()
-    last_rest_time = start_time  # Baseline workflow step.
-    
-    # Run the training step.
+    last_rest_time = start_time
     for epoch in range(resume_from_epoch, config.training.num_epochs):
         epoch_start = time.time()
         
-        # Run the training step.
         train_loss = train_epoch(model, train_loader, criterion, optimizer, device, config)
         
         # Evaluate the validation subset.
         val_metrics = evaluate(model, val_loader, criterion, device)
         
-        # Baseline workflow step.
         if scheduler is not None:
             if isinstance(scheduler, optim.lr_scheduler.ReduceLROnPlateau):
                 scheduler.step(val_metrics['loss'])
@@ -753,7 +708,6 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
         # Configure the output artifacts.
         train_metrics = evaluate(model, train_loader, criterion, device)
         
-        # Baseline workflow step.
         history_entry = {
             'epoch': epoch + 1,
             'train_loss': train_loss,
@@ -805,7 +759,6 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
         }
         train_history.append(history_entry)
         
-        # Baseline workflow step.
         best_loss_str = f"{best_val_mse:.6f} (epoch {best_val_loss})" if best_val_loss != float('inf') else "initial"
         print(f"Epoch {epoch+1}/{config.training.num_epochs} | training time : {epoch_time:.2f} seconds | Train Loss: {train_loss:.6f}")
         print(f"Best Loss: {best_loss_str}")
@@ -832,17 +785,14 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
             print(f" checkpoint output path : {checkpoint_path}")
             print(f" training history output path : {checkpoint_path_with_history}")
         
-        # Baseline workflow step.
         current_time = time.time()
-        elapsed_hours = (current_time - last_rest_time) / 3600.0  # Baseline workflow step.
-        
+        elapsed_hours = (current_time - last_rest_time) / 3600.0
         if elapsed_hours >= config.training.rest_interval_hours and (epoch + 1) < config.training.num_epochs:
             print("\n" + "=" * 100)
-            print(f" Trained {elapsed_hours:.2f} hours , Break {config.training.rest_duration} seconds ({config.training.rest_duration/60:.1f} minutes ) allow CPU/GPU to allow a cooldown period ...")
+            print(f"Elapsed since the previous pause: {elapsed_hours:.2f} hours; pausing for {config.training.rest_duration/60:.1f} minutes to cool the hardware...")
             print("=" * 100 + "\n")
             time.sleep(config.training.rest_duration)
-            last_rest_time = time.time()  # Baseline workflow step.
-        
+            last_rest_time = time.time()
         # Save the generated artifacts.
         if val_metrics['mse'] < best_val_mse - config.training.early_stop_min_delta:
             best_val_mse = val_metrics['mse']
@@ -875,7 +825,7 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
     print(f" mean time per epoch : {avg_time_per_epoch:.2f} seconds ")
     
     # Load the input data.
-    print("\n load the best model Into rows Test ...")
+    print("\nLoading the best model for test evaluation...")
     checkpoint = torch.load(os.path.join(best_model_dir, 'GLAM.pt'))
     model.load_state_dict(checkpoint['model_state_dict'])
     
@@ -901,21 +851,19 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
         mae = mean_absolute_error(best_val_labels_np, best_val_preds_np)
         rmse = np.sqrt(mse)
         
-        # Baseline workflow step.
         r2_list = []
         for dim in range(best_val_labels_np.shape[1]):
             y_true_dim = best_val_labels_np[:, dim]
             y_pred_dim = best_val_preds_np[:, dim]
             ss_res = np.sum((y_true_dim - y_pred_dim) ** 2)
             ss_tot = np.sum((y_true_dim - np.mean(y_true_dim)) ** 2)
-            if ss_tot < 1e-10:  # Baseline workflow step.
+            if ss_tot < 1e-10:
                 r2_dim = 0.0
             else:
                 r2_dim = 1 - (ss_res / ss_tot)
             r2_list.append(r2_dim)
         r2 = np.mean(r2_list)
         
-        # Baseline workflow step.
         mae_per_dim = []
         rmse_per_dim = []
         for dim in range(best_val_labels_np.shape[1]):
@@ -935,7 +883,6 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
         metrics_E_R = calculate_metrics_E_R(best_val_preds_np, best_val_labels_np)
         
         # Compute evaluation metrics.
-        # Baseline workflow step.
         mae_E_per_dim = []
         rmse_E_per_dim = []
         for dim in range(3):
@@ -950,7 +897,6 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
         rmse_E_mean = np.mean(rmse_E_per_dim)
         rmse_E_std = np.std(rmse_E_per_dim)
         
-        # Baseline workflow step.
         mae_R_per_dim = []
         rmse_R_per_dim = []
         for dim in range(3, 6):
@@ -1094,7 +1040,6 @@ def main(config=None, seed=None, base_output_dir=None, resume_checkpoint=None, a
 
 
 def calculate_std_metrics(all_test_metrics):
-    """Run the calculate std metrics baseline operation."""
     # Compute evaluation metrics.
     metrics_list = {
         'mae': [],
@@ -1112,7 +1057,6 @@ def calculate_std_metrics(all_test_metrics):
         for key in metrics_list.keys():
             metrics_list[key].append(metrics[key])
     
-    # Baseline workflow step.
     result = {}
     for key, values in metrics_list.items():
         result[f'{key}_mean'] = np.mean(values)
@@ -1122,16 +1066,13 @@ def calculate_std_metrics(all_test_metrics):
 
 
 def format_metric_with_std(mean, std, decimals=6):
-    """Run the format metric with std baseline operation."""
     return f"{mean:.{decimals}f} ± {std:.{decimals}f}"
 
 
 def save_summary_txt(all_seeds, all_test_metrics, summary_dir):
-    """Run the save summary txt baseline operation."""
     # Compute evaluation metrics.
     summary_metrics = calculate_std_metrics(all_test_metrics)
     
-    # Baseline workflow step.
     content = "=" * 100 + "\n"
     content += " multiple Seed Training results Summary \n"
     content += "=" * 100 + "\n\n"
@@ -1178,7 +1119,6 @@ def save_summary_txt(all_seeds, all_test_metrics, summary_dir):
     
     print(f"\n summary saved to : {summary_path}")
     
-    # Baseline workflow step.
     print("\n" + "=" * 100)
     print(" test-metric summary ( mean ± standard deviation )")
     print("=" * 100)
@@ -1198,7 +1138,6 @@ def save_summary_txt(all_seeds, all_test_metrics, summary_dir):
 
 
 def main_multi_seed(seeds=[42, 123, 456, 789, 2024], base_output_dir=None):
-    """Run the main multi seed baseline operation."""
     print("=" * 100)
     print(" multiple Seed Training start ")
     print("=" * 100)
@@ -1213,16 +1152,13 @@ def main_multi_seed(seeds=[42, 123, 456, 789, 2024], base_output_dir=None):
     
     all_test_metrics = []
     
-    # Run the training step.
     for i, seed in enumerate(seeds):
         print(f"\n{'='*100}")
         print(f" start training Seed {seed} ({i+1}/{len(seeds)})")
         print(f"{'='*100}\n")
         
-        # Baseline workflow step.
         config = Config()
         
-        # Run the training step.
         test_metrics = main(config=config, seed=seed, base_output_dir=base_output_dir)
         
         # Save the generated artifacts.
@@ -1309,24 +1245,19 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    # Run the training step.
     if not args.multi_seed and not args.single_seed:
-        # Run the training step.
         print("=" * 100)
         print(" default run multiple Seed Training ")
         print(f"Seed list : {args.seeds}")
         print("=" * 100)
         main_multi_seed(seeds=args.seeds, base_output_dir=args.output_dir)
     elif args.single_seed:
-        # Run the training step.
         config = default_config
         if args.seed is not None:
             main(config=config, seed=args.seed, base_output_dir=args.base_output_dir,
                  resume_checkpoint=args.resume, auto_resume=args.auto_resume)
         else:
-            # Baseline workflow step.
             main(config=config, base_output_dir=args.base_output_dir,
                  resume_checkpoint=args.resume, auto_resume=args.auto_resume)
     else:
-        # Run the training step.
         main_multi_seed(seeds=args.seeds, base_output_dir=args.output_dir)

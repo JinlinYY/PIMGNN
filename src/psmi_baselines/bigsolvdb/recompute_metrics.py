@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Implement the bigsolvdb recompute_metrics baseline module."""
 import os
 import numpy as np
 import pandas as pd
@@ -9,7 +8,6 @@ from psmi_baselines.paths import BIGSOLVDB_EXPERIMENT_ROOT
 
 
 def compute_metrics_from_csv(csv_path: str) -> Dict[str, float]:
-    """Run the compute metrics from csv baseline operation."""
     df = pd.read_csv(csv_path)
     
     if 'target' not in df.columns or 'pred' not in df.columns:
@@ -18,7 +16,6 @@ def compute_metrics_from_csv(csv_path: str) -> Dict[str, float]:
     y_true = df['target'].values.astype(np.float64)
     y_pred = df['pred'].values.astype(np.float64)
     
-    # Baseline workflow step.
     mask = ~(np.isnan(y_true) | np.isnan(y_pred))
     y_true = y_true[mask]
     y_pred = y_pred[mask]
@@ -28,31 +25,22 @@ def compute_metrics_from_csv(csv_path: str) -> Dict[str, float]:
     
     n_samples = len(y_true)
     
-    # Baseline workflow step.
     abs_errors = np.abs(y_true - y_pred)
-    # Baseline workflow step.
     mae = float(np.mean(abs_errors))
     mae_std = float(np.std(abs_errors, ddof=1) / np.sqrt(n_samples)) if n_samples > 1 else 0.0
     
-    # Baseline workflow step.
     squared_errors = (y_true - y_pred) ** 2
-    # Baseline workflow step.
     rmse = float(np.sqrt(np.mean(squared_errors)))
-    # Baseline workflow step.
-    # Baseline workflow step.
     mean_squared_error = float(np.mean(squared_errors))
     if mean_squared_error > 1e-12 and n_samples > 1:
         rmse_std = float(np.std(squared_errors, ddof=1) / (2 * np.sqrt(mean_squared_error) * np.sqrt(n_samples)))
     else:
         rmse_std = 0.0
     
-    # Baseline workflow step.
     ss_res = float(np.sum((y_true - y_pred) ** 2))
     ss_tot = float(np.sum((y_true - float(np.mean(y_true))) ** 2))
     r2 = float("nan") if ss_tot < 1e-12 else float(1.0 - ss_res / ss_tot)
     
-    # Baseline workflow step.
-    # Baseline workflow step.
     residuals = y_true - y_pred
     r2_std = float(np.std(residuals, ddof=1) / np.sqrt(n_samples)) if n_samples > 1 else 0.0
     
@@ -67,7 +55,6 @@ def compute_metrics_from_csv(csv_path: str) -> Dict[str, float]:
 
 
 def recompute_all_metrics(results_dir: str, seeds: List[int] = [42, 123, 456, 789, 2024]) -> pd.DataFrame:
-    """Run the recompute all metrics baseline operation."""
     all_results = []
     
     print("="*80)
@@ -81,7 +68,7 @@ def recompute_all_metrics(results_dir: str, seeds: List[int] = [42, 123, 456, 78
         csv_path = os.path.join(seed_dir, "test_results.csv")
         
         if not os.path.exists(csv_path):
-            print(f" warning : Seed {seed} test_results.csv does not exist : {csv_path}")
+            print(f"Warning: test_results.csv is absent for seed {seed}: {csv_path}")
             continue
         
         try:
@@ -99,18 +86,17 @@ def recompute_all_metrics(results_dir: str, seeds: List[int] = [42, 123, 456, 78
             }
             all_results.append(result)
             
-            # Baseline workflow step.
             print(f"  MAE:  {metrics['mae']:.6f} ± {metrics['mae_std']:.4f}")
             print(f"  RMSE: {metrics['rmse']:.6f} ± {metrics['rmse_std']:.4f}")
             print(f"  R²:   {metrics['r2']:.6f} ± {metrics['r2_std']:.4f}")
             
         except Exception as e:
-            print(f" error : {e}")
+            print(f"Error: {e}")
             import traceback
             traceback.print_exc()
     
     if not all_results:
-        print("\n error : None successful process Any results ")
+        print("\nNo result files were processed.")
         return pd.DataFrame(), {}
     
     df = pd.DataFrame(all_results)
@@ -133,22 +119,16 @@ def recompute_all_metrics(results_dir: str, seeds: List[int] = [42, 123, 456, 78
             if len(values) > 0:
                 mean_val = float(values.mean())
                 if len(values) > 1:
-                    # Baseline workflow step.
                     std_val = float(values.std(ddof=1))
-                    # Baseline workflow step.
-                    # Baseline workflow step.
                     if std_val < 0.001:
-                        # Baseline workflow step.
                         stats[f'{metric}_mean'] = round(mean_val, 6)
                         stats[f'{metric}_std'] = round(std_val, 6)
                         stats[f'{metric}_format'] = f"{mean_val:.6f}±{std_val:.6f}"
                     elif std_val < 0.01:
-                        # Baseline workflow step.
                         stats[f'{metric}_mean'] = round(mean_val, 4)
                         stats[f'{metric}_std'] = round(std_val, 4)
                         stats[f'{metric}_format'] = f"{mean_val:.4f}±{std_val:.4f}"
                     else:
-                        # Baseline workflow step.
                         stats[f'{metric}_mean'] = round(mean_val, 3)
                         stats[f'{metric}_std'] = round(std_val, 3)
                         stats[f'{metric}_format'] = f"{mean_val:.3f}±{std_val:.3f}"
@@ -191,14 +171,13 @@ def recompute_all_metrics(results_dir: str, seeds: List[int] = [42, 123, 456, 78
                 print(f" ( mean : {stats['test_r2_mean']:.3f}, standard deviation : {stats['test_r2_std']:.3f})")
         print("-"*80)
     else:
-        print(f"\n note : processed only {len(all_results)} seeds , unable to compute standard deviation ")
+        print(f"\nOnly {len(all_results)} seed was processed; standard deviation is undefined.")
     
     # Set the random seed.
     print("\n" + "="*80)
     print(" update each seed directory results_summary.txt( Contains standard deviation )")
     print("="*80)
     
-    # Baseline workflow step.
     if not stats and len(all_results) > 1:
         for metric in ['test_mae', 'test_rmse', 'test_r2']:
             if metric in df.columns:
@@ -207,7 +186,6 @@ def recompute_all_metrics(results_dir: str, seeds: List[int] = [42, 123, 456, 78
                     mean_val = float(values.mean())
                     if len(values) > 1:
                         std_val = float(values.std(ddof=1))
-                        # Baseline workflow step.
                         if std_val < 0.001:
                             stats[f'{metric}_mean'] = round(mean_val, 6)
                             stats[f'{metric}_std'] = round(std_val, 6)
@@ -231,7 +209,6 @@ def recompute_all_metrics(results_dir: str, seeds: List[int] = [42, 123, 456, 78
         summary_txt_path = os.path.join(seed_dir, "results_summary.txt")
         csv_path = os.path.join(seed_dir, "test_results.csv")
         
-        # Baseline workflow step.
         if not os.path.exists(csv_path):
             print(f" skip Seed {seed}: test_results.csv does not exist ")
             continue
@@ -240,7 +217,7 @@ def recompute_all_metrics(results_dir: str, seeds: List[int] = [42, 123, 456, 78
         try:
             seed_metrics = compute_metrics_from_csv(csv_path)
         except Exception as e:
-            print(f" error : Seed {seed} compute metrics failed : {e}")
+            print(f"Error: metric computation failed for seed {seed}: {e}")
             continue
         
         # Read the input data.
@@ -302,7 +279,7 @@ def recompute_all_metrics(results_dir: str, seeds: List[int] = [42, 123, 456, 78
                         f.write(f" ( mean : {stats['test_r2_mean']:.3f}, standard deviation : {stats['test_r2_std']:.3f})\n")
                 f.write("="*80 + "\n")
             else:
-                f.write("\n note : Only one seeds results , unable to compute standard deviation \n")
+                f.write("\nOnly one seed was processed; standard deviation is undefined.\n")
                 f.write("="*80 + "\n")
         
         print(f"\nSeed {seed}: {summary_txt_path}")
@@ -323,7 +300,6 @@ def recompute_all_metrics(results_dir: str, seeds: List[int] = [42, 123, 456, 78
     df.to_csv(detail_csv_path, index=False, encoding='utf-8-sig')
     print(f" Detail results saved to : {detail_csv_path}")
     
-    # Baseline workflow step.
     print("\n" + "="*80)
     print(" test-prediction statistics across all seeds ( mean ± standard deviation )")
     print("="*80)

@@ -1,4 +1,4 @@
-"""Create the ten-row FreeSolv example included in the public archive."""
+"""Create the ten-row FreeSolv example included in the public release."""
 
 from __future__ import annotations
 
@@ -48,7 +48,7 @@ def build_example() -> pd.DataFrame:
 
 def main() -> None:
     """Write the example workbook."""
-    parser = argparse.ArgumentParser(description="Build the archived ten-row FreeSolv example.")
+    parser = argparse.ArgumentParser(description="Build the reference ten-row FreeSolv example.")
     parser.add_argument(
         "--output",
         type=Path,

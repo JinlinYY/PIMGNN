@@ -1,4 +1,4 @@
-"""Convert a CompSol workbook to the legacy pseudo-ternary schema."""
+"""Convert a CompSol workbook to the checkpoint-compatible pseudo-ternary schema."""
 
 from __future__ import annotations
 
@@ -26,7 +26,6 @@ def main() -> None:
     """Find, convert, and save the first matching CompSol source workbook."""
     args = parse_args()
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    # Legacy public-release workflow step.
     possible_files = glob.glob(args.input_glob)
     source_file = None
     for f in possible_files:
@@ -35,16 +34,13 @@ def main() -> None:
             break
 
     if not source_file:
-        print("❌ None found CompSol Excel file ! verify file at current file Clip .")
+        print("No CompSol workbook was found in the requested location.")
         return
 
-    print(f"🚀 found Source file : {source_file}")
+    print(f"Source workbook: {source_file}")
     save_path = str(args.output)
 
-    # Legacy public-release workflow step.
-    # Legacy public-release workflow step.
     smiles_db = {
-        # Legacy public-release workflow step.
         "water": "O",
         "methanol": "CO",
         "ethanol": "CCO",
@@ -77,7 +73,6 @@ def main() -> None:
         "2_2'-oxybispropane": "CC(C)OC(C)C",
         "diisopropyl ether": "CC(C)OC(C)C",
         
-        # Legacy public-release workflow step.
         "hexane": "CCCCCC",
         "n-hexane": "CCCCCC",
         "heptane": "CCCCCCC",
@@ -102,7 +97,6 @@ def main() -> None:
         "tetracosane": "CCCCCCCCCCCCCCCCCCCCCCCC",
         "octacosane": "CCCCCCCCCCCCCCCCCCCCCCCCCCCC",
 
-        # Legacy public-release workflow step.
         "benzene": "c1ccccc1",
         "methylbenzene": "Cc1ccccc1",
         "toluene": "Cc1ccccc1",
@@ -120,7 +114,6 @@ def main() -> None:
         "nitrobenzene": "O=[N+]([O-])c1ccccc1",
         "naphthalene": "c1ccc2ccccc2c1",
         
-        # Legacy public-release workflow step.
         "trichloromethane": "ClC(Cl)Cl",
         "chloroform": "ClC(Cl)Cl",
         "tetrachloromethane": "ClC(Cl)(Cl)Cl",
@@ -129,7 +122,6 @@ def main() -> None:
         "1_2-dichloroethane": "ClCCCl",
         "1-chlorobutane": "CCCCCl",
         
-        # Legacy public-release workflow step.
         "acetic_acid_ethyl_ester": "CCOC(C)=O",
         "ethyl acetate": "CCOC(C)=O",
         "acetic_acid_methyl_ester": "COC(C)=O",
@@ -154,44 +146,38 @@ def main() -> None:
         "hydrogen": "[H][H]",
     }
 
-    # Legacy public-release workflow step.
-    print("📖 reading Excel (Sheet='Binary mixtures')...")
+    print("Reading the 'Binary mixtures' worksheet...")
     try:
-        # Legacy public-release workflow step.
         df = pd.read_excel(source_file, sheet_name="Binary mixtures", skiprows=1, engine="openpyxl")
     except:
-        print("⚠️ read Binary mixtures failed , attempt read default Sheet...")
+        print("Named-sheet lookup failed; reading the default worksheet.")
         df = pd.read_excel(source_file, skiprows=1, engine="openpyxl")
 
-    print(f"📊 Original data : {len(df)} rows ")
-    print("⚡ start Offline Matching (Matches -> SMILES)...")
+    print(f"Input records: {len(df)}")
+    print("Matching compound names to SMILES using the local mapping...")
 
     new_data = []
     match_count = 0
 
     for index, row in df.iterrows():
         try:
-            # Legacy public-release workflow step.
             s_name = str(row['solvent']).lower().strip()
             u_name = str(row['solute']).lower().strip()
             val = row['DG_solv[kcal.mol-1]']
             
-            # Legacy public-release workflow step.
             smi_solvent = smiles_db.get(s_name)
             smi_solute = smiles_db.get(u_name)
             
-            # Legacy public-release workflow step.
             if smi_solvent and smi_solute and pd.notna(val):
                 new_data.append({
                     'system_id': 20000 + match_count,
-                    'smiles1': smi_solute,   # Legacy public-release workflow step.
-                    'smiles2': smi_solvent,  # Legacy public-release workflow step.
-                    'smiles3': 'O',          # Legacy public-release workflow step.
-                    'T': 298.15,             # Legacy public-release workflow step.
+                    'smiles1': smi_solute,
+                    'smiles2': smi_solvent,
+                    'smiles3': 'O',
+                    'T': 298.15,
                     'Ex1': 0.01, 'Ex2': 0.99, 'Ex3': 0.0,
                     'Rx1': 0.01, 'Rx2': 0.99, 'Rx3': 0.0,
                     'value': float(val),
-                    # Run the training step.
                     'split': 'train' if match_count % 10 < 8 else 'test'
                 })
                 match_count += 1
@@ -199,21 +185,20 @@ def main() -> None:
         except Exception as e:
             continue
 
-    # Legacy public-release workflow step.
     if new_data:
         df_out = pd.DataFrame(new_data)
         df_out.to_excel(save_path, index=False)
         print("\n" + "="*40)
-        print(f"🎉 successful generate ! No internet required !")
-        print(f"📊 successful match data : {len(new_data)} bar ")
+        print("Conversion complete; no network access was required.")
+        print(f"Matched records: {len(new_data)}")
         print(f" ( This vs. before Hundreds multiple multiple of , And Very Fast )")
-        print(f"📂 output path : {os.path.abspath(save_path)}")
+        print(f"Output path: {os.path.abspath(save_path)}")
         print("="*40)
-        print("👉 Now at Next :")
+        print("Next steps:")
         print(f"1. Confirm config.py Vil. EXCEL_PATH = '{save_path}'")
         print("2. run python main.py")
     else:
-        print("❌ match count is 0. please check Excel Vil. First Name whether true Strange .")
+        print("No records were matched; verify the workbook columns and identifiers.")
 
 
 if __name__ == "__main__":

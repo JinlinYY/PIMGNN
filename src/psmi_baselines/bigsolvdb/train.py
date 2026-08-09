@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Implement the bigsolvdb train baseline module."""
 import os
 import time
 import glob
@@ -8,11 +7,9 @@ import re
 from typing import Dict, List, Tuple
 import warnings
 
-# Baseline workflow step.
 warnings.filterwarnings('ignore')
 os.environ['PYTHONWARNINGS'] = 'ignore'
 
-# Baseline workflow step.
 try:
     from rdkit import RDLogger
     RDLogger.DisableLog('rdApp.*')
@@ -35,18 +32,15 @@ warnings.filterwarnings('ignore')
 
 
 class SolubilityDataset(Dataset):
-    """Represent the SolubilityDataset baseline component."""
     def __init__(self, df: pd.DataFrame, T_scaler: Scaler, target_scaler: Scaler = None):
         self.df = df.reset_index(drop=True)
         self.T_scaler = T_scaler
         self.target_scaler = target_scaler
         
-        # Baseline workflow step.
         self.features = []
         self.targets = []
         
         for idx, row in self.df.iterrows():
-            # Baseline workflow step.
             solute_fp = row['solute_fp']
             solvent_fp = row['solvent_fp']
             T_norm = self.T_scaler.transform(np.array([row['T']]))[0]
@@ -70,7 +64,6 @@ class SolubilityDataset(Dataset):
 
 
 class EarlyStopping:
-    """Represent the EarlyStopping baseline component."""
     def __init__(self, patience: int = 50, min_delta: float = 0.0):
         self.patience = patience
         self.min_delta = min_delta
@@ -94,7 +87,6 @@ class EarlyStopping:
 
 
 def compute_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> Dict[str, float]:
-    """Run the compute metrics baseline operation."""
     y_true = y_true.astype(np.float64).reshape(-1)
     y_pred = y_pred.astype(np.float64).reshape(-1)
     
@@ -114,7 +106,6 @@ def compute_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> Dict[str, float]:
 
 @torch.no_grad()
 def evaluate(model, loader, device):
-    """Run the evaluate baseline operation."""
     model.eval()
     all_preds = []
     all_targets = []
@@ -134,7 +125,6 @@ def evaluate(model, loader, device):
 
 
 def train_epoch(model, train_loader, optimizer, criterion, device):
-    """Run the train epoch baseline operation."""
     model.train()
     total_loss = 0.0
     n_samples = 0
@@ -179,7 +169,6 @@ def train_single_seed(
     resume_from: str = None,
     save_checkpoint_every: int = 10,
 ) -> Dict:
-    """Run the train single seed baseline operation."""
     
     seed_out_dir = os.path.join(out_dir, f"seed_{seed}")
     os.makedirs(seed_out_dir, exist_ok=True)
@@ -192,10 +181,8 @@ def train_single_seed(
     # Set the random seed.
     set_seed(seed)
     
-    # Baseline workflow step.
     T_scaler = Scaler.fit(train_df["T"].values.astype(np.float32))
     
-    # Baseline workflow step.
     target_scaler = None
     
     # Process the experiment data.
@@ -208,7 +195,7 @@ def train_single_seed(
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=0)
     
     # Configure the baseline model.
-    in_dim = 2 * fp_bits + 1  # Baseline workflow step.
+    in_dim = 2 * fp_bits + 1
     model = build_solubility_model(
         model_name=model_name,
         in_dim=in_dim,
@@ -220,7 +207,6 @@ def train_single_seed(
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
     criterion = nn.MSELoss()
     
-    # Run the training step.
     history = {
         'epoch': [],
         'train_loss': [],
@@ -240,7 +226,6 @@ def train_single_seed(
     
     early_stopping = EarlyStopping(patience=patience)
     
-    # Baseline workflow step.
     if resume_from and os.path.exists(resume_from):
         checkpoint = torch.load(resume_from, map_location=device)
         print(f" resume from checkpoint : {resume_from}")
@@ -262,23 +247,19 @@ def train_single_seed(
         if 'T_scaler' in checkpoint:
             T_scaler = Scaler.from_state_dict(checkpoint['T_scaler'])
     
-    # Run the training step.
     print(f"\n start training ( from epoch {start_epoch}/{epochs})...")
     print(f"{'='*80}")
     
     for epoch in range(start_epoch, epochs + 1):
         epoch_start_time = time.time()
         
-        # Run the training step.
         train_loss = train_epoch(model, train_loader, optimizer, criterion, device)
         
-        # Baseline workflow step.
         train_metrics, _, _ = evaluate(model, train_loader, device)
         val_metrics, _, _ = evaluate(model, val_loader, device)
         
         epoch_time = time.time() - epoch_start_time
         
-        # Baseline workflow step.
         history['epoch'].append(epoch)
         history['train_loss'].append(train_loss)
         history['train_mae'].append(train_metrics['mae'])
@@ -295,7 +276,6 @@ def train_single_seed(
             best_model_state = {k: v.cpu().clone() for k, v in model.state_dict().items()}
             best_epoch = epoch
         
-        # Baseline workflow step.
         print(f"\nEpoch {epoch}/{epochs} | Time : {epoch_time:.2f} seconds ")
         print(f" training set : MAE={train_metrics['mae']:.6f} RMSE={train_metrics['rmse']:.6f} R²={train_metrics['r2']:.6f}")
         print(f" validation set : MAE={val_metrics['mae']:.6f} RMSE={val_metrics['rmse']:.6f} R²={val_metrics['r2']:.6f}")
@@ -377,7 +357,6 @@ def train_single_seed(
 
 
 def collect_all_results(out_dir: str, seeds: List[int]) -> pd.DataFrame:
-    """Run the collect all results baseline operation."""
     all_results = []
     
     for seed in seeds:
@@ -391,7 +370,6 @@ def collect_all_results(out_dir: str, seeds: List[int]) -> pd.DataFrame:
         if os.path.exists(txt_file):
             with open(txt_file, 'r', encoding='utf-8') as f:
                 content = f.read()
-                # Baseline workflow step.
                 epoch_match = re.search(r' best epoch:\s+(\d+)', content)
                 if epoch_match:
                     metrics['best_epoch'] = int(epoch_match.group(1))
@@ -423,7 +401,7 @@ def collect_all_results(out_dir: str, seeds: List[int]) -> pd.DataFrame:
                 metrics['best_val_mae'] = float(best_row['val_mae'])
                 # Evaluate the test subset.
         
-        if len(metrics) > 1:  # Baseline workflow step.
+        if len(metrics) > 1:
             all_results.append(metrics)
     
     if not all_results:
@@ -438,7 +416,6 @@ def collect_all_results(out_dir: str, seeds: List[int]) -> pd.DataFrame:
             values = df[metric].dropna()
             if len(values) > 0:
                 mean_val = float(values.mean())
-                # Baseline workflow step.
                 if len(values) > 1:
                     std_val = float(values.std(ddof=1))
                 else:
@@ -593,7 +570,6 @@ def main():
             print(f"\n remaining {remaining} seeds To be trained , starting the next run ...")
             print("-"*80)
     
-    # Baseline workflow step.
     print("\n" + "="*80)
     print(" collect results for all seeds ...")
     print("="*80)

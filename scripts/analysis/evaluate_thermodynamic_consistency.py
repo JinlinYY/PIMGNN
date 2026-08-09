@@ -280,9 +280,8 @@ def main() -> None:
         type=Path,
         default=(
             PROJECT_ROOT
-            / "experiments"
-            / "12_thermodynamic_audit"
-            / "results"
+            / "outputs"
+            / "thermodynamic_consistency_audit"
         ),
     )
     parser.add_argument("--thresholds", default="0.000001,0.1,0.25,0.5,1.0,2.0")

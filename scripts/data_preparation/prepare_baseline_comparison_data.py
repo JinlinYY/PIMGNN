@@ -24,7 +24,7 @@ from psmi.data import load_and_prepare_excel, split_by_manifest
 DEFAULT_EXCEL = (
     PROJECT_ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles.xlsx"
 )
-DEFAULT_MANIFEST = PROJECT_ROOT / "datasets" / "splits" / "main_benchmark_corrected_v2.json"
+DEFAULT_MANIFEST = PROJECT_ROOT / "datasets" / "splits" / "main_benchmark_system_split.json"
 DEFAULT_OUTPUT = PROJECT_ROOT / "datasets" / "processed" / "baseline_comparison"
 
 
@@ -38,7 +38,7 @@ def _sha256(path: Path) -> str:
 
 
 def _export_schema(frame: pd.DataFrame, split_name: str) -> pd.DataFrame:
-    """Add the legacy headers required by the imported comparison models."""
+    """Add the column aliases required by the comparison-model loaders."""
     output = frame.copy()
     output["LLE system NO."] = output["system_id"]
     output["T/K"] = output["T"]

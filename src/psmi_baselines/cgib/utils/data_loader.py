@@ -1,4 +1,3 @@
-"""Implement the cgib utils data_loader baseline module."""
 import torch
 from torch_geometric.data import Data, Batch
 from rdkit import Chem
@@ -7,10 +6,7 @@ import numpy as np
 
 
 def smiles_to_graph(smiles):
-    """Run the smiles to graph baseline operation."""
-    # Baseline workflow step.
     if '.' in smiles:
-        # Baseline workflow step.
         mol_smiles_list = smiles.split('.')
         all_atom_features = []
         all_edge_index = []
@@ -26,7 +22,6 @@ def smiles_to_graph(smiles):
             if mol is None:
                 continue
             
-            # Baseline workflow step.
             atom_features = []
             for atom in mol.GetAtoms():
                 features = [
@@ -40,7 +35,6 @@ def smiles_to_graph(smiles):
                 ]
                 atom_features.append(features)
             
-            # Baseline workflow step.
             edge_index = []
             edge_attr = []
             for bond in mol.GetBonds():
@@ -48,8 +42,7 @@ def smiles_to_graph(smiles):
                 j = bond.GetEndAtomIdx() + node_offset
                 
                 edge_index.append([i, j])
-                edge_index.append([j, i])  # Baseline workflow step.
-                
+                edge_index.append([j, i])
                 bond_features = [
                     int(bond.GetBondType()),
                     int(bond.GetIsAromatic()),
@@ -64,11 +57,9 @@ def smiles_to_graph(smiles):
             
             node_offset += len(atom_features)
         
-        # Baseline workflow step.
         if len(all_atom_features) == 0:
             return None
         
-        # Baseline workflow step.
         if len(all_edge_index) == 0:
             all_edge_index = [[0], [0]]
             all_edge_attr = [[0, 0, 0]]
@@ -79,12 +70,10 @@ def smiles_to_graph(smiles):
         
         return Data(x=x, edge_index=edge_index, edge_attr=edge_attr)
     else:
-        # Baseline workflow step.
         mol = Chem.MolFromSmiles(smiles)
         if mol is None:
             return None
         
-        # Baseline workflow step.
         atom_features = []
         for atom in mol.GetAtoms():
             features = [
@@ -98,7 +87,6 @@ def smiles_to_graph(smiles):
             ]
             atom_features.append(features)
         
-        # Baseline workflow step.
         edge_index = []
         edge_attr = []
         for bond in mol.GetBonds():
@@ -106,8 +94,7 @@ def smiles_to_graph(smiles):
             j = bond.GetEndAtomIdx()
             
             edge_index.append([i, j])
-            edge_index.append([j, i])  # Baseline workflow step.
-            
+            edge_index.append([j, i])
             bond_features = [
                 int(bond.GetBondType()),
                 int(bond.GetIsAromatic()),
@@ -117,7 +104,6 @@ def smiles_to_graph(smiles):
             edge_attr.append(bond_features)
         
         if len(edge_index) == 0:
-            # Baseline workflow step.
             edge_index = [[0], [0]]
             edge_attr = [[0, 0, 0]]
         
@@ -129,12 +115,10 @@ def smiles_to_graph(smiles):
 
 
 def create_batch(graphs1, graphs2, targets=None):
-    """Run the create batch baseline operation."""
     batch1 = Batch.from_data_list(graphs1)
     batch2 = Batch.from_data_list(graphs2)
     
     if targets is not None:
-        # Baseline workflow step.
         if isinstance(targets, list):
             targets = np.array(targets)
         targets = torch.tensor(targets, dtype=torch.float)
@@ -144,13 +128,11 @@ def create_batch(graphs1, graphs2, targets=None):
 
 
 class MolecularDataset:
-    """Represent the MolecularDataset baseline component."""
     def __init__(self, smiles1_list, smiles2_list, targets=None):
         self.smiles1_list = smiles1_list
         self.smiles2_list = smiles2_list
         self.targets = targets
         
-        # Baseline workflow step.
         self.graphs1 = []
         self.graphs2 = []
         self.valid_indices = []

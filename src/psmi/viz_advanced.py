@@ -56,7 +56,7 @@ def plot_importance_treemap(
         import plotly.graph_objects as go
         import plotly.express as px
     except ImportError:
-        print("[WARN] plotly Not Installed , skip Treemap")
+        print("[WARN] plotly is not installed; skipping the treemap.")
         return
     
     
@@ -170,7 +170,7 @@ def plot_importance_treemap(
     )
     
     fig.write_html(out_path.replace('.png', '.html'))
-    print(f" [OK] Treemap saved : {os.path.basename(out_path.replace('.png', '.html'))}")
+    print(f"  [OK] Saved treemap: {os.path.basename(out_path.replace('.png', '.html'))}")
 
 
 def _get_color_for_mol(mol):
@@ -214,7 +214,7 @@ def plot_feature_rank_heatmap(
     try:
         import seaborn as sns
     except ImportError:
-        print("[WARN] seaborn Not Installed , skip Rank Heatmap")
+        print("[WARN] seaborn is not installed; skipping the rank heatmap.")
         return
     
     apply_publication_style()
@@ -244,7 +244,7 @@ def plot_feature_rank_heatmap(
             g_importance[mol_id] = (imp_array, feature_names_dict.get(key, []))
     
     if len(g_importance) < 2:
-        print("[WARN] insufficient data , skip Rank Heatmap")
+        print("[WARN] Insufficient data; skipping the rank heatmap.")
         return
     
     
@@ -302,7 +302,7 @@ def plot_feature_rank_heatmap(
     plt.tight_layout()
     plt.savefig(out_path, dpi=300, bbox_inches='tight')
     plt.close()
-    print(f" [OK] Rank Heatmap saved : {os.path.basename(out_path)}")
+    print(f"  [OK] Saved rank heatmap: {os.path.basename(out_path)}")
 
 
 def plot_combined_rank_heatmaps(
@@ -319,7 +319,7 @@ def plot_combined_rank_heatmaps(
         import seaborn as sns
         from matplotlib.colors import LinearSegmentedColormap
     except ImportError:
-        print("[WARN] seaborn Not Installed , skip combination Rank Heatmap")
+        print("[WARN] seaborn is not installed; skipping the combined rank heatmap.")
         return
     
     apply_publication_style()
@@ -376,7 +376,7 @@ def plot_combined_rank_heatmaps(
                 g_importance[mol_id] = (imp_array, feature_names_dict.get(key, []))
         
         if len(g_importance) < 2:
-            ax.text(0.5, 0.5, f" insufficient data \n({feat_name})", 
+            ax.text(0.5, 0.5, f"Insufficient data\n({feat_name})",
                    ha='center', va='center', fontsize=12)
             ax.axis('off')
             continue
@@ -458,7 +458,7 @@ def plot_combined_rank_heatmaps(
     plt.tight_layout()
     plt.savefig(out_path, dpi=300, bbox_inches='tight')
     plt.close()
-    print(f" [OK] combination Rank Heatmap saved : {os.path.basename(out_path)}")
+    print(f"  [OK] Saved combined rank heatmap: {os.path.basename(out_path)}")
 
 
 
@@ -473,7 +473,7 @@ def plot_bump_chart(
     try:
         import plotly.graph_objects as go
     except ImportError:
-        print("[WARN] plotly Not Installed , skip Bump Chart")
+        print("[WARN] plotly is not installed; skipping the bump chart.")
         return
     
     
@@ -489,7 +489,7 @@ def plot_bump_chart(
             g_importance[mol_id] = (imp_array, feature_names_dict.get(key, []))
     
     if len(g_importance) < 2:
-        print("[WARN] insufficient data , skip Bump Chart")
+        print("[WARN] Insufficient data; skipping the bump chart.")
         return
     
     
@@ -540,7 +540,7 @@ def plot_bump_chart(
     )
     
     fig.write_html(out_path.replace('.png', '.html'))
-    print(f" [OK] Bump Chart saved : {os.path.basename(out_path.replace('.png', '.html'))}")
+    print(f"  [OK] Saved bump chart: {os.path.basename(out_path.replace('.png', '.html'))}")
 
 
 
@@ -556,7 +556,7 @@ def plot_shap_beeswarm_distribution(
     try:
         import plotly.graph_objects as go
     except ImportError:
-        print("[WARN] plotly Not Installed , skip Beeswarm")
+        print("[WARN] plotly is not installed; skipping the beeswarm plot.")
         return
     
     shap_values = np.asarray(shap_values, dtype=np.float64)
@@ -622,7 +622,7 @@ def plot_shap_beeswarm_distribution(
     
     if out_path:
         fig.write_html(out_path.replace('.png', '.html'))
-        print(f" [OK] Beeswarm distribution plot saved : {os.path.basename(out_path.replace('.png', '.html'))}")
+        print(f"  [OK] Saved beeswarm plot: {os.path.basename(out_path.replace('.png', '.html'))}")
     else:
         fig.show()
 
@@ -642,19 +642,18 @@ def plot_importance_summary(
     else:
         out_dir = str(
             Path(__file__).resolve().parents[2]
-            / "figures"
-            / "08_interpretability"
-            / "reproduction"
+            / "outputs"
+            / "molecular_interaction_visualization"
         )
     
-    print("\n📊 generate advanced visualizations ...")
+    print("\nGenerating advanced visualizations...")
     
     
     try:
         treemap_path = os.path.join(out_dir, f"{prefix}_importance_treemap.png")
         plot_importance_treemap(importance_dict, feature_names_dict, treemap_path, top_k=15)
     except Exception as e:
-        print(f"[WARN] Treemap generation failed : {e}")
+        print(f"[WARN] Treemap generation failed: {e}")
     
     
     for color_scheme, suffix in [("nature_green", "green"), ("nature_blue", "blue")]:
@@ -670,7 +669,7 @@ def plot_importance_summary(
                 font_scale=font_scale
             )
         except Exception as e:
-            print(f"[WARN] combination Rank Heatmap ({suffix}) generation failed : {e}")
+            print(f"[WARN] Combined rank heatmap ({suffix}) generation failed: {e}")
     
     
     for feat_type, feat_name in [("node", "Atom"), ("edge", "Bond"), ("glob", "Global")]:
@@ -685,14 +684,14 @@ def plot_importance_summary(
                 feature_type=feat_type
             )
         except Exception as e:
-            print(f"[WARN] {feat_name} Rank Heatmap generation failed : {e}")
+            print(f"[WARN] {feat_name} rank heatmap generation failed: {e}")
     
     # 3. Bump Chart
     try:
         bump_path = os.path.join(out_dir, f"{prefix}_bump_chart.html")
         plot_bump_chart(importance_dict, feature_names_dict, bump_path, top_k=8)
     except Exception as e:
-        print(f"[WARN] Bump Chart generation failed : {e}")
+        print(f"[WARN] Bump chart generation failed: {e}")
     
     
     if shap_values_dict:
@@ -709,6 +708,6 @@ def plot_importance_summary(
                     top_k=15
                 )
             except Exception as e:
-                print(f"[WARN] Beeswarm ({key}) generation failed : {e}")
+                print(f"[WARN] Beeswarm plot ({key}) generation failed: {e}")
     
-    print("[OK] advanced visualization complete !")
+    print("[OK] Advanced visualizations are complete.")

@@ -1,11 +1,10 @@
-"""Regression tests for the imported visualization and split utilities."""
+"""Regression tests for the system-level split utilities."""
 
 from __future__ import annotations
 
 import unittest
 
 import pandas as pd
-from rdkit import Chem
 
 from scripts.experiments.data_splitting.run_kfold_cv import (
     build_stratified_system_folds,
@@ -14,46 +13,6 @@ from scripts.experiments.data_splitting.run_kfold_cv import (
 from scripts.experiments.data_splitting.run_split_strategy_benchmark import (
     split_system_random,
 )
-from scripts.visualization.explainability._common import (
-    functional_group_weights,
-    normalize_weights,
-    parse_bond_importance,
-    parse_node_importance,
-)
-
-
-class ExplainabilityUtilityTest(unittest.TestCase):
-    def test_node_and_bond_labels_map_to_expected_atoms(self) -> None:
-        node_rows = pd.DataFrame(
-            {
-                "node_label": ["[g1] C:0", "[g2] O:3"],
-                "importance": [-0.25, 0.75],
-            }
-        )
-        bond_rows = pd.DataFrame(
-            {
-                "bond_label": ["[g1] C:0-C:1", "[g1] C:1-O:2"],
-                "importance": [0.4, 0.6],
-            }
-        )
-
-        self.assertEqual(parse_node_importance(node_rows)[1][0], -0.25)
-        self.assertEqual(parse_node_importance(node_rows)[2][3], 0.75)
-        bond_weights = parse_bond_importance(bond_rows)[1]
-        self.assertAlmostEqual(bond_weights[0], 0.4)
-        self.assertAlmostEqual(bond_weights[1], 1.0)
-        self.assertAlmostEqual(bond_weights[2], 0.6)
-
-    def test_functional_group_weights_are_normalized(self) -> None:
-        mol = Chem.MolFromSmiles("CCO")
-        weights = functional_group_weights(mol, [("CO", 2.0), ("C", 1.0)])
-        normalized = normalize_weights(weights)
-
-        self.assertEqual(len(normalized), mol.GetNumAtoms())
-        self.assertAlmostEqual(max(normalized), 1.0)
-        self.assertTrue(all(0.0 <= value <= 1.0 for value in normalized))
-
-
 class DataSplitUtilityTest(unittest.TestCase):
     @staticmethod
     def _example_frame() -> pd.DataFrame:

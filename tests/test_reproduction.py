@@ -21,7 +21,7 @@ def test_checkpoint_input_verification_accepts_portable_paths(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Only content hashes, not archived absolute paths, define input identity."""
+    """Only content hashes, not reference absolute paths, define input identity."""
     dataset = tmp_path / "dataset.xlsx"
     split = tmp_path / "split.json"
     dataset.write_bytes(b"dataset")

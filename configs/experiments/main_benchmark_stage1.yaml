@@ -1,8 +1,8 @@
 include:
   - ../data/primary_lle.yaml
-  - ../model/psmi_corrected_v2.yaml
+  - ../model/psmi_sample_major.yaml
   - ../training/stage1_supervised.yaml
 SEED: 42
 LOAD_CKPT_PATH: ""
-OUT_DIR: results/main_benchmark/corrected_v2/seed42/stage1_supervised
+OUT_DIR: results/main_benchmark/multiseed_reference/seed42/stage1_supervised
 

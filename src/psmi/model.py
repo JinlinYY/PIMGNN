@@ -10,8 +10,8 @@ from .utils import atom_feature_dim, bond_feature_dim, global_feature_dim
 
 _FUSION_MODE_ALIASES = {
     "concat": "concat",
-    # Historical run folders used ``tf`` while the implementation fell through
-    # to concatenation. Keep that numerical behavior explicit for provenance.
+    # Published configuration tables used ``tf`` for the concatenation profile.
+    # The alias preserves the numerical contract of those checkpoints.
     "tf": "concat",
     "transformer": "transformer",
     "s3_set": "s3_set",
@@ -39,9 +39,9 @@ def stack_mixture_node_embeddings(
 ) -> torch.Tensor:
     """Stack component embeddings in the layout expected by mixture graph batches.
 
-    ``sample_major`` matches :func:`psmi.utils.batch_mixture_graphs`. The legacy
-    component-major layout remains available only to reproduce historical
-    checkpoints and quantify the numerical effect of the corrected ordering.
+    ``sample_major`` matches :func:`psmi.utils.batch_mixture_graphs`.
+    ``component_major`` is retained for checkpoints trained with the alternate
+    component-first batch layout.
     """
     if e1.shape != e2.shape or e1.shape != e3.shape:
         raise ValueError(
@@ -51,11 +51,11 @@ def stack_mixture_node_embeddings(
     normalized = str(layout).lower().strip()
     if normalized == "sample_major":
         return torch.stack((e1, e2, e3), dim=1).reshape(-1, e1.shape[-1])
-    if normalized == "legacy_component_major":
+    if normalized == "component_major":
         return torch.cat((e1, e2, e3), dim=0)
     raise ValueError(
         f"Unsupported mixture node layout {layout!r}; expected "
-        "'sample_major' or 'legacy_component_major'"
+        "'sample_major' or 'component_major'"
     )
 
 
@@ -168,7 +168,6 @@ def cross_molecular_fg_attention(
 # Fingerprint baseline (kept)
 # ----------------------------
 class LLECurveNet(nn.Module):
-    """Represent the LLECurveNet component."""
     def __init__(self, in_dim: int, hidden: int = 1024, dropout: float = 0.15):
         super().__init__()
         self.backbone = nn.Sequential(
@@ -195,7 +194,6 @@ class LLECurveNet(nn.Module):
 # Molecule graph encoder (custom graph dict)
 # ----------------------------
 class MPNNLayer(nn.Module):
-    """Represent the MPNNLayer component."""
     def __init__(
         self,
         hidden: int,
@@ -294,7 +292,6 @@ class MPNNLayer(nn.Module):
 
 
 class MPNNEncoder(nn.Module):
-    """Represent the MPNNEncoder component."""
     def __init__(
         self,
         node_dim: int,
@@ -384,7 +381,6 @@ class MPNNEncoder(nn.Module):
 # Mixture graph encoder (3 nodes per sample)
 # ----------------------------
 class MixGraphEncoder(nn.Module):
-    """Represent the MixGraphEncoder component."""
     def __init__(
         self,
         hidden: int,
@@ -470,7 +466,6 @@ class MixGraphEncoder(nn.Module):
 # Token fusion transformer (for multi-scale features)
 # ----------------------------
 class TokenFusionTransformer(nn.Module):
-    """Represent the TokenFusionTransformer component."""
     def __init__(
         self,
         d_model: int,
@@ -584,7 +579,6 @@ class TokenFusionTransformer(nn.Module):
 # ----------------------------
 
 class LLEGraphNet(nn.Module):
-    """Represent the LLEGraphNet component."""
     def __init__(
         self,
         gnn_hidden: int = 256,
@@ -646,10 +640,10 @@ class LLEGraphNet(nn.Module):
         if self.scalar_dim not in {2, 3}:
             raise ValueError(f"scalar_dim must be 2 or 3, got {scalar_dim!r}")
         self.mixture_node_layout = str(mixture_node_layout).lower().strip()
-        if self.mixture_node_layout not in {"sample_major", "legacy_component_major"}:
+        if self.mixture_node_layout not in {"sample_major", "component_major"}:
             raise ValueError(
                 "mixture_node_layout must be 'sample_major' or "
-                "'legacy_component_major'"
+                "'component_major'"
             )
         if tf_dim is None:
             tf_dim = self.hidden

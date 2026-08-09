@@ -9,8 +9,8 @@ import yaml
 from types import SimpleNamespace
 
 
-def test_fusion_mode_aliases_preserve_historical_tf_behavior() -> None:
-    """The historical ``tf`` label selected concatenation, not Transformer fusion."""
+def test_fusion_mode_aliases_preserve_published_tf_behavior() -> None:
+    """The published ``tf`` label selected concatenation, not Transformer fusion."""
     from psmi.model import normalize_fusion_mode
 
     assert normalize_fusion_mode("concat") == "concat"
@@ -57,15 +57,15 @@ def test_sample_major_mixture_node_layout_matches_batched_graph_indices() -> Non
     assert actual[:, 0].tolist() == [11.0, 12.0, 13.0, 21.0, 22.0, 23.0]
 
 
-def test_legacy_mixture_node_layout_remains_available_for_old_checkpoints() -> None:
-    """Historical results can be audited without presenting the old layout as corrected."""
+def test_component_major_layout_remains_available_for_declared_checkpoints() -> None:
+    """Checkpoints can select their declared component-major layout."""
     from psmi.model import stack_mixture_node_embeddings
 
     e1 = torch.tensor([[11.0], [21.0]])
     e2 = torch.tensor([[12.0], [22.0]])
     e3 = torch.tensor([[13.0], [23.0]])
 
-    actual = stack_mixture_node_embeddings(e1, e2, e3, layout="legacy_component_major")
+    actual = stack_mixture_node_embeddings(e1, e2, e3, layout="component_major")
 
     assert actual[:, 0].tolist() == [11.0, 21.0, 12.0, 22.0, 13.0, 23.0]
 
@@ -87,7 +87,7 @@ def test_condition_scalar_contract_is_explicit(
 
 
 def test_model_scalar_dimension_matches_profile() -> None:
-    """A two-scalar historical checkpoint must not require a pressure column."""
+    """A two-scalar published checkpoint must not require a pressure column."""
     from psmi.model import LLEGraphNet
 
     benchmark_model = LLEGraphNet(
@@ -140,11 +140,11 @@ def test_layered_config_resolves_includes_and_project_paths(tmp_path) -> None:
     assert values["EPOCHS"] == 300
 
 
-def test_corrected_profile_names_s3_scope_without_claiming_full_equivariance() -> None:
+def test_sample_major_profile_names_s3_scope_without_claiming_full_equivariance() -> None:
     """The public profile must name the component embedding rather than the full model."""
     from psmi.configuration import load_config_file
 
-    profile = load_config_file("configs/model/psmi_corrected_v2.yaml")
+    profile = load_config_file("configs/model/psmi_sample_major.yaml")
     assert profile["USE_S3_COMPONENT_EMBEDDING"] is True
     assert "S3_EQUIVARIANT" not in profile
 
@@ -303,7 +303,7 @@ def test_expanded_release_manifest_has_declared_system_counts() -> None:
     from pathlib import Path
 
     project_root = Path(__file__).resolve().parents[1]
-    manifest_path = project_root / "datasets" / "splits" / "expanded_lle_corrected_v2.json"
+    manifest_path = project_root / "datasets" / "splits" / "expanded_lle_system_split.json"
     payload = json.loads(manifest_path.read_text(encoding="utf-8"))
     partitions = payload["partitions"]
     assert {name: len(ids) for name, ids in partitions.items()} == {

@@ -82,12 +82,12 @@ def run_with_seed(
     print(f"RUN {run_number}/{total_runs}: SEED={seed}")
     print(f"{'='*90}\n")
     
-    # Create a temporary output directory for this seed
+    # Isolate artifacts from each random seed.
     temp_out_dir = os.path.join(base_out_dir, f"seed_{seed}")
     
     os.makedirs(temp_out_dir, exist_ok=True)
     
-    # If results already exist, skip re-running to save time
+    # Reuse a complete metric package when requested by the caller.
     try:
         metrics_table = os.path.join(temp_out_dir, "baseline_compare_metrics.csv")
         metric_files = [
@@ -290,7 +290,6 @@ def compute_statistics(all_metrics: dict) -> pd.DataFrame:
 
 
 def format_summary_table(all_metrics: dict) -> pd.DataFrame:
-    """Run the format summary table baseline operation."""
     
     summary_rows = []
     
@@ -365,7 +364,7 @@ def main():
     base_out_dir = C.OUT_DIR
     os.makedirs(base_out_dir, exist_ok=True)
     protocol = {
-        "protocol_version": "corrected_v2",
+        "protocol_version": "sample_major",
         "seeds": SEEDS,
         "models": list(C.MODELS_TO_RUN),
         "epochs": int(C.EPOCHS),

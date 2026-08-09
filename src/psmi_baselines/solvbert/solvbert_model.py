@@ -1,4 +1,3 @@
-"""Implement the solvbert solvbert_model baseline module."""
 import torch
 import torch.nn as nn
 from transformers import BertModel, BertConfig
@@ -6,7 +5,6 @@ from transformers import AutoTokenizer
 
 
 class SolvBERT(nn.Module):
-    """Represent the SolvBERT baseline component."""
     
     def __init__(
         self,
@@ -26,10 +24,8 @@ class SolvBERT(nn.Module):
         hidden_dropout_rate: float = 0.4,
         num_outputs: int = 6,  # Configure the output artifacts.
     ):
-        """Run the init baseline operation."""
         super(SolvBERT, self).__init__()
         
-        # Baseline workflow step.
         config = BertConfig(
             vocab_size=vocab_size,
             hidden_size=hidden_size,
@@ -46,10 +42,8 @@ class SolvBERT(nn.Module):
             mask_token_id=mask_token_id,
         )
         
-        # Baseline workflow step.
         self.bert = BertModel(config)
         
-        # Baseline workflow step.
         self.regression_head = nn.Sequential(
             nn.Dropout(hidden_dropout_rate),
             nn.Linear(hidden_size, hidden_size // 2),
@@ -58,11 +52,9 @@ class SolvBERT(nn.Module):
             nn.Linear(hidden_size // 2, num_outputs)  # Configure the output artifacts.
         )
         
-        # Baseline workflow step.
         self.apply(self._init_weights)
     
     def _init_weights(self, module):
-        """Run the init weights baseline operation."""
         if isinstance(module, nn.Linear):
             module.weight.data.normal_(mean=0.0, std=0.02)
             if module.bias is not None:
@@ -80,15 +72,12 @@ class SolvBERT(nn.Module):
         token_type_ids=None,
         return_embeddings=False
     ):
-        """Run the forward baseline operation."""
-        # Baseline workflow step.
         outputs = self.bert(
             input_ids=input_ids,
             attention_mask=attention_mask,
             token_type_ids=token_type_ids
         )
         
-        # Baseline workflow step.
         cls_embedding = outputs.last_hidden_state[:, 0, :]  # [batch_size, hidden_size]
         
         # Generate model predictions.
@@ -99,7 +88,6 @@ class SolvBERT(nn.Module):
         return prediction
     
     def get_embeddings(self, input_ids, attention_mask=None, token_type_ids=None):
-        """Run the get embeddings baseline operation."""
         outputs = self.bert(
             input_ids=input_ids,
             attention_mask=attention_mask,
@@ -109,7 +97,6 @@ class SolvBERT(nn.Module):
 
 
 class SolvBERTForMLM(nn.Module):
-    """Represent the SolvBERTForMLM baseline component."""
     
     def __init__(
         self,
@@ -127,7 +114,6 @@ class SolvBERTForMLM(nn.Module):
         cls_token_id: int = 101,
         mask_token_id: int = 103,
     ):
-        """Run the init baseline operation."""
         super(SolvBERTForMLM, self).__init__()
         
         config = BertConfig(
@@ -154,7 +140,6 @@ class SolvBERTForMLM(nn.Module):
         self.apply(self._init_weights)
     
     def _init_weights(self, module):
-        """Run the init weights baseline operation."""
         if isinstance(module, nn.Linear):
             module.weight.data.normal_(mean=0.0, std=0.02)
             if module.bias is not None:
@@ -172,7 +157,6 @@ class SolvBERTForMLM(nn.Module):
         token_type_ids=None,
         labels=None
     ):
-        """Run the forward baseline operation."""
         outputs = self.bert(
             input_ids=input_ids,
             attention_mask=attention_mask,
@@ -184,7 +168,7 @@ class SolvBERTForMLM(nn.Module):
         
         loss = None
         if labels is not None:
-            loss_fct = nn.CrossEntropyLoss()  # Baseline workflow step.
+            loss_fct = nn.CrossEntropyLoss()
             loss = loss_fct(prediction_scores.view(-1, prediction_scores.size(-1)), labels.view(-1))
         
         return loss, prediction_scores

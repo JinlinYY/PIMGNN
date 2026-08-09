@@ -123,7 +123,6 @@ def _make_loader(
     device: str,
     collate_fn=None,
 ) -> DataLoader:
-    # Baseline workflow step.
     num_workers = getattr(C, "NUM_WORKERS", min(8, os.cpu_count() or 4))
     pin = device.startswith("cuda")
 
@@ -152,9 +151,7 @@ def train_or_load(train_df, val_df, test_df, model_name: Optional[str] = None, o
     is_gnn = name == "gnn"
 
     # ----- perf knobs -----
-    # Baseline workflow step.
     eval_every = getattr(C, "EVAL_EVERY", 1)
-    # Baseline workflow step.
     plot_every = getattr(C, "PLOT_EVERY", 5)
 
     # AMP/TF32
@@ -221,7 +218,6 @@ def train_or_load(train_df, val_df, test_df, model_name: Optional[str] = None, o
         print(f"Loaded ckpt: {ckpt_path}")
         return model, T_scaler, history
 
-    # Baseline workflow step.
     batch_size = getattr(C, "BATCH_SIZE")
     if is_smiles_rnn:
         max_len = getattr(C, "SMILES_MAX_LEN", 256)
@@ -421,38 +417,13 @@ def train_or_load(train_df, val_df, test_df, model_name: Optional[str] = None, o
         model.load_state_dict(best_state)
         print(f"Loaded best model by val_mse={best_val:.6f}")
 
-        # write best metrics summary files
-        # try:
-        #     import json
-        #     summary = {
-        #         "best_epoch": best_epoch,
-        #         "best_val_mse": float(best_val),
-        #         "best_val_metrics": best_val_metrics,
-        #         "best_test_metrics": best_test_metrics,
-        #     }
-        #     with open(os.path.join(out_dir, "best_metrics.json"), "w", encoding="utf-8") as f:
-        #         json.dump(summary, f, ensure_ascii=False, indent=2)
-
-        #     with open(os.path.join(out_dir, "best_metrics.txt"), "w", encoding="utf-8") as f:
-        #         f.write(f"best_epoch: {best_epoch}\n")
-        #         f.write(f"best_val_mse: {best_val:.8f}\n\n")
-        #         f.write("best_val_metrics:\n")
-        #         for k, v in (best_val_metrics or {}).items():
-        #             f.write(f"  {k}: {v}\n")
-        #         f.write("\nbest_test_metrics:\n")
-        #         for k, v in (best_test_metrics or {}).items():
-        #             f.write(f"  {k}: {v}\n")
-        # except Exception as e:
-        #     print("Warning: failed to write best_metrics files:", e)
-
-
-            # write best metrics summary files (round all floats to 4 decimals)
+        # Write a compact validation-only selection record.
         try:
             import json
 
             def _round4(x):
                 if isinstance(x, float):
-                    # keep NaN as NaN (json will write NaN; if you dislike it, we can convert to None)
+                    # Preserve NaN for metrics that are undefined on degenerate subsets.
                     return round(x, 4)
                 if isinstance(x, (int, str)) or x is None:
                     return x
@@ -500,7 +471,7 @@ def train_or_load(train_df, val_df, test_df, model_name: Optional[str] = None, o
 
 
     # Save ckpt
-    # keep backward-compatible filename for your original model
+    # Preserve the established filename used by the MLP evaluation scripts.
     ckpt_fname = "lle_curve_net.pt" if name in {"mlp", "lle_curve_net"} else f"{name}.pt"
     ckpt_out = os.path.join(out_dir, ckpt_fname)
     # also save an alias file <name>.pt for convenience

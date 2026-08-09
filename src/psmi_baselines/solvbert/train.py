@@ -1,4 +1,3 @@
-"""Implement the solvbert train baseline module."""
 import os
 import argparse
 import torch
@@ -23,7 +22,6 @@ from psmi_baselines.paths import EXPERIMENT_ROOT, TRAIN_CSV, VALIDATION_CSV, TES
 
 # Compute evaluation metrics.
 def r2_score(y_true, y_pred):
-    """Run the r2 score baseline operation."""
     y_true = np.array(y_true)
     y_pred = np.array(y_pred)
     ss_res = np.sum((y_true - y_pred) ** 2)
@@ -33,16 +31,13 @@ def r2_score(y_true, y_pred):
     return 1 - (ss_res / ss_tot)
 
 def mean_squared_error(y_true, y_pred):
-    """Run the mean squared error baseline operation."""
     return np.mean((np.array(y_true) - np.array(y_pred)) ** 2)
 
 def mean_absolute_error(y_true, y_pred):
-    """Run the mean absolute error baseline operation."""
     return np.mean(np.abs(np.array(y_true) - np.array(y_pred)))
 
 
 def pretrain_epoch(model, dataloader, optimizer, scheduler, device, tokenizer, mlm_probability=0.15):
-    """Run the pretrain epoch baseline operation."""
     model.train()
     total_loss = 0
     num_batches = 0
@@ -53,20 +48,17 @@ def pretrain_epoch(model, dataloader, optimizer, scheduler, device, tokenizer, m
         input_ids = batch['input_ids'].to(device)
         attention_mask = batch['attention_mask'].to(device)
         
-        # Baseline workflow step.
         masked_input_ids, labels = mask_tokens_for_mlm(
             input_ids, tokenizer, mlm_probability
         )
         labels = labels.to(device)
         
-        # Baseline workflow step.
         loss, _ = model(
             input_ids=masked_input_ids,
             attention_mask=attention_mask,
             labels=labels
         )
         
-        # Baseline workflow step.
         optimizer.zero_grad()
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
@@ -82,7 +74,6 @@ def pretrain_epoch(model, dataloader, optimizer, scheduler, device, tokenizer, m
 
 
 def pretrain_evaluate(model, dataloader, device, tokenizer, mlm_probability=0.15):
-    """Run the pretrain evaluate baseline operation."""
     model.eval()
     total_loss = 0
     num_batches = 0
@@ -110,7 +101,6 @@ def pretrain_evaluate(model, dataloader, device, tokenizer, mlm_probability=0.15
 
 
 def finetune_epoch(model, dataloader, optimizer, scheduler, device):
-    """Run the finetune epoch baseline operation."""
     model.train()
     total_loss = 0
     num_batches = 0
@@ -123,7 +113,6 @@ def finetune_epoch(model, dataloader, optimizer, scheduler, device):
         attention_mask = batch['attention_mask'].to(device)
         labels = batch['labels'].to(device)  # [batch_size, 6]
         
-        # Baseline workflow step.
         predictions = model(
             input_ids=input_ids,
             attention_mask=attention_mask
@@ -131,7 +120,6 @@ def finetune_epoch(model, dataloader, optimizer, scheduler, device):
         
         loss = criterion(predictions, labels)
         
-        # Baseline workflow step.
         optimizer.zero_grad()
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
@@ -147,7 +135,6 @@ def finetune_epoch(model, dataloader, optimizer, scheduler, device):
 
 
 def finetune_evaluate(model, dataloader, device, return_predictions=False, dataset=None):
-    """Run the finetune evaluate baseline operation."""
     model.eval()
     all_predictions = []
     all_labels = []
@@ -211,17 +198,17 @@ def finetune_evaluate(model, dataloader, device, return_predictions=False, datas
     overall_std = np.std(overall_residuals)
     
     result = {
-        'r2': overall_r2,  # Baseline workflow step.
-        'rmse': overall_rmse,  # Baseline workflow step.
-        'mae': overall_mae,  # Baseline workflow step.
-        'mse': overall_mse,  # Baseline workflow step.
-        'std': overall_std,  # Baseline workflow step.
+        'r2': overall_r2,
+        'rmse': overall_rmse,
+        'mae': overall_mae,
+        'mse': overall_mse,
+        'std': overall_std,
         'loss': overall_rmse,  # Configure the baseline model.
-        'avg_r2': avg_r2,  # Baseline workflow step.
-        'avg_rmse': avg_rmse,  # Baseline workflow step.
-        'avg_mae': avg_mae,  # Baseline workflow step.
-        'avg_mse': avg_mse,  # Baseline workflow step.
-        'avg_std': avg_std,  # Baseline workflow step.
+        'avg_r2': avg_r2,
+        'avg_rmse': avg_rmse,
+        'avg_mae': avg_mae,
+        'avg_mse': avg_mse,
+        'avg_std': avg_std,
         'per_output_metrics': per_output_metrics  # Configure the output artifacts.
     }
     
@@ -233,7 +220,6 @@ def finetune_evaluate(model, dataloader, device, return_predictions=False, datas
 
 
 def print_config_info(args, train_size, val_size, test_size, device):
-    """Run the print config info baseline operation."""
     print("\n" + "="*100)
     print("[ training configuration ]")
     print("="*100)
@@ -286,7 +272,6 @@ def print_config_info(args, train_size, val_size, test_size, device):
 
 
 def print_epoch_info(epoch, total_epochs, epoch_time, train_loss, train_result, val_result, best_val_mse, best_epoch):
-    """Run the print epoch info baseline operation."""
     print("="*100)
     print(f"Epoch {epoch}/{total_epochs} | training time : {epoch_time:.2f} seconds | Train Loss: {train_loss:.6f}")
     if best_epoch >= 0:
@@ -330,8 +315,6 @@ def print_epoch_info(epoch, total_epochs, epoch_time, train_loss, train_result, 
 
 
 def save_training_history(history, output_dir):
-    """Run the save training history baseline operation."""
-    # Baseline workflow step.
     os.makedirs(output_dir, exist_ok=True)
     
     df = pd.DataFrame(history)
@@ -341,8 +324,6 @@ def save_training_history(history, output_dir):
 
 
 def save_predictions(predictions, labels, output_path, dataset_type='train'):
-    """Run the save predictions baseline operation."""
-    # Baseline workflow step.
     df = pd.DataFrame({
         'true_Ex1': labels[:, 0],
         'true_Ex2': labels[:, 1],
@@ -362,7 +343,6 @@ def save_predictions(predictions, labels, output_path, dataset_type='train'):
 
 
 def convert_to_python_type(value):
-    """Run the convert to python type baseline operation."""
     if isinstance(value, (np.integer, np.floating)):
         return value.item() if hasattr(value, 'item') else float(value)
     elif isinstance(value, np.ndarray):
@@ -378,12 +358,9 @@ def convert_to_python_type(value):
 
 
 def save_metrics(best_metrics, output_dir, total_time, avg_time_per_epoch, total_epochs):
-    """Run the save metrics baseline operation."""
-    # Baseline workflow step.
     results_dir = output_dir
     os.makedirs(results_dir, exist_ok=True)
     
-    # Baseline workflow step.
     best_val_mse = convert_to_python_type(best_metrics.get('best_val_mse', float('inf')))
     best_val_rmse = convert_to_python_type(best_metrics.get('best_val_rmse', float('inf')))
     best_val_mae = convert_to_python_type(best_metrics.get('best_val_mae', float('inf')))
@@ -432,7 +409,6 @@ def save_metrics(best_metrics, output_dir, total_time, avg_time_per_epoch, total
 
 
 def train_single(args):
-    """Run the train single baseline operation."""
     # Set the random seed.
     torch.manual_seed(args.random_seed)
     np.random.seed(args.random_seed)
@@ -472,7 +448,7 @@ def train_single(args):
             try:
                 tokenizer = build_tokenizer(vocab_path=tokenizer_path, local_files_only=True)
             except Exception as e:
-                print(f" unable to from Local load tokenizer: {e}, attempt Other methods ...")
+                print(f"Unable to load the local tokenizer ({e}); trying fallback methods...")
     
     # Load the input data.
     if tokenizer is None:
@@ -480,24 +456,21 @@ def train_single(args):
             print(f" attempt from HuggingFace Download tokenizer: {args.tokenizer_name}")
             tokenizer = build_tokenizer(model_name=args.tokenizer_name, local_files_only=False, vocab_size=args.vocab_size)
         except Exception as e:
-            print(f" online download failed : {e}")
+            print(f"Online download failed: {e}")
             print(" trying the local cache ...")
             try:
                 tokenizer = build_tokenizer(model_name=args.tokenizer_name, local_files_only=True, vocab_size=args.vocab_size)
             except Exception as e2:
                 print(f" local cache is also unavailable : {e2}")
                 print(" use Easy Character Level tokenizer as a fallback ...")
-                # Baseline workflow step.
                 tokenizer = build_tokenizer(model_name=args.tokenizer_name, local_files_only=True, vocab_size=args.vocab_size)
     
     # Save the generated artifacts.
     print(f" save tokenizer to : {args.pretrain_output_dir}")
     tokenizer.save_pretrained(args.pretrain_output_dir)
     
-    # Run the training step.
     pretrained_model_path = None
     if not args.skip_pretrain:
-        # Run the training step.
         pretrain_train_dataset = SolvDataset(
             args.pretrain_train_data,
             tokenizer,
@@ -524,7 +497,6 @@ def train_single(args):
                 shuffle=False
             )
         
-        # Run the training step.
         pretrain_model = SolvBERTForMLM(
             vocab_size=len(tokenizer),
             hidden_size=args.hidden_size,
@@ -536,7 +508,6 @@ def train_single(args):
             mask_token_id=tokenizer.mask_token_id,
         ).to(device)
         
-        # Run the training step.
         pretrain_optimizer = AdamW(pretrain_model.parameters(), lr=args.pretrain_learning_rate)
         pretrain_total_steps = len(pretrain_train_loader) * args.pretrain_num_epochs
         pretrain_scheduler = get_linear_schedule_with_warmup(
@@ -545,13 +516,11 @@ def train_single(args):
             num_training_steps=pretrain_total_steps
         )
         
-        # Run the training step.
         best_pretrain_val_loss = float('inf')
         
         for epoch in range(args.pretrain_num_epochs):
             epoch_start_time = time.time()
             
-            # Run the training step.
             train_loss = pretrain_epoch(
                 pretrain_model, pretrain_train_loader, pretrain_optimizer,
                 pretrain_scheduler, device, tokenizer, args.mlm_probability
@@ -613,7 +582,6 @@ def train_single(args):
         if not os.path.exists(pretrained_model_path):
             pretrained_model_path = final_pretrain_path
     
-    # Baseline workflow step.
     # Process the experiment data.
     finetune_train_dataset = SolvDataset(
         args.finetune_train_data,
@@ -626,7 +594,6 @@ def train_single(args):
         batch_size=args.finetune_batch_size,
         shuffle=True
     )
-    # Baseline workflow step.
     finetune_train_eval_loader = create_data_loader(
         finetune_train_dataset,
         batch_size=args.finetune_batch_size,
@@ -661,7 +628,6 @@ def train_single(args):
         )
         test_size = len(finetune_test_dataset)
     
-    # Baseline workflow step.
     print_config_info(
         args,
         len(finetune_train_dataset),
@@ -681,7 +647,7 @@ def train_single(args):
         cls_token_id=tokenizer.cls_token_id,
         mask_token_id=tokenizer.mask_token_id,
         hidden_dropout_rate=args.hidden_dropout_rate,
-        num_outputs=6,  # Baseline workflow step.
+        num_outputs=6,
     ).to(device)
     
     # Load the input data.
@@ -703,7 +669,6 @@ def train_single(args):
             
             finetune_model.load_state_dict(model_state, strict=False)
     
-    # Baseline workflow step.
     finetune_optimizer = AdamW(finetune_model.parameters(), lr=args.finetune_learning_rate, weight_decay=0.0001)
     finetune_total_steps = len(finetune_train_loader) * args.finetune_num_epochs
     finetune_scheduler = get_linear_schedule_with_warmup(
@@ -712,7 +677,6 @@ def train_single(args):
         num_training_steps=finetune_total_steps
     )
     
-    # Run the training step.
     training_history = []
     best_val_mse = float('inf')
     best_val_rmse = float('inf')
@@ -731,7 +695,7 @@ def train_single(args):
         if os.path.exists(args.resume_from_checkpoint):
             checkpoint_path_to_load = args.resume_from_checkpoint
         else:
-            print(f" warning : Designation checkpoint path does not exist : {args.resume_from_checkpoint}")
+            print(f"Warning: checkpoint path does not exist: {args.resume_from_checkpoint}")
     
     # Handle model checkpoints.
     if checkpoint_path_to_load is None:
@@ -768,21 +732,18 @@ def train_single(args):
         print(f" best epoch: {best_epoch}, best validation MSE: {best_val_mse:.6f}")
         print(f" waited {no_improve_count}/{args.early_stop_patience} epoch without improvement ")
     
-    # Baseline workflow step.
     total_start_time = time.time()
-    last_rest_time = total_start_time  # Baseline workflow step.
+    last_rest_time = total_start_time
     rest_interval_seconds = args.rest_interval_hours * 3600 if args.rest_interval_hours > 0 else 0
     
     for epoch in range(start_epoch, args.finetune_num_epochs):
         epoch_start_time = time.time()
         
-        # Run the training step.
         train_loss = finetune_epoch(
             finetune_model, finetune_train_loader, finetune_optimizer,
             finetune_scheduler, device
         )
         
-        # Run the training step.
         train_result = finetune_evaluate(finetune_model, finetune_train_eval_loader, device, return_predictions=True)
         train_metrics = {
             'mae': train_result['mae'],
@@ -804,7 +765,6 @@ def train_single(args):
         
         epoch_time = time.time() - epoch_start_time
         
-        # Baseline workflow step.
         print_epoch_info(
             epoch + 1,
             args.finetune_num_epochs,
@@ -816,7 +776,6 @@ def train_single(args):
             best_epoch
         )
         
-        # Run the training step.
         history_entry = {
             'epoch': epoch + 1,
             'train_loss': train_loss,
@@ -834,7 +793,6 @@ def train_single(args):
         }
         training_history.append(history_entry)
         
-        # Baseline workflow step.
         improved = False
         if val_metrics['mse'] < (best_val_mse - args.early_stop_min_delta):
             improved = True
@@ -894,18 +852,16 @@ def train_single(args):
             }, checkpoint_path)
             print(f" checkpoint saved : {checkpoint_path}")
         
-        # Baseline workflow step.
         current_time = time.time()
         elapsed_since_last_rest = current_time - last_rest_time
         
         if rest_interval_seconds > 0 and elapsed_since_last_rest >= rest_interval_seconds and (epoch + 1) < args.finetune_num_epochs:
             elapsed_hours = elapsed_since_last_rest / 3600
             print("="*100)
-            print(f" Trained {elapsed_hours:.2f} hours ({elapsed_since_last_rest:.0f} seconds ), Break {args.rest_duration} seconds ({args.rest_duration/60:.1f} minutes ) allow CPU/GPU to allow a cooldown period ...")
+            print(f"Elapsed since the previous pause: {elapsed_hours:.2f} hours; pausing for {args.rest_duration/60:.1f} minutes to cool the hardware...")
             print("="*100 + "\n")
             time.sleep(args.rest_duration)
-            last_rest_time = time.time()  # Baseline workflow step.
-        
+            last_rest_time = time.time()
         # Apply early stopping.
         if no_improve_count >= args.early_stop_patience:
             print("="*100)
@@ -915,7 +871,6 @@ def train_single(args):
             print("="*100 + "\n")
             break
     
-    # Run the training step.
     total_time = time.time() - total_start_time
     avg_time_per_epoch = total_time / len(training_history) if training_history else 0
     
@@ -984,7 +939,6 @@ def train_single(args):
         }
     }, final_model_path)
     
-    # Run the training step.
     best_model_checkpoint = torch.load(os.path.join(args.finetune_output_dir, 'best_model.pt'), map_location=device, weights_only=False)
     finetune_model.load_state_dict(best_model_checkpoint['model_state_dict'])
     best_train_result = finetune_evaluate(finetune_model, finetune_train_eval_loader, device, return_predictions=False)
@@ -1005,7 +959,6 @@ def train_single(args):
         'best_train_r2': best_train_result['r2'],
         'best_train_mse': best_train_result['mse'],
         'best_train_std': best_train_result['std'],
-        # Run the training step.
         'best_train_e_phase_mae': np.mean([best_train_result['per_output_metrics'][i]['mae'] for i in [0, 1, 2]]),
         'best_train_e_phase_rmse': np.mean([best_train_result['per_output_metrics'][i]['rmse'] for i in [0, 1, 2]]),
         'best_train_r_phase_mae': np.mean([best_train_result['per_output_metrics'][i]['mae'] for i in [3, 4, 5]]),
@@ -1107,7 +1060,6 @@ def train_single(args):
             f.write(f"R²: {test_r_r2:.6f} ± {test_r_std:.6f}\n")
             f.write("="*100 + "\n")
     
-    # Run the training step.
     print("="*100)
     print(" training complete !")
     print(f" best model at epoch {best_epoch}, validation set MSE: {best_val_mse:.6f}")
@@ -1126,7 +1078,6 @@ def train_single(args):
     print("="*100)
 
 
-# Run the training step.
 
 # Process the experiment data.
 PRETRAIN_TRAIN_DATA = str(TRAIN_CSV)
@@ -1143,7 +1094,6 @@ BASE_OUTPUT_DIR = str(EXPERIMENT_ROOT / 'runs' / 'solvbert')
 
 
 def train_with_seed(seed, args_override=None):
-    """Run the train with seed baseline operation."""
     print("\n" + "="*100)
     print(f" start training - random seed : {seed}")
     print("="*100 + "\n")
@@ -1202,7 +1152,7 @@ def train_with_seed(seed, args_override=None):
             if key not in ['pretrain_output_dir', 'finetune_output_dir']:
                 setattr(args, key, value)
             else:
-                print(f" warning : parameters '{key}' Ignored , will use seed Specific path : {getattr(args, key)}")
+                print(f"Warning: ignoring parameter '{key}'; using the seed-specific path {getattr(args, key)}")
     
     # Configure repository paths.
     args.pretrain_output_dir = pretrain_output_dir
@@ -1260,18 +1210,17 @@ def train_with_seed(seed, args_override=None):
                             metrics['val_r_mae'] = float(val_r_match.group(1))
                             metrics['val_r_rmse'] = float(val_r_match.group(2))
             except Exception as e:
-                print(f" warning : unable to parse Seeds {seed} metrics file : {e}")
+                print(f"Warning: unable to parse the metrics file for seed {seed}: {e}")
         
         return metrics
     except Exception as e:
-        print(f"\n Seeds {seed} training failed ! error : {str(e)}")
+        print(f"\nTraining failed for seed {seed}: {e}")
         import traceback
         traceback.print_exc()
         return None
 
 
 def train_multiple_seeds(seeds=None, args_override=None):
-    """Run the train multiple seeds baseline operation."""
     if seeds is None:
         seeds = DEFAULT_SEEDS
     
@@ -1305,7 +1254,6 @@ def train_multiple_seeds(seeds=None, args_override=None):
         else:
             failed_seeds.append(seed)
         
-        # Baseline workflow step.
         if i < len(seeds):
             print("\n" + "-"*100 + "\n")
     
@@ -1378,19 +1326,18 @@ def train_multiple_seeds(seeds=None, args_override=None):
                 f.write(f" validation set - MAE: {val_r_mae_mean:.4f} ± {val_r_mae_std:.4f}, RMSE: {val_r_rmse_mean:.4f} ± {val_r_rmse_std:.4f}\n\n")
             
             f.write(f" Training number of seeds : {len(success_seeds)}\n")
-            f.write(f" successful Seeds : {success_seeds}\n")
+            f.write(f"successful seeds: {success_seeds}\n")
             if failed_seeds:
-                f.write(f" failed seeds : {failed_seeds}\n")
+                f.write(f"failed seeds: {failed_seeds}\n")
         
         print(f"\n Summary metrics saved to : {summary_path}")
     
-    # Baseline workflow step.
     print("\n" + "="*100)
     print(" Batch training complete !")
     print("="*100)
-    print(f"\n successful Training Seeds : {success_seeds}")
+    print(f"\nSuccessful training seeds: {success_seeds}")
     if failed_seeds:
-        print(f" failed seeds : {failed_seeds}")
+        print(f"Failed seeds: {failed_seeds}")
     print(f"\n all results save at : {BASE_OUTPUT_DIR}/")
     if all_metrics:
         print(f" Summary metrics save at : {os.path.join(BASE_OUTPUT_DIR, 'summary_metrics.txt')}")
@@ -1398,16 +1345,13 @@ def train_multiple_seeds(seeds=None, args_override=None):
 
 
 def create_parser():
-    """Run the create parser baseline operation."""
     parser = argparse.ArgumentParser(description='SolvBERT Complete Training workflow ( pretraining + fine-tuning ), supports Single Training and Batch multiple Seed Training ')
     
-    # Run the training step.
     parser.add_argument('--mode', type=str, choices=['single', 'multiple'], default='multiple',
                         help=' Training Mode : single= Single Training , multiple= Batch multiple Seed Training ')
     parser.add_argument('--seeds', type=int, nargs='+', default=None,
                         help=' When batch training Seeds list ( only in mode=multiple effective when )')
     
-    # Run the training step.
     parser.add_argument('--pretrain_train_data', type=str, default=PRETRAIN_TRAIN_DATA, help=' pretraining Training data path ')
     parser.add_argument('--pretrain_val_data', type=str, default=PRETRAIN_VAL_DATA, help=' pretraining Verify data path ')
     
@@ -1433,21 +1377,18 @@ def create_parser():
     parser.add_argument('--intermediate_size', type=int, default=1024, help=' feed-forward intermediate dimension ')
     parser.add_argument('--max_length', type=int, default=512, help=' maximum sequence length ')
     
-    # Run the training step.
     parser.add_argument('--pretrain_batch_size', type=int, default=16, help=' pretraining batch size ')
     parser.add_argument('--pretrain_learning_rate', type=float, default=2e-5, help=' pretraining learning rate ')
     parser.add_argument('--pretrain_num_epochs', type=int, default=10, help=' pre training epochs ')
     parser.add_argument('--pretrain_warmup_steps', type=int, default=1000, help=' pretraining Number of warm-up steps ')
     parser.add_argument('--mlm_probability', type=float, default=0.15, help=' Mask General rate ')
     
-    # Baseline workflow step.
     parser.add_argument('--finetune_batch_size', type=int, default=16, help=' fine-tuning batch size ')
     parser.add_argument('--finetune_learning_rate', type=float, default=8e-5, help=' fine-tuning learning rate ')
     parser.add_argument('--finetune_num_epochs', type=int, default=200, help=' fine-tuning number of rounds ( Increase to 200 in supports Early Stop )')
     parser.add_argument('--finetune_warmup_steps', type=int, default=500, help=' fine-tuning Number of warm-up steps ')
     parser.add_argument('--hidden_dropout_rate', type=float, default=0.4, help='Dropout rate ')
     
-    # Run the training step.
     parser.add_argument('--early_stop_patience', type=int, default=50, help=' early-stopping patience ( set is 50)')
     parser.add_argument('--early_stop_min_delta', type=float, default=0.0, help=' minimum early-stopping improvement ')
     parser.add_argument('--checkpoint_save_freq', type=int, default=10, help=' checkpoint frequency ( per N epoch)')
@@ -1455,7 +1396,6 @@ def create_parser():
     parser.add_argument('--rest_duration', type=int, default=300, help=' rest duration ( seconds )')
     parser.add_argument('--resume_from_checkpoint', type=str, default=None, help=' resume training from a checkpoint ( checkpoint path )')
     
-    # Baseline workflow step.
     parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', help=' device ')
     parser.add_argument('--tokenizer_name', type=str, default='bert-base-uncased', help='tokenizer name ')
     parser.add_argument('--skip_pretrain', action='store_true', help=' skip pretraining , Direct fine-tuning ')
@@ -1465,21 +1405,16 @@ def create_parser():
 
 
 def main():
-    """Run the main baseline operation."""
     parser = create_parser()
     args = parser.parse_args()
     
     if args.mode == 'multiple':
-        # Run the training step.
         seeds = args.seeds if args.seeds else DEFAULT_SEEDS
-        # Baseline workflow step.
         args_dict = vars(args)
-        # Run the training step.
         args_dict.pop('mode')
         args_dict.pop('seeds')
         train_multiple_seeds(seeds, args_dict)
     else:
-        # Run the training step.
         train_single(args)
 
 

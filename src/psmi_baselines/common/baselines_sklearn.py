@@ -5,7 +5,7 @@ Sklearn / xgboost / (optional) TabNet baselines for the LLE point prediction tas
 Conventions:
 - Input X: same as torch models (3 fingerprints + [Tn, t])
 - Output y: 6 dims [Ex1,Ex2,Ex3,Rx1,Rx2,Rx3]
-- We post-process predictions to satisfy compositional constraints (nonneg + sum-to-1 per phase).
+- Predictions are projected onto the non-negative, sum-to-one phase simplex.
 """
 
 from __future__ import annotations
@@ -74,7 +74,7 @@ def build_sklearn_model(model_name: str, seed: int = 42):
 
     if name == "xgboost":
         if not _HAS_XGB:
-            raise ImportError("xgboost is not installed. Please: pip install xgboost")
+            raise ImportError("xgboost is not installed; run `pip install xgboost`.")
         # Use GPU if available (XGBoost 2.0+ API)
         import torch
         device = "cpu"
@@ -102,7 +102,7 @@ def build_sklearn_model(model_name: str, seed: int = 42):
 
     if name == "tabnet":
         if not _HAS_TABNET:
-            raise ImportError("pytorch-tabnet is not installed. Please: pip install pytorch-tabnet")
+            raise ImportError("pytorch-tabnet is not installed; run `pip install pytorch-tabnet`.")
         # TabNetRegressor supports multi-target regression directly
         import torch
         device = "cuda" if torch.cuda.is_available() else "cpu"

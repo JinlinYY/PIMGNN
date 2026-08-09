@@ -1,0 +1,31 @@
+{
+  "dataset": "datasets/processed/update-LLE-all-with-smiles.xlsx",
+  "checkpoint": "experiments/section_3_results/3_1_lle_prediction/main_benchmark/models/figure_2a_psmi/best_model.pt",
+  "models": [
+    "data_only",
+    "margules",
+    "nrtl",
+    "van_laar"
+  ],
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "split": {
+    "train": 0.8,
+    "validation": 0.1,
+    "test": 0.1,
+    "by": "system_id"
+  },
+  "min_tie_lines_per_system_temperature": 6,
+  "permutation_augmentation": "identity_plus_swap_components_2_and_3",
+  "parameter_fit_scope": "training_systems_only",
+  "parameter_fit_steps": 1000,
+  "finetune_epochs": 30,
+  "finetune_learning_rate": 5e-06,
+  "lambda_phy": 0.001,
+  "freeze_backbone": true
+}

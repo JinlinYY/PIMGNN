@@ -52,7 +52,7 @@ class BaselineComparisonTest(unittest.TestCase):
         )
 
     def test_exported_splits_match_the_canonical_benchmark(self) -> None:
-        manifest_path = PROJECT_ROOT / "datasets" / "splits" / "main_benchmark_corrected_v2.json"
+        manifest_path = PROJECT_ROOT / "datasets" / "splits" / "main_benchmark_system_split.json"
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         expected = {
             "train": (6092, 612, "train"),

@@ -148,7 +148,7 @@ def main():
             fp_cache = FingerprintCache()
             precompute = True
 
-            # Build cached X/Y using your dataset feature pipeline
+            # Build cached feature and target arrays with the shared data pipeline.
             train_ds = LLEDataset(train_df, T_scaler, fp_cache, precompute=precompute)
             val_ds   = LLEDataset(val_df,   T_scaler, fp_cache, precompute=precompute)
             test_ds  = LLEDataset(test_df,  T_scaler, fp_cache, precompute=precompute)

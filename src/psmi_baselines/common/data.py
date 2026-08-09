@@ -229,7 +229,6 @@ class GraphCache:
 
 
 class LLEDataset(Dataset):
-    """Represent the LLEDataset baseline component."""
     def __init__(
         self,
         df: pd.DataFrame,
@@ -257,7 +256,6 @@ class LLEDataset(Dataset):
         X = np.empty((n, in_dim), dtype=np.float32)
         Y = np.empty((n, 6), dtype=np.float32)
 
-        # Baseline workflow step.
         for i in range(n):
             r = self.df.iloc[i]
             fp1 = self.fp_cache.get(r["smiles1"])
@@ -280,7 +278,6 @@ class LLEDataset(Dataset):
         if self._X is not None and self._Y is not None:
             return self._X[idx], self._Y[idx]
 
-        # Baseline workflow step.
         r = self.df.iloc[idx]
         fp1 = self.fp_cache.get(r["smiles1"])
         fp2 = self.fp_cache.get(r["smiles2"])

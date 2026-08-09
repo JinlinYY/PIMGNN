@@ -1,4 +1,3 @@
-"""Implement the cignn model baseline module."""
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -7,23 +6,18 @@ from torch_geometric.nn import Set2Set
 
 # ===== MPNN / Gather / Interaction (merged) =====
 class MessagePassingLayer(nn.Module):
-    """Represent the MessagePassingLayer baseline component."""
     def __init__(self, node_dim, edge_dim, hidden_dim):
         super(MessagePassingLayer, self).__init__()
         self.node_dim = node_dim
         self.edge_dim = edge_dim
         self.hidden_dim = hidden_dim
         
-        # Baseline workflow step.
-        # Baseline workflow step.
         self.message_net = nn.Sequential(
             nn.Linear(node_dim * 2 + edge_dim, hidden_dim),
             nn.ReLU(),
             nn.Linear(hidden_dim, hidden_dim)
         )
         
-        # Baseline workflow step.
-        # Baseline workflow step.
         self.update_net = nn.Sequential(
             nn.Linear(node_dim + hidden_dim, hidden_dim),
             nn.ReLU(),
@@ -31,26 +25,20 @@ class MessagePassingLayer(nn.Module):
         )
     
     def forward(self, x, edge_index, edge_attr):
-        """Run the forward baseline operation."""
         row, col = edge_index
         
-        # Baseline workflow step.
         src_features = x[row]  # [E, node_dim]
         dst_features = x[col]  # [E, node_dim]
         
-        # Baseline workflow step.
         message_input = torch.cat([dst_features, src_features, edge_attr], dim=1)
         
-        # Baseline workflow step.
         messages = self.message_net(message_input)  # [E, hidden_dim]
         
-        # Baseline workflow step.
         num_nodes = x.size(0)
         aggregated_messages = torch.zeros(num_nodes, self.hidden_dim, 
                                          device=x.device, dtype=x.dtype)
         aggregated_messages.index_add_(0, col, messages)
         
-        # Baseline workflow step.
         update_input = torch.cat([x, aggregated_messages], dim=1)
         updated_nodes = self.update_net(update_input)
         
@@ -58,26 +46,20 @@ class MessagePassingLayer(nn.Module):
 
 
 class MPNN(nn.Module):
-    """Represent the MPNN baseline component."""
     def __init__(self, node_dim, edge_dim, hidden_dim, num_layers=3):
         super(MPNN, self).__init__()
         self.num_layers = num_layers
         
-        # Baseline workflow step.
         self.input_proj = nn.Linear(node_dim, hidden_dim)
         
-        # Baseline workflow step.
         self.mp_layers = nn.ModuleList([
             MessagePassingLayer(hidden_dim, edge_dim, hidden_dim)
             for _ in range(num_layers)
         ])
     
     def forward(self, x, edge_index, edge_attr, batch=None):
-        """Run the forward baseline operation."""
-        # Baseline workflow step.
         h = self.input_proj(x)  # [N, hidden_dim]
         
-        # Baseline workflow step.
         for mp_layer in self.mp_layers:
             h = mp_layer(h, edge_index, edge_attr)
         
@@ -85,7 +67,6 @@ class MPNN(nn.Module):
 
 
 class GatherLayer(nn.Module):
-    """Represent the GatherLayer baseline component."""
     def __init__(self, node_dim, hidden_dim, use_set2set=False, processing_steps=3):
         super(GatherLayer, self).__init__()
         self.use_set2set = use_set2set
@@ -93,12 +74,10 @@ class GatherLayer(nn.Module):
         self.hidden_dim = hidden_dim
         
         if use_set2set:
-            # Baseline workflow step.
             from torch_geometric.nn import Set2Set
             self.set2set = Set2Set(hidden_dim, processing_steps=processing_steps)
             self.output_dim = hidden_dim * 2
         else:
-            # Baseline workflow step.
             self.gather_net = nn.Sequential(
                 nn.Linear(node_dim + hidden_dim, hidden_dim),
                 nn.ReLU(),
@@ -107,35 +86,26 @@ class GatherLayer(nn.Module):
             self.output_dim = hidden_dim
     
     def forward(self, x_init, x_mp, batch=None):
-        """Run the forward baseline operation."""
         if self.use_set2set:
-            # Baseline workflow step.
             if batch is None:
                 batch = torch.zeros(x_mp.size(0), dtype=torch.long, device=x_mp.device)
             return self.set2set(x_mp, batch)
         else:
-            # Baseline workflow step.
             combined = torch.cat([x_init, x_mp], dim=1)
             return self.gather_net(combined)
 
 
 class InteractionLayer(nn.Module):
-    """Represent the InteractionLayer baseline component."""
     def __init__(self):
         super(InteractionLayer, self).__init__()
     
     def forward(self, solute_features, solvent_features):
-        """Run the forward baseline operation."""
-        # Baseline workflow step.
-        # Baseline workflow step.
         interaction_map = torch.tanh(
             torch.matmul(solute_features, solvent_features.t())
         )  # [J, K]
         
-        # Baseline workflow step.
         solute_weighted = torch.matmul(interaction_map, solvent_features)  # [J, L]
         
-        # Baseline workflow step.
         solvent_weighted = torch.matmul(interaction_map.t(), solute_features)  # [K, L]
         
         return interaction_map, solute_weighted, solvent_weighted
@@ -146,7 +116,6 @@ class InteractionLayer(nn.Module):
 
 
 class ReadoutLayer(nn.Module):
-    """Represent the ReadoutLayer baseline component."""
     def __init__(self, input_dim, hidden_dim, use_set2set=False, processing_steps=3):
         super(ReadoutLayer, self).__init__()
         self.use_set2set = use_set2set
@@ -159,7 +128,6 @@ class ReadoutLayer(nn.Module):
             self.output_dim = input_dim
     
     def forward(self, x, batch=None):
-        """Run the forward baseline operation."""
         if self.use_set2set:
             if batch is None:
                 batch = torch.zeros(x.size(0), dtype=torch.long, device=x.device)
@@ -174,15 +142,14 @@ class ReadoutLayer(nn.Module):
 
 
 class CIGIN(nn.Module):
-    """Represent the CIGIN baseline component."""
     def __init__(self, 
-                 node_dim=33,  # Baseline workflow step.
-                 edge_dim=9,   # Baseline workflow step.
+                 node_dim=33,
+                 edge_dim=9,
                  hidden_dim=64,
                  num_mp_layers=3,
                  use_set2set=False,
                  set2set_steps=3,
-                 use_temperature=True):  # Baseline workflow step.
+                 use_temperature=True):
         super(CIGIN, self).__init__()
         
         self.node_dim = node_dim
@@ -191,19 +158,16 @@ class CIGIN(nn.Module):
         self.use_set2set = use_set2set
         self.use_temperature = use_temperature
         
-        # Baseline workflow step.
         self.il_mpnn = MPNN(node_dim, edge_dim, hidden_dim, num_mp_layers)
         self.comp2_mpnn = MPNN(node_dim, edge_dim, hidden_dim, num_mp_layers)
         self.comp3_mpnn = MPNN(node_dim, edge_dim, hidden_dim, num_mp_layers)
         
-        # Baseline workflow step.
         self.il_gather = GatherLayer(node_dim, hidden_dim, use_set2set, set2set_steps)
         self.comp2_gather = GatherLayer(node_dim, hidden_dim, use_set2set, set2set_steps)
         self.comp3_gather = GatherLayer(node_dim, hidden_dim, use_set2set, set2set_steps)
         
         gather_output_dim = self.il_gather.output_dim
         
-        # Baseline workflow step.
         self.interaction_layer = InteractionLayer()
         
         # Generate model predictions.
@@ -213,11 +177,9 @@ class CIGIN(nn.Module):
         
         readout_output_dim = self.il_readout.output_dim
         
-        # Baseline workflow step.
         feature_dim = readout_output_dim * 3
         if use_temperature:
-            feature_dim += 1  # Baseline workflow step.
-        
+            feature_dim += 1
         # Configure the output artifacts.
         self.predictor = nn.Sequential(
             nn.Linear(feature_dim, hidden_dim),
@@ -228,9 +190,6 @@ class CIGIN(nn.Module):
         )
     
     def forward(self, il_data, comp2_data, comp3_data, temperature=None):
-        """Run the forward baseline operation."""
-        # Baseline workflow step.
-        # Baseline workflow step.
         il_mp = self.il_mpnn(
             il_data.x, 
             il_data.edge_index, 
@@ -238,7 +197,6 @@ class CIGIN(nn.Module):
             il_data.batch
         )
         
-        # Baseline workflow step.
         comp2_mp = self.comp2_mpnn(
             comp2_data.x,
             comp2_data.edge_index,
@@ -246,7 +204,6 @@ class CIGIN(nn.Module):
             comp2_data.batch
         )
         
-        # Baseline workflow step.
         comp3_mp = self.comp3_mpnn(
             comp3_data.x,
             comp3_data.edge_index,
@@ -259,8 +216,6 @@ class CIGIN(nn.Module):
         comp2_features = self.comp2_gather(comp2_data.x, comp2_mp, comp2_data.batch)
         comp3_features = self.comp3_gather(comp3_data.x, comp3_mp, comp3_data.batch)
         
-        # Baseline workflow step.
-        # Baseline workflow step.
         batch_size = il_data.batch.max().item() + 1 if il_data.batch is not None else 1
         
         il_weighted_list = []
@@ -269,7 +224,6 @@ class CIGIN(nn.Module):
         interaction_maps = {'il_comp2': [], 'il_comp3': [], 'comp2_comp3': []}
         
         for i in range(batch_size):
-            # Baseline workflow step.
             if batch_size > 1:
                 il_mask = (il_data.batch == i)
                 comp2_mask = (comp2_data.batch == i)
@@ -282,22 +236,18 @@ class CIGIN(nn.Module):
                 comp2_feat = comp2_features
                 comp3_feat = comp3_features
             
-            # Baseline workflow step.
             map_il_comp2, il_weighted_12, comp2_weighted_12 = self.interaction_layer(
                 il_feat, comp2_feat
             )
             
-            # Baseline workflow step.
             map_il_comp3, il_weighted_13, comp3_weighted_13 = self.interaction_layer(
                 il_feat, comp3_feat
             )
             
-            # Baseline workflow step.
             map_comp2_comp3, comp2_weighted_23, comp3_weighted_23 = self.interaction_layer(
                 comp2_feat, comp3_feat
             )
             
-            # Baseline workflow step.
             il_weighted = il_weighted_12 + il_weighted_13
             comp2_weighted = comp2_weighted_12 + comp2_weighted_23
             comp3_weighted = comp3_weighted_13 + comp3_weighted_23
@@ -310,26 +260,21 @@ class CIGIN(nn.Module):
             interaction_maps['il_comp3'].append(map_il_comp3)
             interaction_maps['comp2_comp3'].append(map_comp2_comp3)
         
-        # Baseline workflow step.
         il_weighted = torch.cat(il_weighted_list, dim=0)
         comp2_weighted = torch.cat(comp2_weighted_list, dim=0)
         comp3_weighted = torch.cat(comp3_weighted_list, dim=0)
         
         # Generate model predictions.
-        # Baseline workflow step.
         il_combined = il_features + il_weighted
         comp2_combined = comp2_features + comp2_weighted
         comp3_combined = comp3_features + comp3_weighted
         
-        # Baseline workflow step.
         il_graph = self.il_readout(il_combined, il_data.batch)
         comp2_graph = self.comp2_readout(comp2_combined, comp2_data.batch)
         comp3_graph = self.comp3_readout(comp3_combined, comp3_data.batch)
         
-        # Baseline workflow step.
         combined_features = torch.cat([il_graph, comp2_graph, comp3_graph], dim=1)
         
-        # Baseline workflow step.
         if self.use_temperature and temperature is not None:
             if temperature.dim() == 1:
                 temperature = temperature.unsqueeze(1)  # [batch_size] -> [batch_size, 1]
@@ -338,7 +283,6 @@ class CIGIN(nn.Module):
         # Generate model predictions.
         prediction = self.predictor(combined_features)
         
-        # Baseline workflow step.
         sample_interaction_maps = {
             'il_comp2': interaction_maps['il_comp2'][0] if len(interaction_maps['il_comp2']) > 0 else None,
             'il_comp3': interaction_maps['il_comp3'][0] if len(interaction_maps['il_comp3']) > 0 else None,

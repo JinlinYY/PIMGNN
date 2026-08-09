@@ -38,7 +38,15 @@ from psmi.utils import Scaler, batch_to_device, set_seed
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CHECKPOINT = PROJECT_ROOT / "models" / "efficiency_benchmark" / "best_model.pt"
-DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "experiments" / "15_efficiency" / "results" / "psmi_rtx3090_ti"
+DEFAULT_OUTPUT_DIR = (
+    PROJECT_ROOT
+    / "experiments"
+    / "supporting_information"
+    / "s3_additional_evaluation_and_validation"
+    / "s3_9_inference_efficiency"
+    / "results"
+    / "psmi_rtx3090_ti"
+)
 
 
 def _percentile(values: Sequence[float], q: float) -> float:

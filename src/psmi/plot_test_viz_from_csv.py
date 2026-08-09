@@ -112,9 +112,9 @@ def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
             df = df.rename(columns={k: v})
 
     if "T" not in df.columns:
-        raise ValueError("CSV missing temperature column : requires 'T' or 'temperature'/'temperature_raw'.")
+        raise ValueError("The CSV must contain 'T', 'temperature', or 'temperature_raw'.")
     if "system_id" not in df.columns:
-        raise ValueError("CSV missing system_id column , unable to by system Painting phase diagram .")
+        raise ValueError("The CSV must contain 'system_id' for system-level plots.")
 
     if "t" not in df.columns:
         df["t"] = df.groupby(["system_id", "T"]).cumcount().astype(np.float32)
@@ -128,7 +128,7 @@ def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
     ]
     miss = [c for c in need if c not in df.columns]
     if miss:
-        raise ValueError(f"CSV missing required columns : {miss}")
+        raise ValueError(f"The CSV is missing required columns: {miss}")
 
     return df
 
@@ -326,14 +326,14 @@ def plot_group_ternary_from_csv(
 
 
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--csv", type=str, required=True, help="test_df_raw_pointwise_predictions.csv path ")
-    ap.add_argument("--out_dir", type=str, default="", help=" output directory ( default Auto create )")
-    ap.add_argument("--system_id", type=int, default=None, help=" plot only A system( Optional )")
-    ap.add_argument("--max_groups", type=int, default=0, help=" maximum number to plot (system,T) Group ;0= plot all ")
-    ap.add_argument("--font_scale", type=float, default=1.8, help=" global font scale ( recommendation 1.6~2.2)")
-    ap.add_argument("--skip_ternary", action="store_true", help=" plot only parity, skip phase diagrams (ternary)")
-    ap.add_argument("--tielines_max", type=int, default=18, help=" per Zhang phase diagram most multiple Painting multiple Few tie-line( sampling )")
+    ap = argparse.ArgumentParser(description="Plot parity and ternary diagrams from saved PSMI predictions.")
+    ap.add_argument("--csv", type=str, required=True, help="Path to a pointwise prediction CSV file.")
+    ap.add_argument("--out_dir", type=str, default="", help="Output directory; a timestamped directory is used by default.")
+    ap.add_argument("--system_id", type=int, default=None, help="Plot only this system ID.")
+    ap.add_argument("--max_groups", type=int, default=0, help="Maximum number of (system, temperature) groups; 0 plots all groups.")
+    ap.add_argument("--font_scale", type=float, default=1.8, help="Global font scale; values from 1.6 to 2.2 are recommended.")
+    ap.add_argument("--skip_ternary", action="store_true", help="Generate parity plots only.")
+    ap.add_argument("--tielines_max", type=int, default=18, help="Maximum number of sampled tie lines per ternary diagram.")
     args = ap.parse_args()
 
     df = pd.read_csv(args.csv)
@@ -363,7 +363,7 @@ def main():
     if args.system_id is not None:
         df_plot = df_plot[df_plot["system_id"] == args.system_id].copy()
         if len(df_plot) == 0:
-            raise RuntimeError(f"system_id={args.system_id} at CSV in does not exist .")
+            raise RuntimeError(f"system_id={args.system_id} is not present in the CSV file.")
 
     groups = list(df_plot.groupby(["system_id", "T"], sort=True))
     if args.max_groups and args.max_groups > 0:

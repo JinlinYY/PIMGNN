@@ -1,0 +1,22 @@
+name: psmi-cpu
+channels:
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pip
+  - pytorch=2.6.0
+  - cpuonly
+  - numpy=2.1.3
+  - pandas=2.3.3
+  - scipy=1.15.3
+  - scikit-learn=1.6.1
+  - matplotlib=3.10.0
+  - seaborn=0.13.2
+  - openpyxl=3.1.5
+  - pyyaml=6.0.2
+  - tqdm=4.67.1
+  - pip:
+      - rdkit==2025.03.5
+      - imbalanced-learn==0.13.0
+      - plotly==5.24.1

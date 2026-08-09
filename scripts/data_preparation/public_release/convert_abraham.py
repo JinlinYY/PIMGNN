@@ -1,4 +1,4 @@
-"""Convert an Abraham CSV table to the legacy pseudo-ternary schema."""
+"""Convert an Abraham CSV table to the checkpoint-compatible pseudo-ternary schema."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ except ImportError:
 
 add_src_to_path()
 
-from psmi_legacy_public.utils import canonicalize_smiles
+from psmi_checkpoint_compat.utils import canonicalize_smiles
 
 
 def load_abraham_csv_as_pseudo_ternary(
@@ -64,7 +64,7 @@ def load_abraham_csv_as_pseudo_ternary(
 
 def parse_args() -> argparse.Namespace:
     """Parse Abraham conversion options."""
-    parser = argparse.ArgumentParser(description="Convert Abraham data for legacy PSMI workflows.")
+    parser = argparse.ArgumentParser(description="Convert Abraham data for checkpoint-compatible PSMI workflows.")
     parser.add_argument("input_csv", type=Path)
     parser.add_argument("output_csv", type=Path)
     parser.add_argument("--target-column", default="L")

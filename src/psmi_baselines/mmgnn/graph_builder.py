@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Implement the mmgnn graph_builder baseline module."""
 
 from typing import Dict, Tuple, Optional
 import numpy as np
@@ -7,30 +6,22 @@ import torch
 from rdkit import Chem
 from rdkit.Chem import Descriptors, rdMolDescriptors
 
-# Baseline workflow step.
-ATOM_FEAT_DIM = 44  # Baseline workflow step.
-BOND_FEAT_DIM = 10  # Baseline workflow step.
-
-
+ATOM_FEAT_DIM = 44
+BOND_FEAT_DIM = 10
 def get_atom_features(atom) -> np.ndarray:
-    """Run the get atom features baseline operation."""
     features = []
     
-    # Baseline workflow step.
     atom_types = ['C', 'N', 'O', 'F', 'P', 'S', 'Cl', 'Br', 'I', 'B', 'Si', 'Se', 'Sn']
     atom_type_onehot = [1 if atom.GetSymbol() == t else 0 for t in atom_types]
     features.extend(atom_type_onehot)
     
-    # Baseline workflow step.
     degree = atom.GetDegree()
     degree_onehot = [1 if degree == i else 0 for i in range(6)]
     features.extend(degree_onehot)
     
-    # Baseline workflow step.
     formal_charge = atom.GetFormalCharge()
     features.append(formal_charge)
     
-    # Baseline workflow step.
     hybridization = atom.GetHybridization()
     hybrid_onehot = [1 if hybridization == h else 0 for h in [Chem.HybridizationType.SP, 
                                                               Chem.HybridizationType.SP2,
@@ -39,28 +30,22 @@ def get_atom_features(atom) -> np.ndarray:
                                                               Chem.HybridizationType.SP3D2]]
     features.extend(hybrid_onehot)
     
-    # Baseline workflow step.
     features.append(1 if atom.GetIsAromatic() else 0)
     
-    # Baseline workflow step.
     num_h = atom.GetTotalNumHs()
     features.append(num_h)
     
-    # Baseline workflow step.
     features.append(1 if atom.IsInRing() else 0)
     
-    # Baseline workflow step.
-    mass = atom.GetMass() / 200.0  # Baseline workflow step.
+    mass = atom.GetMass() / 200.0
     features.append(mass)
     
-    # Baseline workflow step.
     try:
-        radius = Descriptors.Crippen.MR(atom) / 10.0  # Baseline workflow step.
+        radius = Descriptors.Crippen.MR(atom) / 10.0
     except:
         radius = 0.0
     features.append(radius)
     
-    # Baseline workflow step.
     while len(features) < ATOM_FEAT_DIM:
         features.append(0.0)
     
@@ -68,10 +53,8 @@ def get_atom_features(atom) -> np.ndarray:
 
 
 def get_bond_features(bond) -> np.ndarray:
-    """Run the get bond features baseline operation."""
     features = []
     
-    # Baseline workflow step.
     bond_type = bond.GetBondType()
     bond_type_onehot = [
         1 if bond_type == Chem.BondType.SINGLE else 0,
@@ -81,13 +64,10 @@ def get_bond_features(bond) -> np.ndarray:
     ]
     features.extend(bond_type_onehot)
     
-    # Baseline workflow step.
     features.append(1 if bond.GetIsConjugated() else 0)
     
-    # Baseline workflow step.
     features.append(1 if bond.IsInRing() else 0)
     
-    # Baseline workflow step.
     stereo = bond.GetStereo()
     stereo_onehot = [1 if stereo == s else 0 for s in [Chem.BondStereo.STEREONONE,
                                                         Chem.BondStereo.STEREOANY,
@@ -95,7 +75,6 @@ def get_bond_features(bond) -> np.ndarray:
                                                         Chem.BondStereo.STEREOE]]
     features.extend(stereo_onehot)
     
-    # Baseline workflow step.
     while len(features) < BOND_FEAT_DIM:
         features.append(0.0)
     
@@ -103,10 +82,8 @@ def get_bond_features(bond) -> np.ndarray:
 
 
 def get_molecular_global_features(mol) -> np.ndarray:
-    """Run the get molecular global features baseline operation."""
     features = []
     
-    # Baseline workflow step.
     try:
         mw = Descriptors.MolWt(mol) / 1000.0
     except:
@@ -120,40 +97,30 @@ def get_molecular_global_features(mol) -> np.ndarray:
         logp = 0.0
     features.append(logp)
     
-    # Baseline workflow step.
     try:
         tpsa = Descriptors.TPSA(mol) / 200.0
     except:
         tpsa = 0.0
     features.append(tpsa)
     
-    # Baseline workflow step.
     num_atoms = mol.GetNumAtoms()
-    features.append(num_atoms / 100.0)  # Baseline workflow step.
-    
-    # Baseline workflow step.
+    features.append(num_atoms / 100.0)
     num_bonds = mol.GetNumBonds()
-    features.append(num_bonds / 100.0)  # Baseline workflow step.
-    
-    # Baseline workflow step.
+    features.append(num_bonds / 100.0)
     num_rings = rdMolDescriptors.CalcNumRings(mol)
-    features.append(num_rings / 10.0)  # Baseline workflow step.
-    
+    features.append(num_rings / 10.0)
     return np.array(features, dtype=np.float32)
 
 
 class MoleculeGraphBuilder:
-    """Represent the MoleculeGraphBuilder baseline component."""
     
     def __init__(self):
         self.atom_feat_dim = ATOM_FEAT_DIM
         self.bond_feat_dim = BOND_FEAT_DIM
     
     def smiles_to_graph(self, smiles: str) -> Dict:
-        """Run the smiles to graph baseline operation."""
         mol = Chem.MolFromSmiles(smiles)
         if mol is None:
-            # Baseline workflow step.
             return {
                 'node_features': np.zeros((1, self.atom_feat_dim), dtype=np.float32),
                 'edge_index': np.zeros((2, 0), dtype=np.int64),
@@ -163,20 +130,18 @@ class MoleculeGraphBuilder:
                 'num_edges': 0
             }
         
-        # Baseline workflow step.
         node_features = []
         for atom in mol.GetAtoms():
             node_features.append(get_atom_features(atom))
         node_features = np.array(node_features, dtype=np.float32)
         
-        # Baseline workflow step.
         edge_index = []
         edge_features = []
         for bond in mol.GetBonds():
             i = bond.GetBeginAtomIdx()
             j = bond.GetEndAtomIdx()
             edge_index.append([i, j])
-            edge_index.append([j, i])  # Baseline workflow step.
+            edge_index.append([j, i])
             bond_feat = get_bond_features(bond)
             edge_features.append(bond_feat)
             edge_features.append(bond_feat)
@@ -184,7 +149,6 @@ class MoleculeGraphBuilder:
         edge_index = np.array(edge_index, dtype=np.int64).T if edge_index else np.zeros((2, 0), dtype=np.int64)
         edge_features = np.array(edge_features, dtype=np.float32) if edge_features else np.zeros((0, self.bond_feat_dim), dtype=np.float32)
         
-        # Baseline workflow step.
         global_features = get_molecular_global_features(mol)
         
         return {
@@ -197,22 +161,18 @@ class MoleculeGraphBuilder:
         }
     
     def merge_graphs(self, graphs: list, add_intermolecular_edges: bool = True) -> Dict:
-        """Run the merge graphs baseline operation."""
         if len(graphs) == 0:
             raise ValueError("graphs list cannot be empty")
         
-        # Baseline workflow step.
         node_offsets = [0]
         for g in graphs:
             node_offsets.append(node_offsets[-1] + g['num_nodes'])
         
-        # Baseline workflow step.
         all_node_features = []
         for g in graphs:
             all_node_features.append(g['node_features'])
         all_node_features = np.concatenate(all_node_features, axis=0)
         
-        # Baseline workflow step.
         all_edge_index = []
         all_edge_features = []
         for idx, g in enumerate(graphs):
@@ -221,35 +181,27 @@ class MoleculeGraphBuilder:
             all_edge_index.append(edge_idx)
             all_edge_features.append(g['edge_features'])
         
-        # Baseline workflow step.
         if add_intermolecular_edges and len(graphs) > 1:
             intermolecular_edges = []
             for i in range(len(graphs)):
                 for j in range(i + 1, len(graphs)):
-                    # Baseline workflow step.
                     nodes_i = list(range(node_offsets[i], node_offsets[i+1]))
                     nodes_j = list(range(node_offsets[j], node_offsets[j+1]))
                     for ni in nodes_i:
                         for nj in nodes_j:
                             intermolecular_edges.append([ni, nj])
-                            intermolecular_edges.append([nj, ni])  # Baseline workflow step.
-            
+                            intermolecular_edges.append([nj, ni])
             if intermolecular_edges:
                 intermolecular_edge_index = np.array(intermolecular_edges, dtype=np.int64).T
-                # Baseline workflow step.
                 intermolecular_edge_features = np.zeros((len(intermolecular_edges), self.bond_feat_dim), dtype=np.float32)
-                # Baseline workflow step.
                 for k, (ni, nj) in enumerate(intermolecular_edges):
-                    # Baseline workflow step.
                     node_i_feat = all_node_features[ni]
                     node_j_feat = all_node_features[nj]
                     similarity = 1.0 / (1.0 + np.linalg.norm(node_i_feat - node_j_feat))
-                    intermolecular_edge_features[k, 0] = similarity  # Baseline workflow step.
-                
+                    intermolecular_edge_features[k, 0] = similarity
                 all_edge_index.append(intermolecular_edge_index)
                 all_edge_features.append(intermolecular_edge_features)
         
-        # Baseline workflow step.
         if all_edge_index:
             all_edge_index = np.concatenate(all_edge_index, axis=1)
             all_edge_features = np.concatenate(all_edge_features, axis=0)
@@ -257,10 +209,8 @@ class MoleculeGraphBuilder:
             all_edge_index = np.zeros((2, 0), dtype=np.int64)
             all_edge_features = np.zeros((0, self.bond_feat_dim), dtype=np.float32)
         
-        # Baseline workflow step.
         all_global_features = np.concatenate([g['global_features'] for g in graphs], axis=0)
         
-        # Baseline workflow step.
         molecule_ranges = [(node_offsets[i], node_offsets[i+1]) for i in range(len(graphs))]
         
         return {
@@ -270,7 +220,7 @@ class MoleculeGraphBuilder:
             'global_features': all_global_features,
             'num_nodes': len(all_node_features),
             'num_edges': len(all_edge_features),
-            'molecule_ranges': molecule_ranges,  # Baseline workflow step.
+            'molecule_ranges': molecule_ranges,
             'num_molecules': len(graphs)
         }
 

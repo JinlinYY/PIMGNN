@@ -1,0 +1,4 @@
+﻿"category","n_system_temperature_groups","fraction","median_rmse_x","median_tie_angle_deg","median_shape_spearman"
+"Quantitative within tolerance","4","0.05128205128205128","0.01708274093200619","0.8450060404887535","1.0"
+"Qualitatively correct","72","0.9230769230769231","0.04846438822475663","3.4410327595443677","1.0"
+"Failure","2","0.02564102564102564","0.09515685352965078","3.2292625089645663","0.9958333333333333"

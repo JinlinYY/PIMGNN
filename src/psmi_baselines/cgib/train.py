@@ -1,4 +1,3 @@
-"""Implement the cgib train baseline module."""
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -19,7 +18,6 @@ from psmi_baselines.protocol import canonical_split_indices
 
 
 def set_seed(seed):
-    """Run the set seed baseline operation."""
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
     np.random.seed(seed)
@@ -28,19 +26,16 @@ def set_seed(seed):
 
 
 def init_weights(m, output_dim=6):
-    """Run the init weights baseline operation."""
     if isinstance(m, nn.Linear):
         # Configure the output artifacts.
         # Configure the output artifacts.
         if m.out_features == output_dim:
             # Configure the output artifacts.
-            # Baseline workflow step.
             nn.init.normal_(m.weight, mean=0.0, std=0.01)
             if m.bias is not None:
                 # Configure the output artifacts.
                 nn.init.constant_(m.bias, 0.0)
         else:
-            # Baseline workflow step.
             nn.init.xavier_uniform_(m.weight, gain=0.1)  # Configure the output artifacts.
             if m.bias is not None:
                 nn.init.constant_(m.bias, 0.0)
@@ -50,7 +45,6 @@ def init_weights(m, output_dim=6):
 
 
 def compute_metrics_batch(y_true, y_pred):
-    """Run the compute metrics batch baseline operation."""
     # Configure the output artifacts.
     mae_all = mean_absolute_error(y_true, y_pred)
     rmse_all = np.sqrt(mean_squared_error(y_true, y_pred))
@@ -75,12 +69,9 @@ def compute_metrics_batch(y_true, y_pred):
 
 
 def safe_r2_score(y_true, y_pred):
-    """Run the safe r2 score baseline operation."""
-    # Baseline workflow step.
     y_true_flat = y_true.flatten()
     y_pred_flat = y_pred.flatten()
     
-    # Baseline workflow step.
     mask = np.isfinite(y_true_flat) & np.isfinite(y_pred_flat)
     y_true_flat = y_true_flat[mask]
     y_pred_flat = y_pred_flat[mask]
@@ -88,38 +79,31 @@ def safe_r2_score(y_true, y_pred):
     if len(y_true_flat) == 0:
         return 0.0
     
-    # Baseline workflow step.
     y_mean = np.mean(y_true_flat)
     
-    # Baseline workflow step.
     ss_tot = np.sum((y_true_flat - y_mean) ** 2)
     ss_res = np.sum((y_true_flat - y_pred_flat) ** 2)
     
-    # Baseline workflow step.
     if ss_tot < 1e-10:
-        # Baseline workflow step.
         return 0.0
     
     r2 = 1 - (ss_res / ss_tot)
     
-    # Baseline workflow step.
     r2 = np.clip(r2, -10.0, 1.0)
     
     return r2
 
 
 def compute_metrics(y_true, y_pred):
-    """Run the compute metrics baseline operation."""
-    # Baseline workflow step.
     mask = np.isfinite(y_true) & np.isfinite(y_pred)
     if not np.all(mask):
-        print(f" warning : Discovery {np.sum(~mask)} non-finite values , will be ignored ")
+        print(f"Warning: ignoring {np.sum(~mask)} non-finite values.")
         y_true = y_true[mask.all(axis=1)]
         y_pred = y_pred[mask.all(axis=1)]
     
     # Process the experiment data.
     if len(y_true) == 0:
-        print(" error : valid data is Empty ")
+        print("Error: no finite target values are available.")
         return {
             'all': {'mae': 0.0, 'rmse': 0.0, 'r2': 0.0},
             'e_phase': {'mae': 0.0, 'rmse': 0.0, 'r2': 0.0},
@@ -134,7 +118,6 @@ def compute_metrics(y_true, y_pred):
     # Configure the output artifacts.
     mae_all = mean_absolute_error(y_true, y_pred)
     rmse_all = np.sqrt(mean_squared_error(y_true, y_pred))
-    # Baseline workflow step.
     r2_all = safe_r2_score(y_true, y_pred)
     
     # Compute evaluation metrics.
@@ -159,7 +142,6 @@ def compute_metrics(y_true, y_pred):
 
 
 def train_epoch(model, dataloader, optimizer, device, beta):
-    """Run the train epoch baseline operation."""
     model.train()
     all_predictions = []
     all_targets = []
@@ -180,7 +162,6 @@ def train_epoch(model, dataloader, optimizer, device, beta):
         graphs2 = graphs2.to(device)
         targets = targets.to(device)
         
-        # Baseline workflow step.
         pred, loss_components = model(graphs1, graphs2, return_loss_components=True)
         
         # Compute the training loss.
@@ -190,7 +171,6 @@ def train_epoch(model, dataloader, optimizer, device, beta):
         
         total_loss_batch = pred_loss + beta * (mi1_loss + mi2_loss)
         
-        # Baseline workflow step.
         optimizer.zero_grad()
         total_loss_batch.backward()
         optimizer.step()
@@ -222,7 +202,6 @@ def train_epoch(model, dataloader, optimizer, device, beta):
         all_predictions.append(pred_np)
         all_targets.append(targets_np)
     
-    # Baseline workflow step.
     all_predictions = np.concatenate(all_predictions, axis=0)
     all_targets = np.concatenate(all_targets, axis=0)
     
@@ -235,7 +214,6 @@ def train_epoch(model, dataloader, optimizer, device, beta):
         target_mean = all_targets.mean(axis=0)
         target_std = all_targets.std(axis=0)
         
-        # Baseline workflow step.
         if pred_max > 2.0 or pred_min < -1.0:
             print(f"\n[ warning ] prediction range is unusual :")
             print(f" prediction : [{pred_min:.6f}, {pred_max:.6f}], mean : {pred_mean}")
@@ -288,7 +266,6 @@ def train_epoch(model, dataloader, optimizer, device, beta):
 
 
 def evaluate(model, dataloader, device):
-    """Run the evaluate baseline operation."""
     model.eval()
     all_predictions = []
     all_targets = []
@@ -330,7 +307,6 @@ def evaluate(model, dataloader, device):
             all_predictions.append(pred_np)
             all_targets.append(targets_np)
     
-    # Baseline workflow step.
     all_predictions = np.concatenate(all_predictions, axis=0)
     all_targets = np.concatenate(all_targets, axis=0)
     
@@ -341,7 +317,6 @@ def evaluate(model, dataloader, device):
         target_min, target_max = all_targets.min(), all_targets.max()
         target_mean = all_targets.mean()
         
-        # Baseline workflow step.
         if pred_max > 2.0 or pred_min < -1.0:
             print(f"\n[ warning ] prediction range is unusual :")
             print(f" prediction : [{pred_min:.6f}, {pred_max:.6f}], mean : {pred_mean:.6f}")
@@ -385,7 +360,6 @@ def evaluate(model, dataloader, device):
 
 
 def print_metrics(metrics, prefix=""):
-    """Run the print metrics baseline operation."""
     print(f"{prefix}【Overall】 MAE: {metrics['all']['mae_mean']:.6f}±{metrics['all']['mae_std']:.6f}, "
           f"RMSE: {metrics['all']['rmse_mean']:.6f}±{metrics['all']['rmse_std']:.6f}, "
           f"R²: {metrics['all']['r2']:.6f}")
@@ -398,7 +372,6 @@ def print_metrics(metrics, prefix=""):
 
 
 def save_results(predictions, targets, split, output_dir):
-    """Run the save results baseline operation."""
     results = pd.DataFrame({
         'Ex1_true': targets[:, 0],
         'Ex2_true': targets[:, 1],
@@ -428,7 +401,6 @@ def save_results(predictions, targets, split, output_dir):
 
 def save_metrics_txt(best_epoch, best_val_rmse, total_epochs, total_time, avg_time_per_epoch,
                      val_metrics, test_metrics=None, output_dir=None):
-    """Run the save metrics txt baseline operation."""
     results_dir = os.path.join(output_dir, 'results')
     os.makedirs(results_dir, exist_ok=True)
     
@@ -505,7 +477,6 @@ def save_metrics_txt(best_epoch, best_val_rmse, total_epochs, total_time, avg_ti
 
 
 def train_single_seed(args):
-    """Run the train single seed baseline operation."""
     # Set the random seed.
     set_seed(args.seed)
     
@@ -515,7 +486,6 @@ def train_single_seed(args):
     os.makedirs(os.path.join(output_dir, 'checkpoint'), exist_ok=True)
     os.makedirs(os.path.join(output_dir, 'results'), exist_ok=True)
     
-    # Baseline workflow step.
     print("=" * 80)
     print("CGIB model training configuration ")
     print("=" * 80)
@@ -526,7 +496,6 @@ def train_single_seed(args):
     
     # Process the experiment data.
     if 'IL (Component 1) full name SMILES' in df.columns:
-        # Baseline workflow step.
         print(" detected total.csv format , True at convert ...")
         smiles1_list = []
         smiles2_list = []
@@ -536,7 +505,6 @@ def train_single_seed(args):
             comp2_smiles = str(row['Component 2 SMILES']).strip()
             comp3_smiles = str(row['Component 3 SMILES']).strip()
             
-            # Baseline workflow step.
             if pd.notna(comp3_smiles) and comp3_smiles != '' and comp3_smiles != 'nan':
                 combined_smiles = f"{comp2_smiles}.{comp3_smiles}"
             else:
@@ -545,18 +513,14 @@ def train_single_seed(args):
             smiles1_list.append(il_smiles)
             smiles2_list.append(combined_smiles)
         
-        # Baseline workflow step.
         targets = df[['Ex1', 'Ex2', 'Ex3', 'Rx1', 'Rx2', 'Rx3']].values
     elif 'smiles1' in df.columns and 'smiles2' in df.columns:
-        # Baseline workflow step.
         smiles1_list = df['smiles1'].tolist()
         smiles2_list = df['smiles2'].tolist()
         
-        # Baseline workflow step.
         if 'Ex1' in df.columns:
             targets = df[['Ex1', 'Ex2', 'Ex3', 'Rx1', 'Rx2', 'Rx3']].values
         elif 'target' in df.columns:
-            # Baseline workflow step.
             targets = np.array([eval(x) if isinstance(x, str) else x for x in df['target']])
             if targets.ndim == 1:
                 targets = targets.reshape(-1, 1)
@@ -587,7 +551,7 @@ def train_single_seed(args):
     else:
         raise ValueError(
             "The input CSV must contain the canonical split column. "
-            "Use --allow_random_row_split only for explicitly labeled legacy reproduction."
+            "Use --allow_random_row_split only for an explicitly requested row-split comparison."
         )
     
     print(f" total samples : {total_size}")
@@ -637,7 +601,6 @@ def train_single_seed(args):
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, collate_fn=collate_fn)
     test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False, collate_fn=collate_fn)
     
-    # Baseline workflow step.
     sample_graph = dataset.graphs1[0]
     input_dim = sample_graph.x.size(1)
     output_dim = 6
@@ -667,17 +630,14 @@ def train_single_seed(args):
     model.apply(init_with_output_dim)
     print(" model checkpoint Initialized ( output Floor : Small weights Initialization , Other Layers :Xavier Initialization ,gain=0.1)")
     
-    # Baseline workflow step.
     optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     
-    # Run the training step.
     history = []
     best_val_rmse = float('inf')
     best_epoch = 0
     patience_counter = 0
     start_epoch = 0
     
-    # Baseline workflow step.
     if args.resume:
         checkpoint = torch.load(args.resume, map_location=args.device, weights_only=False)
         model.load_state_dict(checkpoint['model_state_dict'])
@@ -689,7 +649,6 @@ def train_single_seed(args):
         history = checkpoint.get('history', [])
         print(f"\n resume training from a checkpoint : epoch {start_epoch}, best RMSE: {best_val_rmse:.6f}")
     
-    # Run the training step.
     training_start_time = time.time()
     last_rest_time = time.time()
     
@@ -697,11 +656,9 @@ def train_single_seed(args):
     print(" start training ")
     print("=" * 80 + "\n")
     
-    # Run the training step.
     for epoch in range(start_epoch, args.epochs):
         epoch_start_time = time.time()
         
-        # Run the training step.
         train_results = train_epoch(model, train_loader, optimizer, args.device, args.beta)
         
         # Evaluate the validation subset.
@@ -709,7 +666,6 @@ def train_single_seed(args):
         
         epoch_time = time.time() - epoch_start_time
         
-        # Baseline workflow step.
         history.append({
             'epoch': epoch + 1,
             'train_loss': train_results['loss'],
@@ -745,7 +701,6 @@ def train_single_seed(args):
             'val_r_r2': val_results['metrics']['r_phase']['r2'],
         })
         
-        # Baseline workflow step.
         print(f"\nEpoch {epoch+1}/{args.epochs} | training time : {epoch_time:.2f} seconds | Train Loss: {train_results['loss']:.6f}")
         print(f"Best RMSE: {best_val_rmse:.6f} (epoch {best_epoch+1})")
         
@@ -755,7 +710,6 @@ def train_single_seed(args):
         print("\n[ validation metrics ]")
         print_metrics(val_results['metrics'])
         
-        # Baseline workflow step.
         current_val_rmse = val_results['metrics']['all']['rmse_mean']
         improved = current_val_rmse < (best_val_rmse - args.min_delta)
         
@@ -799,18 +753,16 @@ def train_single_seed(args):
             print(f" waited {patience_counter}/{args.patience} epoch without improvement ")
             break
         
-        # Baseline workflow step.
         current_time = time.time()
         elapsed_since_rest = current_time - last_rest_time
         if elapsed_since_rest >= args.rest_interval:
             elapsed_hours = elapsed_since_rest / 3600
             rest_minutes = args.rest_duration / 60
-            print(f"\n Already run {elapsed_hours:.2f} hours ({elapsed_since_rest:.0f} seconds ), current epoch completed ")
-            print(f" Break {rest_minutes:.1f} minutes ({args.rest_duration:.0f} seconds ) allow CPU/GPU to allow a cooldown period ...")
+            print(f"\nElapsed since the previous pause: {elapsed_hours:.2f} hours ({elapsed_since_rest:.0f} seconds).")
+            print(f"Pausing for {rest_minutes:.1f} minutes ({args.rest_duration:.0f} seconds) to cool the hardware...")
             time.sleep(args.rest_duration)
             last_rest_time = time.time()
     
-    # Run the training step.
     total_time = time.time() - training_start_time
     avg_time_per_epoch = total_time / (epoch + 1 - start_epoch) if epoch + 1 > start_epoch else 0
     
@@ -827,7 +779,6 @@ def train_single_seed(args):
         checkpoint = torch.load(best_model_path, map_location=args.device, weights_only=False)
         model.load_state_dict(checkpoint['model_state_dict'])
     
-    # Baseline workflow step.
     print("\n[ Final validation metrics ]")
     final_val_results = evaluate(model, val_loader, args.device)
     print_metrics(final_val_results['metrics'])
@@ -874,7 +825,7 @@ def main():
     parser.add_argument(
         '--allow_random_row_split',
         action='store_true',
-        help='Allow the legacy random row split when the CSV has no split column.',
+        help='Allow a random row split when the CSV has no canonical split column.',
     )
     parser.add_argument(
         '--output_dir',
@@ -905,13 +856,10 @@ def main():
     
     args = parser.parse_args()
     
-    # Baseline workflow step.
     if not hasattr(args, 'constrain_output') or args.constrain_output is None:
         args.constrain_output = True
     
-    # Run the training step.
     if args.all_seeds:
-        # Run the training step.
         seeds = [42, 123, 456, 789, 2024]
         print("=" * 80)
         print(" start run all seed Training ")
@@ -925,7 +873,6 @@ def main():
             print(f" Training Seed {seed} ({i}/{len(seeds)})")
             print(f"{'='*80}\n")
             
-            # Baseline workflow step.
             seed_args = argparse.Namespace(**vars(args))
             seed_args.seed = seed
             
@@ -933,8 +880,8 @@ def main():
                 train_single_seed(seed_args)
                 print(f"\nSeed {seed} training complete !\n")
             except Exception as e:
-                print(f"\nSeed {seed} training failed , error : {str(e)}\n")
-                print(" whether Continue Next seed?(y/n): ", end='')
+                print(f"\nTraining failed for seed {seed}: {e}\n")
+                print("Continue with the next seed? (y/n): ", end='')
                 try:
                     response = input().strip().lower()
                     if response != 'y':
@@ -948,9 +895,8 @@ def main():
         print(" all seed Training completed !")
         print("=" * 80)
     else:
-        # Run the training step.
         if args.seed is None:
-            args.seed = 42  # Baseline workflow step.
+            args.seed = 42
         train_single_seed(args)
 
 

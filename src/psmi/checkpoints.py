@@ -71,7 +71,7 @@ def build_checkpoint_provenance(
 
 
 def extract_state_dict(checkpoint: Any) -> Mapping[str, torch.Tensor]:
-    """Return model weights from supported historical checkpoint layouts."""
+    """Return model weights from supported checkpoint container layouts."""
     if not isinstance(checkpoint, Mapping):
         raise TypeError(f"Checkpoint must be a mapping, got {type(checkpoint).__name__}")
 
@@ -102,10 +102,10 @@ def adapt_state_dict_to_model(
     model: torch.nn.Module,
     state_dict: Mapping[str, torch.Tensor],
 ) -> Tuple[MutableMapping[str, torch.Tensor], Tuple[str, ...]]:
-    """Adapt known historical changes while leaving unknown mismatches strict.
+    """Adapt known input-contract changes while keeping other mismatches strict.
 
     PSMI added normalized pressure as the third scalar after temperature and
-    curve position. Historical linear weights therefore need one zero-valued
+    curve position. Two-scalar linear weights therefore receive one zero-valued
     input column so their original predictions remain unchanged.
     """
     target = model.state_dict()

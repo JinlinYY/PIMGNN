@@ -86,9 +86,7 @@ class Scaler:
         return Scaler(mean=float(np.mean(x)), std=float(np.std(x)))
 
 def safe_group_apply_t(df: pd.DataFrame) -> pd.DataFrame:
-    # Baseline workflow step.
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", FutureWarning)
-        # Baseline workflow step.
         result = df.groupby(["system_id", "T"], group_keys=False).apply(assign_t_by_pca)
     return result.reset_index(drop=True)

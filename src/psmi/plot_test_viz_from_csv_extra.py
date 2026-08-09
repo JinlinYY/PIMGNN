@@ -135,9 +135,9 @@ def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
             df = df.rename(columns={k: v})
 
     if "T" not in df.columns:
-        raise ValueError("CSV missing temperature column : requires 'T' or 'temperature'/'temperature_raw'.")
+        raise ValueError("The CSV must contain 'T', 'temperature', or 'temperature_raw'.")
     if "system_id" not in df.columns:
-        raise ValueError("CSV missing system_id column , unable to by system Painting phase diagram .")
+        raise ValueError("The CSV must contain 'system_id' for system-level plots.")
 
     if "t" not in df.columns:
         df["t"] = df.groupby(["system_id", "T"]).cumcount().astype(np.float32)
@@ -151,7 +151,7 @@ def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
     ]
     miss = [c for c in need if c not in df.columns]
     if miss:
-        raise ValueError(f"CSV missing required columns : {miss}")
+        raise ValueError(f"The CSV is missing required columns: {miss}")
 
     return df
 
@@ -787,7 +787,7 @@ def plot_violin_combined_categories(
 
 
 # -----------------------------
-# Ternary plotting (keep your existing style)
+# Ternary phase-diagram plotting
 # -----------------------------
 def plot_group_ternary_from_csv(
     group: pd.DataFrame,
@@ -890,20 +890,20 @@ def plot_group_ternary_from_csv(
 
 
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--csv", type=str, required=True, help="test_df_raw_pointwise_predictions.csv path ")
-    ap.add_argument("--out_dir", type=str, default="", help=" output directory ( default Auto create )")
-    ap.add_argument("--system_id", type=int, default=None, help=" plot only A system( Optional )")
-    ap.add_argument("--max_groups", type=int, default=0, help=" maximum number to plot (system,T) Group ;0= plot all ")
-    ap.add_argument("--font_scale", type=float, default=1.7, help=" global font scale ( recommendation 1.6~2.2)")
-    ap.add_argument("--skip_ternary", action="store_true", help=" plot only parity + additional statistical plots , skip phase diagrams (ternary)")
-    ap.add_argument("--skip_extra", action="store_true", help=" plot only parity/ternary, skip additional statistical plots ")
-    ap.add_argument("--tielines_max", type=int, default=18, help=" per Zhang phase diagram most multiple Painting multiple Few tie-line( sampling )")
+    ap = argparse.ArgumentParser(description="Generate extended diagnostics from saved PSMI predictions.")
+    ap.add_argument("--csv", type=str, required=True, help="Path to a pointwise prediction CSV file.")
+    ap.add_argument("--out_dir", type=str, default="", help="Output directory; a timestamped directory is used by default.")
+    ap.add_argument("--system_id", type=int, default=None, help="Plot only this system ID.")
+    ap.add_argument("--max_groups", type=int, default=0, help="Maximum number of (system, temperature) groups; 0 plots all groups.")
+    ap.add_argument("--font_scale", type=float, default=1.7, help="Global font scale; values from 1.6 to 2.2 are recommended.")
+    ap.add_argument("--skip_ternary", action="store_true", help="Skip ternary diagrams.")
+    ap.add_argument("--skip_extra", action="store_true", help="Skip the extended statistical figures.")
+    ap.add_argument("--tielines_max", type=int, default=18, help="Maximum number of sampled tie lines per ternary diagram.")
 
-    ap.add_argument("--scatter_max", type=int, default=8000, help=" maximum scatter points ( down sampling ),0= not down sampling ")
-    ap.add_argument("--top_categories", type=int, default=12, help=" category Box Lines / Violin graph Showcase top-N category ")
-    ap.add_argument("--cat_kind", type=str, default="violin", choices=["violin", "box"], help=" category Error graph type ")
-    ap.add_argument("--seed", type=int, default=0, help=" downsampling seed ")
+    ap.add_argument("--scatter_max", type=int, default=8000, help="Maximum number of scatter points after sampling; 0 disables sampling.")
+    ap.add_argument("--top_categories", type=int, default=12, help="Number of leading categories in category-error plots.")
+    ap.add_argument("--cat_kind", type=str, default="violin", choices=["violin", "box"], help="Category-error plot type.")
+    ap.add_argument("--seed", type=int, default=0, help="Random seed used for plot-only subsampling.")
 
     args = ap.parse_args()
 
@@ -974,7 +974,7 @@ def main():
     if args.system_id is not None:
         df_plot = df_plot[df_plot["system_id"] == args.system_id].copy()
         if len(df_plot) == 0:
-            raise RuntimeError(f"system_id={args.system_id} at CSV in does not exist .")
+            raise RuntimeError(f"system_id={args.system_id} is not present in the CSV file.")
 
     groups = list(df_plot.groupby(["system_id", "T"], sort=True))
     if args.max_groups and args.max_groups > 0:

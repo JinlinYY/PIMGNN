@@ -125,8 +125,8 @@ def ge_ln_gamma(
     )
 
     if model == "nrtl":
-        # Lazy import avoids a module cycle while the legacy loss module migrates to
-        # this public activity-model interface.
+        # Lazy import avoids a module cycle between the activity-model and loss
+        # interfaces.
         from .loss import nrtl_ln_gamma
 
         return nrtl_ln_gamma(

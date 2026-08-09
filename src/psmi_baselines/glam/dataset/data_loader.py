@@ -1,4 +1,3 @@
-"""Implement the glam dataset data_loader baseline module."""
 import pandas as pd
 import numpy as np
 import torch
@@ -11,54 +10,47 @@ import os
 
 
 def smiles_to_graph(smiles):
-    """Run the smiles to graph baseline operation."""
     try:
         mol = Chem.MolFromSmiles(smiles)
         if mol is None:
             return None
         
-        # Baseline workflow step.
         num_atoms = mol.GetNumAtoms()
         
-        # Baseline workflow step.
         node_features = []
         for atom in mol.GetAtoms():
             features = [
-                atom.GetAtomicNum(),  # Baseline workflow step.
-                atom.GetDegree(),     # Baseline workflow step.
-                atom.GetFormalCharge(),  # Baseline workflow step.
-                int(atom.GetHybridization()),  # Baseline workflow step.
-                int(atom.GetIsAromatic()),  # Baseline workflow step.
-                atom.GetTotalNumHs(),  # Baseline workflow step.
-                atom.GetNumRadicalElectrons(),  # Baseline workflow step.
-                int(atom.GetChiralTag()),  # Baseline workflow step.
+                atom.GetAtomicNum(),
+                atom.GetDegree(),
+                atom.GetFormalCharge(),
+                int(atom.GetHybridization()),
+                int(atom.GetIsAromatic()),
+                atom.GetTotalNumHs(),
+                atom.GetNumRadicalElectrons(),
+                int(atom.GetChiralTag()),
             ]
             node_features.append(features)
         
         node_features = np.array(node_features, dtype=np.float32)
         
-        # Baseline workflow step.
         edge_index = []
         edge_attr = []
         for bond in mol.GetBonds():
             i = bond.GetBeginAtomIdx()
             j = bond.GetEndAtomIdx()
             
-            # Baseline workflow step.
             edge_index.append([i, j])
             edge_index.append([j, i])
             
-            # Baseline workflow step.
             bond_features = [
-                bond.GetBondTypeAsDouble(),  # Baseline workflow step.
-                int(bond.GetIsConjugated()),  # Baseline workflow step.
-                int(bond.IsInRing()),  # Baseline workflow step.
+                bond.GetBondTypeAsDouble(),
+                int(bond.GetIsConjugated()),
+                int(bond.IsInRing()),
             ]
             edge_attr.append(bond_features)
             edge_attr.append(bond_features)
         
         if len(edge_index) == 0:
-            # Baseline workflow step.
             edge_index = [[0, 0]]
             edge_attr = [[0.0, 0.0, 0.0]]
         
@@ -74,7 +66,6 @@ def smiles_to_graph(smiles):
 
 
 def load_LLE_dataset(csv_path, test_size=0.2, val_size=0.1, random_state=42):
-    """Run the load LLE dataset baseline operation."""
     # Read the input data.
     if not os.path.exists(csv_path):
         raise FileNotFoundError(f"CSV file does not exist : {csv_path}")
@@ -82,7 +73,7 @@ def load_LLE_dataset(csv_path, test_size=0.2, val_size=0.1, random_state=42):
     try:
         df = pd.read_csv(csv_path)
     except Exception as e:
-        raise ValueError(f" unable to read CSV file {csv_path}: {e}")
+        raise ValueError(f"Unable to read CSV file {csv_path}: {e}")
     
     if len(df) == 0:
         raise ValueError(f"CSV file is Empty : {csv_path}")
@@ -90,7 +81,6 @@ def load_LLE_dataset(csv_path, test_size=0.2, val_size=0.1, random_state=42):
     print(f" dataset total samples : {len(df)}")
     print(f" dataset column : {df.columns.tolist()}")
     
-    # Baseline workflow step.
     required_columns = [
         'IL (Component 1) full name SMILES',
         'Component 2 SMILES',
@@ -103,38 +93,35 @@ def load_LLE_dataset(csv_path, test_size=0.2, val_size=0.1, random_state=42):
     if missing_columns:
         raise ValueError(f"CSV file missing required columns : {missing_columns}\n Actual column : {df.columns.tolist()}")
     
-    # Baseline workflow step.
     data_list = []
     labels = []
     failed_count = 0
     failed_reasons = {'il': 0, 'comp2': 0, 'comp3': 0}
     
     for idx, row in df.iterrows():
-        # Baseline workflow step.
         il_smiles = str(row['IL (Component 1) full name SMILES'])
         comp2_smiles = str(row['Component 2 SMILES'])
         comp3_smiles = str(row['Component 3 SMILES'])
         
-        # Baseline workflow step.
         if pd.isna(row['IL (Component 1) full name SMILES']) or il_smiles == 'nan' or il_smiles.strip() == '':
             failed_count += 1
             failed_reasons['il'] += 1
-            if failed_count <= 5:  # Baseline workflow step.
-                print(f" warning : number {idx+1} rows IL SMILES is empty or invalid ")
+            if failed_count <= 5:
+                print(f"Warning: component-1 SMILES is empty or invalid at row {idx + 1}.")
             continue
         
         if pd.isna(row['Component 2 SMILES']) or comp2_smiles == 'nan' or comp2_smiles.strip() == '':
             failed_count += 1
             failed_reasons['comp2'] += 1
             if failed_count <= 5:
-                print(f" warning : number {idx+1} rows Component 2 SMILES is empty or invalid ")
+                print(f"Warning: component-2 SMILES is empty or invalid at row {idx + 1}.")
             continue
         
         if pd.isna(row['Component 3 SMILES']) or comp3_smiles == 'nan' or comp3_smiles.strip() == '':
             failed_count += 1
             failed_reasons['comp3'] += 1
             if failed_count <= 5:
-                print(f" warning : number {idx+1} rows Component 3 SMILES is empty or invalid ")
+                print(f"Warning: component-3 SMILES is empty or invalid at row {idx + 1}.")
             continue
         
         # Configure the output artifacts.
@@ -147,17 +134,13 @@ def load_LLE_dataset(csv_path, test_size=0.2, val_size=0.1, random_state=42):
             float(row['Rx3']) if pd.notna(row['Rx3']) else 0.0,
         ]
         
-        # Baseline workflow step.
         temperature = float(row['T/K']) if pd.notna(row['T/K']) else 298.15
         
-        # Baseline workflow step.
         il_graph = smiles_to_graph(il_smiles)
         comp2_graph = smiles_to_graph(comp2_smiles)
         comp3_graph = smiles_to_graph(comp3_smiles)
         
-        # Baseline workflow step.
         if il_graph is not None and comp2_graph is not None and comp3_graph is not None:
-            # Baseline workflow step.
             system_no = int(row['LLE system NO.']) if pd.notna(row['LLE system NO.']) else idx
             
             data_list.append({
@@ -168,7 +151,7 @@ def load_LLE_dataset(csv_path, test_size=0.2, val_size=0.1, random_state=42):
                 'il_smiles': il_smiles,
                 'comp2_smiles': comp2_smiles,
                 'comp3_smiles': comp3_smiles,
-                'system_no': system_no,  # Baseline workflow step.
+                'system_no': system_no,
                 'split': str(row['split']).lower() if 'split' in df.columns else None,
             })
             labels.append(label)
@@ -177,37 +160,36 @@ def load_LLE_dataset(csv_path, test_size=0.2, val_size=0.1, random_state=42):
             if il_graph is None:
                 failed_reasons['il'] += 1
                 if failed_count <= 5:
-                    print(f" warning : number {idx+1} rows IL SMILES unable to convert to a graph : {il_smiles[:50]}")
+                    print(f"Warning: component-1 SMILES could not be graphed at row {idx + 1}: {il_smiles[:50]}")
             if comp2_graph is None:
                 failed_reasons['comp2'] += 1
                 if failed_count <= 5:
-                    print(f" warning : number {idx+1} rows Component 2 SMILES unable to convert to a graph : {comp2_smiles[:50]}")
+                    print(f"Warning: component-2 SMILES could not be graphed at row {idx + 1}: {comp2_smiles[:50]}")
             if comp3_graph is None:
                 failed_reasons['comp3'] += 1
                 if failed_count <= 5:
-                    print(f" warning : number {idx+1} rows Component 3 SMILES unable to convert to a graph : {comp3_smiles[:50]}")
+                    print(f"Warning: component-3 SMILES could not be graphed at row {idx + 1}: {comp3_smiles[:50]}")
     
-    print(f" successful process {len(data_list)} samples ")
+    print(f"Processed {len(data_list)} samples.")
     if failed_count > 0:
-        print(f" failed {failed_count} samples ")
-        print(f" failed reason statistics : IL={failed_reasons['il']}, Component2={failed_reasons['comp2']}, Component3={failed_reasons['comp3']}")
+        print(f"Rejected {failed_count} samples.")
+        print(f"Rejection counts: component1={failed_reasons['il']}, component2={failed_reasons['comp2']}, component3={failed_reasons['comp3']}")
     
     # Process the experiment data.
     if len(data_list) == 0:
         error_msg = (
-            " error : None successful process Any sample !\n"
-            " May reason :\n"
-            "1. CSV file path Incorrect or file does not exist \n"
-            "2. CSV file is Empty or format Incorrect \n"
-            "3. SMILES String format Problem ,RDKit unable to parse \n"
-            "4. column First Name mismatch ( please check column First Name whether Correct )\n"
-            f" current CSV path : {csv_path}\n"
-            f"CSV file whether Deposit at : {os.path.exists(csv_path)}\n"
-            f"CSV Total rows Number : {len(df)}"
+            "No valid samples could be constructed.\n"
+            "Possible causes:\n"
+            "1. The CSV path is incorrect or the file is absent.\n"
+            "2. The CSV is empty or malformed.\n"
+            "3. RDKit cannot parse one or more SMILES strings.\n"
+            "4. Required column names are missing.\n"
+            f"CSV path: {csv_path}\n"
+            f"File exists: {os.path.exists(csv_path)}\n"
+            f"Input rows: {len(df)}"
         )
         raise ValueError(error_msg)
     
-    # Baseline workflow step.
     labels = np.array(labels, dtype=np.float32)
 
     # Use the canonical system-exclusive split when it is present in total.csv.
@@ -234,16 +216,15 @@ def load_LLE_dataset(csv_path, test_size=0.2, val_size=0.1, random_state=42):
         }
     
     # Process the experiment data.
-    # Run the training step.
     indices = np.arange(len(data_list))
     
     # Process the experiment data.
     if len(indices) == 0:
-        raise ValueError(" error : dataset is empty , unable to Into rows Divide !")
+        raise ValueError("The dataset is empty and cannot be partitioned.")
     
     # Process the experiment data.
     if len(indices) < 10:
-        print(f" warning : data Small Amount ({len(indices)} samples ), will use Smaller test set Scale ")
+        print(f"Small dataset ({len(indices)} samples); reducing the test fraction.")
         test_size_adjusted = min(test_size, 0.1)  # Evaluate the test subset.
     else:
         test_size_adjusted = test_size
@@ -252,7 +233,6 @@ def load_LLE_dataset(csv_path, test_size=0.2, val_size=0.1, random_state=42):
         indices, test_size=test_size_adjusted, random_state=random_state
     )
     
-    # Run the training step.
     val_size_adjusted = val_size / (1 - test_size)  # Evaluate the validation subset.
     train_indices, val_indices = train_test_split(
         train_val_indices, test_size=val_size_adjusted, random_state=random_state
@@ -281,13 +261,11 @@ def load_LLE_dataset(csv_path, test_size=0.2, val_size=0.1, random_state=42):
 
 
 def collate_fn(batch):
-    """Run the collate fn baseline operation."""
     il_graphs = [item['il_graph'] for item in batch]
     comp2_graphs = [item['comp2_graph'] for item in batch]
     comp3_graphs = [item['comp3_graph'] for item in batch]
     temperatures = torch.tensor([item['temperature'] for item in batch], dtype=torch.float32)
     
-    # Baseline workflow step.
     il_batch = Batch.from_data_list(il_graphs)
     comp2_batch = Batch.from_data_list(comp2_graphs)
     comp3_batch = Batch.from_data_list(comp3_graphs)

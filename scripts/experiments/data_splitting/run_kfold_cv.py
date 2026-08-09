@@ -219,7 +219,7 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument(
         "--excel",
         type=Path,
-        default=PROJECT_ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles_min3.xlsx",
+        default=PROJECT_ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles.xlsx",
         help="Processed ternary LLE workbook.",
     )
     ap.add_argument(
@@ -229,8 +229,8 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=(
             PROJECT_ROOT
-            / "experiments"
-            / "09_data_splitting"
+            / "outputs"
+            / "data_splitting"
             / "kfold_cv"
         ),
         help="Directory for fold manifests, metrics, and run artifacts.",

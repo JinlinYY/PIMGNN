@@ -1,4 +1,3 @@
-"""Implement the solvbert data_utils baseline module."""
 import os
 import pandas as pd
 import numpy as np
@@ -11,7 +10,6 @@ import json
 
 
 class SolvDataset(Dataset):
-    """Represent the SolvDataset baseline component."""
     
     def __init__(
         self,
@@ -22,7 +20,6 @@ class SolvDataset(Dataset):
         label_cols: list = None,
         is_pretrain: bool = False
     ):
-        """Run the init baseline operation."""
         self.tokenizer = tokenizer
         self.max_length = max_length
         self.is_pretrain = is_pretrain
@@ -35,18 +32,15 @@ class SolvDataset(Dataset):
         else:
             raise ValueError(f" unsupported file format : {data_path}")
         
-        # Baseline workflow step.
         if smiles_col not in self.data.columns:
             raise ValueError(f" column '{smiles_col}' does not exist on data file in ")
         
         self.smiles_col = smiles_col
         
-        # Baseline workflow step.
         if label_cols is None:
             label_cols = ['Ex1', 'Ex2', 'Ex3', 'Rx1', 'Rx2', 'Rx3']
         
         if not is_pretrain:
-            # Baseline workflow step.
             missing_cols = [col for col in label_cols if col not in self.data.columns]
             if missing_cols:
                 raise ValueError(f" Below label column does not exist on data file in : {missing_cols}")
@@ -57,7 +51,6 @@ class SolvDataset(Dataset):
         return len(self.data)
     
     def __getitem__(self, idx):
-        """Run the getitem baseline operation."""
         row = self.data.iloc[idx]
         smiles_combination = str(row[self.smiles_col])
         
@@ -75,12 +68,10 @@ class SolvDataset(Dataset):
             'attention_mask': encoded['attention_mask'].squeeze(0),
         }
         
-        # Baseline workflow step.
         if not self.is_pretrain:
             labels = []
             for col in self.label_cols:
                 val = row[col]
-                # Baseline workflow step.
                 if pd.isna(val):
                     labels.append(0.0)
                 else:
@@ -91,36 +82,28 @@ class SolvDataset(Dataset):
 
 
 def create_simple_tokenizer(vocab_size: int = 1000):
-    """Run the create simple tokenizer baseline operation."""
-    # Baseline workflow step.
-    # Baseline workflow step.
     common_chars = [
-        '[UNK]', '[PAD]', '[CLS]', '[SEP]', '[MASK]',  # Baseline workflow step.
-        'C', 'N', 'O', 'S', 'P', 'F', 'Cl', 'Br', 'I',  # Baseline workflow step.
-        'c', 'n', 'o', 's',  # Baseline workflow step.
-        '(', ')', '[', ']', '{', '}',  # Baseline workflow step.
-        '=', '#', '-', '+', '.',  # Baseline workflow step.
-        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',  # Baseline workflow step.
-        '@', '/', '\\', '%',  # Baseline workflow step.
+        '[UNK]', '[PAD]', '[CLS]', '[SEP]', '[MASK]',
+        'C', 'N', 'O', 'S', 'P', 'F', 'Cl', 'Br', 'I',
+        'c', 'n', 'o', 's',
+        '(', ')', '[', ']', '{', '}',
+        '=', '#', '-', '+', '.',
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        '@', '/', '\\', '%',
     ]
     
-    # Baseline workflow step.
     vocab = {}
     for i, char in enumerate(common_chars):
         vocab[char] = i
     
-    # Baseline workflow step.
     all_chars = set(''.join(common_chars))
-    # Baseline workflow step.
     for i in range(32, 127):
         char = chr(i)
         if char not in vocab and len(vocab) < vocab_size:
             vocab[char] = len(vocab)
     
-    # Baseline workflow step.
     ids_to_tokens = {v: k for k, v in vocab.items()}
     
-    # Baseline workflow step.
     class SimpleTokenizer(PreTrainedTokenizer):
         def __init__(self, vocab_dict, ids_to_tokens_dict, **kwargs):
             super().__init__(**kwargs)
@@ -132,7 +115,6 @@ def create_simple_tokenizer(vocab_size: int = 1000):
             self._sep_token = '[SEP]'
             self._mask_token = '[MASK]'
             
-            # Baseline workflow step.
             self.pad_token = self._pad_token
             self.unk_token = self._unk_token
             self.cls_token = self._cls_token
@@ -150,7 +132,6 @@ def create_simple_tokenizer(vocab_size: int = 1000):
             return len(self.vocab)
         
         def _tokenize(self, text):
-            # Baseline workflow step.
             return list(text)
         
         def _convert_token_to_id(self, token):
@@ -185,7 +166,6 @@ def create_simple_tokenizer(vocab_size: int = 1000):
             return len(cls + token_ids_0 + sep) * [0] + len(token_ids_1 + sep) * [1]
         
         def save_pretrained(self, save_directory, **kwargs):
-            """Run the save pretrained baseline operation."""
             os.makedirs(save_directory, exist_ok=True)
             
             # Save the generated artifacts.
@@ -218,7 +198,6 @@ def create_simple_tokenizer(vocab_size: int = 1000):
 
 
 def create_smiles_combination(solvent_smiles: str, solute_smiles: str) -> str:
-    """Run the create smiles combination baseline operation."""
     return f"{solvent_smiles}.{solute_smiles}"
 
 
@@ -229,7 +208,6 @@ def build_tokenizer(
     vocab_size: int = 1000,
     local_files_only: bool = False
 ):
-    """Run the build tokenizer baseline operation."""
     # Load the input data.
     if vocab_path and os.path.exists(vocab_path):
         try:
@@ -237,7 +215,7 @@ def build_tokenizer(
             tokenizer = AutoTokenizer.from_pretrained(vocab_path, local_files_only=True)
             return tokenizer
         except Exception as e:
-            print(f" warning : unable to from {vocab_path} load tokenizer: {e}")
+            print(f"Warning: unable to load tokenizer from {vocab_path}: {e}")
     
     # Load the input data.
     # Save the generated artifacts.
@@ -249,7 +227,6 @@ def build_tokenizer(
     
     for base_path in possible_paths:
         if os.path.exists(base_path):
-            # Baseline workflow step.
             tokenizer_config_path = os.path.join(base_path, 'tokenizer_config.json')
             vocab_file_path = os.path.join(base_path, 'vocab.txt')
             if os.path.exists(tokenizer_config_path) or os.path.exists(vocab_file_path):
@@ -258,10 +235,9 @@ def build_tokenizer(
                     tokenizer = AutoTokenizer.from_pretrained(base_path, local_files_only=True)
                     return tokenizer
                 except Exception as e:
-                    print(f" warning : unable to from {base_path} load tokenizer: {e}")
+                    print(f"Warning: unable to load tokenizer from {base_path}: {e}")
                     continue
     
-    # Baseline workflow step.
     try:
         if local_files_only:
             print(f" attempt from Local Cache load tokenizer: {model_name}")
@@ -272,27 +248,24 @@ def build_tokenizer(
     except Exception as e:
         if local_files_only:
             # Load the input data.
-            print(f" warning : unable to at Offline Mode load tokenizer '{model_name}'")
-            print(f" error : {e}")
+            print(f"Warning: tokenizer '{model_name}' is unavailable in offline mode.")
+            print(f"Error: {e}")
             print(" create Easy Character Level tokenizer as a fallback ...")
             tokenizer = create_simple_tokenizer(vocab_size=vocab_size)
-            print(" Already create Easy Character Level tokenizer")
+            print("Created the character-level fallback tokenizer.")
             return tokenizer
         else:
-            # Baseline workflow step.
-            print(f" online download failed , trying the local cache : {e}")
+            print(f"Online download failed; trying the local cache: {e}")
             try:
                 tokenizer = AutoTokenizer.from_pretrained(model_name, local_files_only=True)
-                print(" successful from Local Cache load tokenizer")
+                print("Loaded tokenizer from the local cache.")
             except Exception as e2:
-                # Baseline workflow step.
-                print(f" warning : unable to load pretraining tokenizer, create Easy Character Level tokenizer as a fallback ")
-                print(f" online download failed : {e}")
+                print("Warning: pretrained tokenizer unavailable; using the character-level fallback.")
+                print(f"Online download failed: {e}")
                 print(f" local cache is also unavailable : {e2}")
                 tokenizer = create_simple_tokenizer(vocab_size=vocab_size)
-                print(" Already create Easy Character Level tokenizer")
+                print("Created the character-level fallback tokenizer.")
     
-    # Run the training step.
     if train_data_path:
         # Read the input data.
         if train_data_path.endswith('.csv'):
@@ -302,12 +275,9 @@ def build_tokenizer(
         else:
             raise ValueError(f" unsupported file format : {train_data_path}")
         
-        # Baseline workflow step.
         smiles_col = 'smiles' if 'smiles' in df.columns else df.columns[0]
         all_smiles = df[smiles_col].astype(str).tolist()
         
-        # Run the training step.
-        # Run the training step.
         print(f" use pretraining tokenizer: {model_name}")
     
     return tokenizer
@@ -319,7 +289,6 @@ def create_data_loader(
     shuffle: bool = True,
     num_workers: int = 0
 ) -> DataLoader:
-    """Run the create data loader baseline operation."""
     return DataLoader(
         dataset,
         batch_size=batch_size,
@@ -330,7 +299,6 @@ def create_data_loader(
 
 
 def collate_fn(batch):
-    """Run the collate fn baseline operation."""
     input_ids = torch.stack([item['input_ids'] for item in batch])
     attention_mask = torch.stack([item['attention_mask'] for item in batch])
     
@@ -339,7 +307,6 @@ def collate_fn(batch):
         'attention_mask': attention_mask,
     }
     
-    # Baseline workflow step.
     if 'labels' in batch[0]:
         labels = torch.stack([item['labels'] for item in batch])
         result['labels'] = labels
@@ -352,13 +319,11 @@ def mask_tokens_for_mlm(
     tokenizer,
     mlm_probability: float = 0.15
 ) -> Tuple[torch.Tensor, torch.Tensor]:
-    """Run the mask tokens for mlm baseline operation."""
     labels = input_ids.clone()
     
     # Configure the runtime device.
     device = input_ids.device
     
-    # Baseline workflow step.
     pad_token_id = tokenizer.pad_token_id
     cls_token_id = tokenizer.cls_token_id
     mask_token_id = tokenizer.mask_token_id
@@ -366,7 +331,6 @@ def mask_tokens_for_mlm(
     # Configure the runtime device.
     probability_matrix = torch.full(labels.shape, mlm_probability, device=device)
     
-    # Baseline workflow step.
     special_tokens_mask = (input_ids == pad_token_id) | (input_ids == cls_token_id)
     probability_matrix.masked_fill_(special_tokens_mask, value=0.0)
     
@@ -382,8 +346,6 @@ def mask_tokens_for_mlm(
     indices_random = torch.bernoulli(torch.full(labels.shape, 0.5, device=device)).bool() & masked_indices & ~indices_replaced
     random_words = torch.randint(len(tokenizer), labels.shape, dtype=torch.long, device=device)
     input_ids[indices_random] = random_words[indices_random]
-    
-    # Baseline workflow step.
     
     return input_ids, labels
 

@@ -13,17 +13,15 @@ except ImportError:
 
 add_src_to_path()
 
-from psmi_legacy_public import config as C
-from psmi_legacy_public.data import GraphCache, collate_graph_batch
-from psmi_legacy_public.model import LLEGraphNet
-from psmi_legacy_public.paths import COMPSOL_DATA, COMPSOL_EXPERIMENT_ROOT
+from psmi_checkpoint_compat import config as C
+from psmi_checkpoint_compat.data import GraphCache, collate_graph_batch
+from psmi_checkpoint_compat.model import LLEGraphNet
+from psmi_checkpoint_compat.paths import COMPSOL_DATA, COMPSOL_EXPERIMENT_ROOT
 
 # ==========================================
-# Legacy public-release workflow step.
 # ==========================================
 class CompSolDataset(Dataset):
     def __init__(self, df, g_cache, target_col='value'):
-        # Legacy public-release workflow step.
         self.df = df.dropna(subset=['smiles1', target_col]).reset_index(drop=True)
         self.g_cache = g_cache
         self.target_col = target_col
@@ -35,7 +33,6 @@ class CompSolDataset(Dataset):
         row = self.df.iloc[idx]
         def fetch_g(s):
             s_str = str(s)
-            # Legacy public-release workflow step.
             for attr in ['graphs', 'cache', '_graphs']:
                 if hasattr(self.g_cache, attr):
                     d = getattr(self.g_cache, attr)
@@ -44,7 +41,6 @@ class CompSolDataset(Dataset):
                     if pd.isna(s) or s_str in ['-', 'nan']:
                         if '' in d: return d['']
                         return list(d.values())[0]
-            # Legacy public-release workflow step.
             for attr in ['graphs', 'cache', '_graphs']:
                 if hasattr(self.g_cache, attr):
                     return list(getattr(self.g_cache, attr).values())[0]
@@ -61,10 +57,9 @@ class CompSolDataset(Dataset):
                y_true
 
 # ==========================================
-# Legacy public-release workflow step.
 # ==========================================
 def main():
-    parser = argparse.ArgumentParser(description="Train the archived CompSol binary model.")
+    parser = argparse.ArgumentParser(description="Train the reference CompSol binary model.")
     parser.add_argument("--data", type=Path, default=COMPSOL_DATA)
     parser.add_argument("--output-dir", type=Path, default=COMPSOL_EXPERIMENT_ROOT)
     parser.add_argument("--epochs", type=int, default=40)
@@ -73,27 +68,24 @@ def main():
     args = parser.parse_args()
     file_path = str(args.data)
     
-    # Legacy public-release workflow step.
-    epochs = 40           # Legacy public-release workflow step.
-    batch_size = 128      # Legacy public-release workflow step.
-    base_lr = 1e-3        # Legacy public-release workflow step.
-    
-    print(f"🚀 launch CompSol Deep Fine Tune task ( Goal {epochs} round )...")
+    epochs = 40
+    batch_size = 128
+    base_lr = 1e-3
+    print(f"Starting CompSol fine-tuning for {epochs} epochs...")
     epochs = args.epochs
     batch_size = args.batch_size
     base_lr = args.learning_rate
     args.output_dir.mkdir(parents=True, exist_ok=True)
     if not os.path.exists(file_path):
-        print(f"❌ file not found {file_path}")
+        print(f"File not found: {file_path}")
         return
 
     print(" loading Excel data ...")
     df = pd.read_excel(file_path)
     
-    # Legacy public-release workflow step.
     g_cache = GraphCache(add_hs=C.GRAPH_ADD_HS, use_gasteiger=C.GRAPH_USE_GASTEIGER, max_atoms=C.GRAPH_MAX_ATOMS)
     smiles_clean = [s for s in pd.concat([df["smiles1"], df["smiles2"], df["smiles3"]]).unique() if pd.notna(s) and str(s) != '-']
-    print(f" building {len(smiles_clean)} molecule Cache , Please Wait ...")
+    print(f"Building graph cache for {len(smiles_clean)} molecules...")
     g_cache.build_from_smiles(smiles_clean)
     
     train_size = int(0.8 * len(df))
@@ -105,11 +97,10 @@ def main():
     model = LLEGraphNet(gnn_hidden=C.GNN_HIDDEN, gnn_layers=C.GNN_LAYERS, mlp_hidden=C.GNN_HEAD_HIDDEN, is_binary=True).to(C.DEVICE)
     optimizer = optim.Adam(model.parameters(), lr=base_lr)
     
-    # Legacy public-release workflow step.
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
     criterion = nn.MSELoss()
     
-    print("\n🔥 training started ...")
+    print("\nTraining started...")
     model.train()
     for epoch in range(epochs):
         total_loss = 0.0
@@ -120,7 +111,6 @@ def main():
             loss = criterion(model(batch_x), batch_y.to(C.DEVICE))
             loss.backward()
             
-            # Legacy public-release workflow step.
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             
             optimizer.step()
@@ -131,10 +121,9 @@ def main():
         current_lr = optimizer.param_groups[0]['lr']
         print(f"Epoch {epoch+1:02d}/{epochs} | MSE Loss: {avg_loss:.4f} | LR: {current_lr:.1e}")
         
-        # Legacy public-release workflow step.
         if (epoch + 1) % 10 == 0:
             torch.save(model.state_dict(), args.output_dir / f"checkpoint_epoch_{epoch+1}.pt")
-            print(f" [ save ] Already generate checkpoint CompSol_checkpoint_ep{epoch+1}.pt")
+            print(f"Saved checkpoint_epoch_{epoch+1}.pt")
 
     print("\n generating final predictions ...")
     model.eval()
@@ -148,7 +137,7 @@ def main():
     pd.DataFrame({'y_true': all_trues, 'y_pred': all_preds}).to_csv(
         args.output_dir / "predictions.csv", index=False
     )
-    print("✅ In-Depth Training Successful complete ! results Already update to CompSol_results.csv")
+    print(f"Training complete. Predictions written to {args.output_dir / 'predictions.csv'}")
 
 if __name__ == "__main__":
     main()

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Implement the mmgnn train baseline module."""
 
 import os
 import json
@@ -15,7 +14,6 @@ from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 
 # Load the input data.
-# Baseline workflow step.
 warnings.filterwarnings('ignore', message='.*torch_geometric.*', category=UserWarning)
 warnings.filterwarnings('ignore', message='.*pyg-lib.*', category=UserWarning)
 warnings.filterwarnings('ignore', message='.*torch-scatter.*', category=UserWarning)
@@ -34,9 +32,7 @@ from psmi_baselines.paths import DATA_DIR, EXPERIMENT_ROOT
 
 
 class EarlyStopping:
-    """Represent the EarlyStopping baseline component."""
     def __init__(self, patience: int = 100, min_delta: float = 0.0, mode: str = 'min'):
-        """Run the init baseline operation."""
         self.patience = patience
         self.min_delta = min_delta
         self.mode = mode
@@ -45,7 +41,6 @@ class EarlyStopping:
         self.early_stop = False
         
     def __call__(self, score: float) -> bool:
-        """Run the call baseline operation."""
         if self.best_score is None:
             self.best_score = score
         elif self.mode == 'min':
@@ -68,7 +63,6 @@ class EarlyStopping:
 
 
 def train_epoch(model, train_loader, optimizer, criterion, device, use_amp=True):
-    """Run the train epoch baseline operation."""
     model.train()
     total_loss = 0.0
     n_samples = 0
@@ -99,7 +93,6 @@ def train_epoch(model, train_loader, optimizer, criterion, device, use_amp=True)
         
         pbar.set_postfix({'loss': loss.item()})
         
-        # Baseline workflow step.
         del pred, loss
         if device.startswith('cuda'):
             torch.cuda.empty_cache()
@@ -109,7 +102,6 @@ def train_epoch(model, train_loader, optimizer, criterion, device, use_amp=True)
 
 @torch.no_grad()
 def evaluate(model, loader, device):
-    """Run the evaluate baseline operation."""
     model.eval()
     all_preds = []
     all_targets = []
@@ -125,7 +117,6 @@ def evaluate(model, loader, device):
         all_preds.append(pred.cpu().numpy())
         all_targets.append(y.cpu().numpy())
         
-        # Baseline workflow step.
         del pred
         if device.startswith('cuda'):
             torch.cuda.empty_cache()
@@ -139,7 +130,6 @@ def evaluate(model, loader, device):
 
 @torch.no_grad()
 def predict_test_set(model, test_dataset, device):
-    """Run the predict test set baseline operation."""
     model.eval()
     all_preds = []
     all_targets = []
@@ -172,7 +162,6 @@ def predict_test_set(model, test_dataset, device):
 
 
 def compute_per_sample_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:
-    """Run the compute per sample metrics baseline operation."""
     n = y_true.shape[0]
     metrics = np.zeros((n, 12), dtype=np.float32)
     
@@ -182,7 +171,6 @@ def compute_per_sample_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> np.nda
     metrics[:, 1] = np.mean(np.abs(diff_all), axis=1)  # MAE_all
     metrics[:, 3] = np.sqrt(metrics[:, 0])  # RMSE_all
     
-    # Baseline workflow step.
     y_true_mean = np.mean(y_true, axis=1, keepdims=True)
     ss_res = np.sum(diff_all ** 2, axis=1)
     ss_tot = np.sum((y_true - y_true_mean) ** 2, axis=1)
@@ -214,7 +202,6 @@ def compute_per_sample_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> np.nda
 
 
 def format_metrics_detailed(metrics: Dict[str, float], prefix: str = "") -> str:
-    """Run the format metrics detailed baseline operation."""
     lines = [
         f"{prefix}[ mean metrics ] MAE={metrics['mae']:.6f} RMSE={metrics['rmse']:.6f} R²={metrics['r2']:.6f}",
         f"{prefix}[E phase metrics ] MAE={metrics['mae_E']:.6f} RMSE={metrics['rmse_E']:.6f} R²={metrics['r2_E']:.6f}",
@@ -235,8 +222,8 @@ def train_mmgnn(
     weight_decay: float = WEIGHT_DECAY,
     hidden_dim: int = 256,
     num_layers: int = 3,
-    set2set_steps: int = 3,  # Baseline workflow step.
-    post_explain_layers: int = 2,  # Baseline workflow step.
+    set2set_steps: int = 3,
+    post_explain_layers: int = 2,
     beta: float = 0.2,
     explainer_method: str = 'local_mask',
     dropout: float = 0.15,
@@ -244,10 +231,9 @@ def train_mmgnn(
     min_delta: float = 0.0,  # Apply early stopping.
     resume_from: str = None,  # Handle model checkpoints.
     save_checkpoint_every: int = 10,  # Save the generated artifacts.
-    rest_interval: int = 60,  # Baseline workflow step.
-    rest_duration: float = 600.0,  # Baseline workflow step.
+    rest_interval: int = 60,
+    rest_duration: float = 600.0,
 ) -> Tuple[nn.Module, Scaler, Dict]:
-    """Run the train mmgnn baseline operation."""
     
     # Configure the output artifacts.
     print("\n" + "=" * 100)
@@ -272,9 +258,8 @@ def train_mmgnn(
             print(f" CUDA version : {torch.version.cuda}")
             print(f" GPU memory : {torch.cuda.get_device_properties(0).total_memory / 1024**3:.2f} GB")
         else:
-            print(" warning : CUDA unavailable , will use CPU")
+            print("Warning: CUDA is unavailable; using CPU.")
     
-    # Run the training step.
     print("\n[ training parameters ]")
     print(f" random seed : 2024")
     print(f" training epochs : {epochs}")
@@ -318,10 +303,9 @@ def train_mmgnn(
     os.makedirs(out_dir, exist_ok=True)
     
     # Set the random seed.
-    seed_value = 2024  # Baseline workflow step.
+    seed_value = 2024
     set_seed(seed_value)
     
-    # Baseline workflow step.
     T_scaler = Scaler.fit(train_df["T"].values.astype(np.float32))
     
     # Process the experiment data.
@@ -336,7 +320,7 @@ def train_mmgnn(
         batch_size=batch_size,
         shuffle=True,
         collate_fn=collate_fn,
-        num_workers=0,  # Baseline workflow step.
+        num_workers=0,
         pin_memory=device.startswith('cuda')
     )
     val_loader = DataLoader(
@@ -400,12 +384,10 @@ def train_mmgnn(
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
     criterion = nn.MSELoss()
     
-    # Run the training step.
     history = {
         'epoch': [],
         'train_loss': [],
-        'epoch_time': [],  # Baseline workflow step.
-        # Run the training step.
+        'epoch_time': [],
         'train_mse': [], 'train_rmse': [], 'train_mae': [], 'train_r2': [],
         'train_mae_E': [], 'train_rmse_E': [], 'train_r2_E': [],
         'train_mae_R': [], 'train_rmse_R': [], 'train_r2_R': [],
@@ -442,7 +424,7 @@ def train_mmgnn(
                 model.load_state_dict(checkpoint['state_dict'], strict=True)
                 print("✓ model state loaded successfully ( exact match )")
             except RuntimeError as e:
-                print(f" warning : full checkpoint loading failed , attempting partial loading : {e}")
+                print(f"Warning: full checkpoint loading failed; attempting partial loading: {e}")
                 missing_keys, unexpected_keys = model.load_state_dict(checkpoint['state_dict'], strict=False)
                 if missing_keys:
                     print(f" missing keys : {missing_keys[:5]}..." if len(missing_keys) > 5 else f" missing keys : {missing_keys}")
@@ -454,7 +436,7 @@ def train_mmgnn(
                 model.load_state_dict(checkpoint['model_state_dict'], strict=True)
                 print("✓ model state loaded successfully ( exact match )")
             except RuntimeError as e:
-                print(f" warning : full checkpoint loading failed , attempting partial loading : {e}")
+                print(f"Warning: full checkpoint loading failed; attempting partial loading: {e}")
                 missing_keys, unexpected_keys = model.load_state_dict(checkpoint['model_state_dict'], strict=False)
                 if missing_keys:
                     print(f" missing keys : {missing_keys[:5]}..." if len(missing_keys) > 5 else f" missing keys : {missing_keys}")
@@ -468,10 +450,9 @@ def train_mmgnn(
                 optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
                 print("✓ Optimizer Status loaded successfully ")
             except (ValueError, RuntimeError) as e:
-                print(f" warning : Optimizer Status loading failed ( model Structure may have changed ), will use new Optimizer : {e}")
-                # Baseline workflow step.
+                print(f"Warning: optimizer state could not be loaded; using a new optimizer: {e}")
                 optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
-                print("✓ Already create new Optimizer ")
+                print("Created a new optimizer.")
         
         # Load the input data.
         if 'history' in checkpoint:
@@ -489,7 +470,6 @@ def train_mmgnn(
         if 'best_epoch' in checkpoint:
             best_epoch = checkpoint['best_epoch']
         if 'best_model_state' in checkpoint and checkpoint['best_model_state'] is not None:
-            # Baseline workflow step.
             best_model_state = checkpoint['best_model_state']
             # Configure the runtime device.
             if isinstance(best_model_state, dict):
@@ -506,13 +486,13 @@ def train_mmgnn(
             early_stopping.best_score = checkpoint['early_stopping'].get('best_score', float('inf'))
             early_stopping.early_stop = checkpoint['early_stopping'].get('early_stop', False)
         
-        print(f" Already resume training Status :")
-        print(f" - from epoch {start_epoch} continue training ")
+        print("Resumed training state:")
+        print(f" - continuing from epoch {start_epoch}")
         print(f" - best epoch: {best_epoch}, best validation MSE: {best_val_mse:.6f}")
-        print(f" - Already training epochs : {len(history.get('epoch', []))}")
+        print(f" - completed epochs: {len(history.get('epoch', []))}")
         print("=" * 100)
     elif resume_from:
-        print(f" warning : specified checkpoint does not exist : {resume_from}")
+        print(f"Warning: specified checkpoint does not exist: {resume_from}")
         print(" will train from scratch ...")
     
     print("=" * 100)
@@ -525,7 +505,7 @@ def train_mmgnn(
             print(f" CUDA version : {torch.version.cuda}")
             print(f" GPU memory : {torch.cuda.get_device_properties(0).total_memory / 1024**3:.2f} GB")
         else:
-            print(" warning : CUDA unavailable , will use CPU")
+            print("Warning: CUDA is unavailable; using CPU.")
     print(f" random seed : 2024")
     print(f" training epochs : {epochs}")
     if start_epoch > 1:
@@ -541,24 +521,19 @@ def train_mmgnn(
     print(" start training ...")
     print("=" * 100)
     
-    # Run the training step.
     for epoch in range(start_epoch, epochs + 1):
         epoch_start_time = time.time()
         
-        # Run the training step.
         train_loss = train_epoch(model, train_loader, optimizer, criterion, device)
         
-        # Run the training step.
         train_metrics, train_preds, train_targets = evaluate(model, train_loader, device)
         val_metrics, val_preds, val_targets = evaluate(model, val_loader, device)
         
         epoch_time = time.time() - epoch_start_time
         
-        # Baseline workflow step.
         history['epoch'].append(epoch)
         history['train_loss'].append(train_loss)
         history['epoch_time'].append(epoch_time)
-        # Run the training step.
         history['train_mse'].append(train_metrics['mse'])
         history['train_rmse'].append(train_metrics['rmse'])
         history['train_mae'].append(train_metrics['mae'])
@@ -587,7 +562,6 @@ def train_mmgnn(
             best_model_state = {k: v.cpu().clone() for k, v in model.state_dict().items()}
             best_epoch = epoch
         
-        # Baseline workflow step.
         print(f"\n{'='*100}")
         print(f"Epoch {epoch}/{epochs} | training time : {epoch_time:.2f} seconds | Train Loss: {train_loss:.6f}")
         print(f"Best Loss: {best_val_mse:.6f} (at epoch {best_epoch})" if best_epoch > 0 else f"Best Loss: {best_val_mse:.6f} (initial)")
@@ -603,7 +577,6 @@ def train_mmgnn(
         data_cols = ['system_id', 'T', 'smiles1', 'smiles2', 'smiles3', 
                      'Ex1', 'Ex2', 'Ex3', 'Rx1', 'Rx2', 'Rx3', 't']
         
-        # Run the training step.
         available_train_cols = [col for col in data_cols if col in train_df.columns]
         if len(available_train_cols) < len(data_cols):
             other_cols = [col for col in train_df.columns 
@@ -613,7 +586,6 @@ def train_mmgnn(
         
         train_df_with_preds = train_df[available_train_cols].copy()
         
-        # Run the training step.
         train_df_with_preds['pred_Ex1'] = train_preds[:, 0]
         train_df_with_preds['pred_Ex2'] = train_preds[:, 1]
         train_df_with_preds['pred_Ex3'] = train_preds[:, 2]
@@ -621,10 +593,8 @@ def train_mmgnn(
         train_df_with_preds['pred_Rx2'] = train_preds[:, 4]
         train_df_with_preds['pred_Rx3'] = train_preds[:, 5]
         
-        # Run the training step.
         train_per_sample_metrics = compute_per_sample_metrics(train_targets, train_preds)
         
-        # Run the training step.
         train_df_with_preds['train_MSE_E'] = train_per_sample_metrics[:, 4]
         train_df_with_preds['train_MAE_E'] = train_per_sample_metrics[:, 5]
         train_df_with_preds['train_R2_E'] = train_per_sample_metrics[:, 6]
@@ -717,10 +687,9 @@ def train_mmgnn(
             }, checkpoint_path)
             print(f" checkpoint saved : {checkpoint_path}")
         
-        # Baseline workflow step.
         if rest_interval > 0 and rest_duration > 0 and epoch % rest_interval == 0:
             print(f"\n{'='*100}")
-            print(f" completed {epoch} epoch, Break {rest_duration} seconds ({rest_duration/60:.1f} minutes ) allow CPU/GPU to allow a cooldown period ...")
+            print(f"Completed epoch {epoch}; pausing for {rest_duration/60:.1f} minutes to cool the hardware...")
             print(f"{'='*100}\n")
             time.sleep(rest_duration)
         
@@ -765,7 +734,6 @@ def train_mmgnn(
     # Configure the baseline model.
     final_val_metrics, _, _ = evaluate(model, val_loader, device)
     
-    # Run the training step.
     print("\n" + "="*100)
     print(" training complete , start compute test metrics ...")
     print("="*100)
@@ -813,7 +781,6 @@ def train_mmgnn(
     test_df_with_preds.to_csv(test_results_csv, index=False, encoding='utf-8-sig')
     print(f" test set results saved to : {test_results_csv}")
     
-    # Run the training step.
     total_time = sum(history['epoch_time'])
     avg_time_per_epoch = np.mean(history['epoch_time'])
     
@@ -853,7 +820,6 @@ def train_mmgnn(
             f.write(f" training loss : {history['train_loss'][i]:.6f}\n")
             f.write(f" training time : {history['epoch_time'][i]:.2f} seconds \n")
             
-            # Run the training step.
             train_metrics_dict = {
                 'mae': history['train_mae'][i],
                 'rmse': history['train_rmse'][i],
@@ -936,7 +902,7 @@ if __name__ == "__main__":
     parser.add_argument('--resume', type=str, default=None,
                         help=' resume training from a checkpoint ( checkpoint path )')
     parser.add_argument('--auto-resume', action='store_true',
-                        help=' Automatically find and recover the most new checkpoint ( if Deposit at )')
+                        help='Resume from the newest checkpoint when one is available.')
     parser.add_argument('--checkpoint-every', type=int, default=10,
                         help=' per N epoch save Once checkpoint ( default 10)')
     args = parser.parse_args()
@@ -960,7 +926,6 @@ if __name__ == "__main__":
         checkpoint_pattern = os.path.join(out_dir, "checkpoint_epoch_*.pt")
         checkpoint_files = glob.glob(checkpoint_pattern)
         if checkpoint_files:
-            # Baseline workflow step.
             def extract_epoch(fpath):
                 try:
                     return int(os.path.basename(fpath).replace("checkpoint_epoch_", "").replace(".pt", ""))
@@ -971,7 +936,6 @@ if __name__ == "__main__":
             print(f"\n automatically selected the latest checkpoint : {args.resume}")
             print(f"  (epoch {extract_epoch(args.resume)})")
     
-    # Run the training step.
     results_dir = os.path.join(out_dir, "results")
     os.makedirs(results_dir, exist_ok=True)
     
@@ -984,11 +948,9 @@ if __name__ == "__main__":
     from .data_loader import load_csv_data
     from psmi_baselines.common import config as C
     
-    # Run the training step.
     train_csv_path = str(DATA_DIR / "train.csv")
     val_csv_path = str(DATA_DIR / "validation.csv")
     
-    # Baseline workflow step.
     if not os.path.exists(train_csv_path):
         raise FileNotFoundError(f" training file does not exist : {train_csv_path}")
     if not os.path.exists(val_csv_path):
@@ -1018,7 +980,7 @@ if __name__ == "__main__":
             permute_23_aug=C.PERMUTE_23_AUG
         )
     else:
-        print(f" warning : test set file does not exist ({test_csv_path}), use validation set By is test set ")
+        print(f"Warning: test file {test_csv_path} is absent; using the validation set.")
         test_df = val_df.copy()
     
     print(f"\n dataset statistics :")
@@ -1026,39 +988,29 @@ if __name__ == "__main__":
     print(f" validation set : {len(val_df)} rows | systems: {val_df['system_id'].nunique()}")
     print(f" test set : {len(test_df)} rows | systems: {test_df['system_id'].nunique()}")
     
-    # Baseline workflow step.
     # Configure the baseline model.
     effective_batch_size = C.BATCH_SIZE
     if torch.cuda.is_available() and C.DEVICE.startswith('cuda'):
         gpu_memory_gb = torch.cuda.get_device_properties(0).total_memory / 1024**3
         if gpu_memory_gb < 8:
-            # Baseline workflow step.
             effective_batch_size = min(32, C.BATCH_SIZE)
-            print(f"\n warning : GPU memory Smaller ({gpu_memory_gb:.2f} GB), will batch size from {C.BATCH_SIZE} adjust to {effective_batch_size}")
+            print(f"\nWarning: GPU memory is {gpu_memory_gb:.2f} GB; reducing batch size from {C.BATCH_SIZE} to {effective_batch_size}.")
         elif gpu_memory_gb < 16:
-            # Baseline workflow step.
             effective_batch_size = min(64, C.BATCH_SIZE)
             print(f"\n hint : GPU memory is {gpu_memory_gb:.2f} GB, will batch size from {C.BATCH_SIZE} adjust to {effective_batch_size}")
         else:
-            # Baseline workflow step.
             effective_batch_size = min(128, C.BATCH_SIZE)
             print(f"\n hint : GPU memory is {gpu_memory_gb:.2f} GB, will batch size from {C.BATCH_SIZE} adjust to {effective_batch_size}")
     
-    # Run the training step.
     print("\n3) Training MMGNN...")
     if args.resume:
         print(f" checkpoint-resume mode : from {args.resume} resume training ")
     else:
         print(" train from scratch ")
     
-    # Run the training step.
-    # Baseline workflow step.
     # Configure the baseline model.
-    # Baseline workflow step.
-    # Run the training step.
     
-    training_mode = "balanced"  # Baseline workflow step.
-    
+    training_mode = "balanced"
     if training_mode == "full":
         # Configure the baseline model.
         hidden_dim = 256
@@ -1071,12 +1023,11 @@ if __name__ == "__main__":
         print(f"  set2set_steps: {set2set_steps}")
         print(f"  post_explain_layers: {post_explain_layers}")
     elif training_mode == "balanced":
-        # Baseline workflow step.
         # Configure experiment parameters.
-        hidden_dim = 256  # Baseline workflow step.
-        num_layers = 3  # Baseline workflow step.
-        set2set_steps = 2  # Baseline workflow step.
-        post_explain_layers = 1  # Baseline workflow step.
+        hidden_dim = 256
+        num_layers = 3
+        set2set_steps = 2
+        post_explain_layers = 1
         print(f"\n use Balance configuration ( Performance First , Moderate acceleration ):")
         print(f" hidden_dim: {hidden_dim} ( retain )")
         print(f" num_layers: {num_layers} ( retain )")
@@ -1084,11 +1035,10 @@ if __name__ == "__main__":
         print(f" post_explain_layers: {post_explain_layers} ( from 2 reduce to 1, approximately 1.2-1.5 Double Acceleration )")
         print(f" Expected total acceleration : approximately 1.5-2 x , Performance loss <5%")
     else:  # fast
-        # Run the training step.
-        hidden_dim = 192  # Baseline workflow step.
-        num_layers = 2  # Baseline workflow step.
-        set2set_steps = 2  # Baseline workflow step.
-        post_explain_layers = 1  # Baseline workflow step.
+        hidden_dim = 192
+        num_layers = 2
+        set2set_steps = 2
+        post_explain_layers = 1
         print(f"\n use Fast training configuration ( approximately 2-3 Double Acceleration ):")
         print(f" hidden_dim: {hidden_dim} ( from 256 reduce )")
         print(f" num_layers: {num_layers} ( from 3 reduce )")
@@ -1112,11 +1062,11 @@ if __name__ == "__main__":
         explainer_method='local_mask',
         dropout=C.DROPOUT,
         patience=100,  # Apply early stopping.
-        min_delta=0.0,  # Baseline workflow step.
-        resume_from=args.resume,  # Baseline workflow step.
+        min_delta=0.0,
+        resume_from=args.resume,
         save_checkpoint_every=args.checkpoint_every,  # Save the generated artifacts.
-        rest_interval=60,  # Baseline workflow step.
-        rest_duration=600.0,  # Baseline workflow step.
+        rest_interval=60,
+        rest_duration=600.0,
     )
     
     print("\n" + "=" * 90)

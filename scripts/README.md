@@ -2,7 +2,7 @@
 
 - `train.py`: supervised, physics-regularized, and expanded-LLE training.
 - `evaluate_checkpoint.py`: deterministic checkpoint evaluation.
-- `reproduce_current_weights.py`: registry-based multi-checkpoint evaluation.
+- `evaluate_checkpoint_registry.py`: registry-based multi-checkpoint evaluation.
 - `fit_nrtl.py`: NRTL parameter fitting for training and diagnostics.
 - `analysis/`: dataset, sensitivity, thermodynamic, and result-bundle analysis.
 - `data_preparation/`: filtering, split construction, and format conversion.

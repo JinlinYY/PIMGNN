@@ -1,4 +1,3 @@
-"""Implement the glam test baseline module."""
 import torch
 import torch.nn as nn
 import numpy as np
@@ -17,14 +16,11 @@ from psmi_baselines.paths import TOTAL_CSV
 
 
 def load_model(model_path, device):
-    """Run the load model baseline operation."""
     checkpoint = torch.load(model_path, map_location=device)
     
-    # Baseline workflow step.
     if 'config' in checkpoint:
         config_dict = checkpoint['config']
         config = Config()
-        # Baseline workflow step.
         if 'model' in config_dict:
             for key, value in config_dict['model'].items():
                 if hasattr(config.model, key):
@@ -64,7 +60,6 @@ def load_model(model_path, device):
 
 
 def plot_predictions(predictions, labels, save_path=None):
-    """Run the plot predictions baseline operation."""
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))
     component_names = ['Component 1', 'Component 2', 'Component 3']
     
@@ -73,15 +68,12 @@ def plot_predictions(predictions, labels, save_path=None):
         pred = predictions[:, i]
         true = labels[:, i]
         
-        # Baseline workflow step.
         ax.scatter(true, pred, alpha=0.6, s=20)
         
-        # Baseline workflow step.
         min_val = min(true.min(), pred.min())
         max_val = max(true.max(), pred.max())
         ax.plot([min_val, max_val], [min_val, max_val], 'r--', lw=2, label='Perfect Prediction')
         
-        # Baseline workflow step.
         r2 = r2_score(true, pred)
         rmse = np.sqrt(mean_squared_error(true, pred))
         
@@ -103,7 +95,6 @@ def plot_predictions(predictions, labels, save_path=None):
 
 
 def plot_training_history(history, save_path=None):
-    """Run the plot training history baseline operation."""
     epochs = [h['epoch'] for h in history]
     train_losses = [h['train_loss'] for h in history]
     val_losses = [h['val_loss'] for h in history]
@@ -121,7 +112,6 @@ def plot_training_history(history, save_path=None):
     ax1.legend()
     ax1.grid(True, alpha=0.3)
     
-    # Baseline workflow step.
     ax2 = axes[1]
     ax2.plot(epochs, val_r2s, label='Val R²', marker='^', markersize=3, color='green')
     ax2.set_xlabel('Epoch', fontsize=12)
@@ -142,7 +132,6 @@ def plot_training_history(history, save_path=None):
 
 
 def main(model_path=None, test_only=False):
-    """Run the main baseline operation."""
     # Configure the runtime device.
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print("=" * 80)
@@ -155,7 +144,7 @@ def main(model_path=None, test_only=False):
         model_path = os.path.join(default_config.model_save_dir, 'best_model.pth')
     
     if not os.path.exists(model_path):
-        print(f" error : model file does not exist : {model_path}")
+        print(f"Error: model file does not exist: {model_path}")
         print(" First run train.py Training model ")
         return
     
@@ -179,7 +168,6 @@ def main(model_path=None, test_only=False):
     test_dataset = LLEDataset(datasets['test'])
     
     def custom_collate_fn(batch):
-        """Run the custom collate fn baseline operation."""
         data_items = [item[0] for item in batch]
         labels = np.array([item[1] for item in batch])
         graph_batch = collate_fn(data_items)
@@ -198,7 +186,6 @@ def main(model_path=None, test_only=False):
     criterion = nn.MSELoss()
     test_metrics = evaluate(model, test_loader, criterion, device)
     
-    # Baseline workflow step.
     print("\n" + "=" * 80)
     print(" test-set results :")
     print("=" * 80)
@@ -222,7 +209,6 @@ def main(model_path=None, test_only=False):
     plot_path = os.path.join(config.result_dir, f'predictions_{timestamp}.png')
     plot_predictions(test_metrics['predictions'], test_metrics['labels'], plot_path)
     
-    # Run the training step.
     if not test_only:
         # Load the input data.
         if 'train_history' in checkpoint:
@@ -244,7 +230,7 @@ def main(model_path=None, test_only=False):
                                 history_path = os.path.join(config.result_dir, f'training_history_{timestamp}.png')
                                 plot_training_history(result_data['results']['train_history'], history_path)
                     except Exception as e:
-                        print(f" unable to load training history : {e}")
+                        print(f"Unable to load training history: {e}")
     
     # Save the generated artifacts.
     test_results = {

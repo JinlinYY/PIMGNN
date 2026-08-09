@@ -9,7 +9,7 @@ import pandas as pd
 
 
 def parse_database(path: Path) -> pd.DataFrame:
-    """Extract SMILES and experimental values from the legacy text format."""
+    """Extract SMILES and experimental values from the FreeSolv text format."""
     rows = []
     with path.open("r", encoding="utf-8") as handle:
         for line in handle:

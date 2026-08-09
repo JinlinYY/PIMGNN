@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Analyze PSMI LLE dataset coverage and distributions for the SI.
+"""Analyze the datasets distributed with PSMI.
 
 Run from the repository root:
 
@@ -9,7 +9,7 @@ Run from the repository root:
 The script intentionally separates:
 1. raw workbook records, i.e. experimental tie-line/equilibrium-point rows;
 2. filtered analysis records after psmi.data.load_and_prepare_excel(...);
-3. training augmentation, which is reported but not counted as experimental data.
+3. training augmentation, which is reported separately from experimental data.
 """
 
 from __future__ import annotations
@@ -49,7 +49,7 @@ DATASETS = [
     {
         "dataset_id": "Curated IL-LLE",
         "dataset_name": "Curated ionic-liquid LLE workbook",
-        "path": ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles_min3.xlsx",
+        "path": ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles.xlsx",
     },
     {
         "dataset_id": "Expanded literature LLE",
@@ -830,13 +830,13 @@ def write_markdown_report(
     )
 
     lines = [
-        "# SI Dataset Description and Distribution Analysis",
+        "# Dataset Coverage Report",
         "",
         "## Reproducibility",
         "",
         "Run from the project root:",
         "",
-        "```powershell",
+        "```bash",
         "python scripts/analysis/analyze_dataset_distribution.py",
         "```",
         "",
@@ -890,17 +890,13 @@ def write_markdown_report(
     lines.extend(
         [
             "",
-            "## SI-Ready Text",
+            "## Counting Contract",
             "",
-            "Each row in the LLE workbooks was treated as one equilibrium point, or equivalently one experimental tie-line record, for a ternary liquid-liquid equilibrium system. A system identifier denotes a fixed combination of three chemical species; multiple rows can therefore share the same system identifier because the same ternary system was measured at different overall compositions along the binodal/tie-line path and, in some cases, at different temperatures. The temperature and composition fields are not independent system identifiers: `system_id` specifies the chemical system, `T` specifies the thermodynamic condition, and the paired extract-phase (`Ex1-Ex3`) and raffinate-phase (`Rx1-Rx3`) compositions define the measured equilibrium point. During model preparation, the project preprocessing assigns a continuous path coordinate `t` within each `(system_id, T)` group to order the composition points. Groups containing fewer than six points are excluded by the current preprocessing setting to ensure sufficient phase-diagram coverage for each system-temperature group.",
+            "One workbook row is one experimental tie-line record. A `system_id` identifies one ternary chemical system, while `(system_id, T)` identifies that system at a specific temperature. The paired extract-phase (`Ex1-Ex3`) and raffinate-phase (`Rx1-Rx3`) compositions define the measured equilibrium point. Preprocessing assigns a continuous phase-path coordinate `t` within each `(system_id, T)` group and retains only groups meeting the configured minimum tie-line density.",
             "",
-            f"For the current local data files, the raw curated IL-LLE workbook contains {int(curated_raw['experimental_or_analysis_rows'])} tie-line records, {int(curated_raw['unique_system_id'])} unique `system_id` values, and {int(curated_raw['unique_system_temperature_groups'])} unique `(system_id, T)` groups over {curated_raw['temperature_min_K']:.2f}-{curated_raw['temperature_max_K']:.2f} K. After applying the model preprocessing filter of at least {min_points_per_group} records per `(system_id, T)` group, the retained curated IL-LLE analysis set contains {int(curated_filtered['experimental_or_analysis_rows'])} tie-line records, {int(curated_filtered['unique_system_id'])} unique systems, and {int(curated_filtered['unique_system_temperature_groups'])} system-temperature groups. The raw expanded literature LLE workbook contains {int(expanded_raw['experimental_or_analysis_rows'])} tie-line records, {int(expanded_raw['unique_system_id'])} unique systems, and {int(expanded_raw['unique_system_temperature_groups'])} system-temperature groups over {expanded_raw['temperature_min_K']:.2f}-{expanded_raw['temperature_max_K']:.2f} K; the retained preprocessed version contains {int(expanded_filtered['experimental_or_analysis_rows'])} tie-line records, {int(expanded_filtered['unique_system_id'])} unique systems, and {int(expanded_filtered['unique_system_temperature_groups'])} system-temperature groups.",
+            f"The distributed main workbook contains {int(curated_raw['experimental_or_analysis_rows'])} raw tie-line records, {int(curated_raw['unique_system_id'])} unique `system_id` values, and {int(curated_raw['unique_system_temperature_groups'])} unique `(system_id, T)` groups over {curated_raw['temperature_min_K']:.2f}-{curated_raw['temperature_max_K']:.2f} K. Requiring at least {min_points_per_group} records per `(system_id, T)` group retains {int(curated_filtered['experimental_or_analysis_rows'])} records, {int(curated_filtered['unique_system_id'])} systems, and {int(curated_filtered['unique_system_temperature_groups'])} system-temperature groups. The distributed expanded workbook contains {int(expanded_raw['experimental_or_analysis_rows'])} raw records, {int(expanded_raw['unique_system_id'])} systems, and {int(expanded_raw['unique_system_temperature_groups'])} system-temperature groups over {expanded_raw['temperature_min_K']:.2f}-{expanded_raw['temperature_max_K']:.2f} K; the same filter retains {int(expanded_filtered['experimental_or_analysis_rows'])} records, {int(expanded_filtered['unique_system_id'])} systems, and {int(expanded_filtered['unique_system_temperature_groups'])} system-temperature groups.",
             "",
-            "The component counts were computed from SMILES strings. For the retained preprocessed curated IL-LLE set, the unique canonical SMILES counts are listed by component role in the table above, with the union across all three roles giving the number of distinct molecular species represented in the retained data. The same calculation was applied to the retained expanded literature LLE set. The 2/3-component swap used by the training code is a symmetry augmentation of the input representation; it doubles the number of training rows when enabled, but it does not create new experimental tie-line records and should not be used when reporting dataset size.",
-            "",
-            "## Discrepancy Check Against Manuscript Counts",
-            "",
-            "The analyzed files do not yield `820 systems / 6316 equilibrium points` when `systems` is interpreted strictly as unique `system_id` values and `equilibrium points` as workbook rows. In the curated IL-LLE workbook, 820 corresponds to unique `(system_id, T)` groups, whereas 818 is the number of unique `system_id` values. None of the evaluated raw or filtered stages yields 6316 tie-line rows. This discrepancy indicates that the reported count depends on a different frozen dataset snapshot, additional curation criteria, or a `(system_id, T)` grouping convention. Reproducible reporting therefore requires an explicit dataset digest and counting convention.",
+            "The component counts are computed from canonical SMILES. Component-2/component-3 permutation is a training-time symmetry augmentation: it can double training examples, but it does not create experimental tie-line records and is excluded from dataset-size reporting.",
             "",
             f"{family_note}",
             "",
@@ -914,7 +910,7 @@ def write_markdown_report(
         ]
     )
 
-    path = out_dir / "SI_dataset_description.md"
+    path = out_dir / "dataset_report.md"
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return path
 
@@ -929,17 +925,19 @@ def parse_args() -> argparse.Namespace:
         default=str(
             ROOT
             / "experiments"
-            / "00_dataset_construction"
+            / "supporting_information"
+            / "s5_dataset_construction_and_distribution"
             / "results"
         ),
-        help="Output directory for CSV tables and the SI markdown report.",
+        help="Output directory for CSV tables and the dataset report.",
     )
     parser.add_argument(
         "--figures-dir",
         default=str(
             ROOT
             / "experiments"
-            / "00_dataset_construction"
+            / "supporting_information"
+            / "s5_dataset_construction_and_distribution"
             / "figures"
         ),
         help="Output directory for generated figures.",

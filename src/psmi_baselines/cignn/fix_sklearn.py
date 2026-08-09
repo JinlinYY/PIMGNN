@@ -1,9 +1,7 @@
-"""Implement the cignn fix_sklearn baseline module."""
 import sys
 import subprocess
 
 def check_sklearn():
-    """Run the check sklearn baseline operation."""
     try:
         import sklearn
         print(f"✓ sklearn Installed , version : {sklearn.__version__}")
@@ -17,22 +15,21 @@ def check_sklearn():
         print(f" training set Size : {len(train)}, test set Size : {len(test)}")
         return True
     except ImportError as e:
-        print(f"✗ sklearn Not Installed or Import failed : {e}")
+        print(f"scikit-learn is unavailable: {e}")
         return False
     except Exception as e:
-        print(f"✗ sklearn Functional Testing failed : {e}")
+        print(f"scikit-learn validation failed: {e}")
         return False
 
 def install_sklearn():
-    """Run the install sklearn baseline operation."""
     print("\n True at Installation scikit-learn...")
     try:
         subprocess.check_call([sys.executable, "-m", "pip", "install", "scikit-learn", "-i", "https://pypi.tuna.tsinghua.edu.cn/simple"])
         print("✓ Installation complete !")
         return True
     except Exception as e:
-        print(f"✗ Installation failed : {e}")
-        print("\n Please Manual run Installation of the following commands :")
+        print(f"Installation failed: {e}")
+        print("\nInstall scikit-learn manually with:")
         print("pip install scikit-learn")
         return False
 

@@ -40,7 +40,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output",
         type=Path,
-        default=PROJECT_ROOT / "datasets" / "splits" / "expanded_lle_corrected_v2.json",
+        default=PROJECT_ROOT / "datasets" / "splits" / "expanded_lle_system_split.json",
     )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--min-points", type=int, default=6)
@@ -77,7 +77,7 @@ def main() -> None:
 
     payload = {
         "schema_version": 1,
-        "name": "expanded_lle_corrected_v2",
+        "name": "expanded_lle_system_split",
         "dataset_path": str(dataset_path.relative_to(PROJECT_ROOT)),
         "dataset_sha256": sha256_file(dataset_path),
         "filter": {"minimum_tie_lines_per_system_temperature": int(args.min_points)},

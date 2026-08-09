@@ -1,4 +1,3 @@
-"""Implement the cignn train baseline module."""
 import os
 import sys
 import argparse
@@ -21,10 +20,8 @@ from psmi_baselines.protocol import canonical_split_indices
 
 
 class LLEDataset(Dataset):
-    """Represent the LLEDataset baseline component."""
     def __init__(self, il_smiles_list, comp2_smiles_list, comp3_smiles_list, 
                  labels, temperatures=None):
-        """Run the init baseline operation."""
         self.il_smiles_list = il_smiles_list
         self.comp2_smiles_list = comp2_smiles_list
         self.comp3_smiles_list = comp3_smiles_list
@@ -45,7 +42,6 @@ class LLEDataset(Dataset):
 
 
 def collate_fn(batch):
-    """Run the collate fn baseline operation."""
     il_graphs = []
     comp2_graphs = []
     comp3_graphs = []
@@ -67,16 +63,13 @@ def collate_fn(batch):
     if len(il_graphs) == 0:
         return None, None, None, None, None
     
-    # Baseline workflow step.
     il_batch = batch_graphs(il_graphs)
     comp2_batch = batch_graphs(comp2_graphs)
     comp3_batch = batch_graphs(comp3_graphs)
     
-    # Baseline workflow step.
     labels = np.array(labels, dtype=np.float32)  # [batch_size, 6]
     labels = torch.from_numpy(labels)  # [batch_size, 6]
     
-    # Baseline workflow step.
     if temperatures[0] is not None:
         temperatures = np.array(temperatures, dtype=np.float32)
         temperatures = torch.from_numpy(temperatures)
@@ -87,7 +80,6 @@ def collate_fn(batch):
 
 
 def train_epoch(model, dataloader, optimizer, criterion, device):
-    """Run the train epoch baseline operation."""
     model.train()
     total_loss = 0
     num_batches = 0
@@ -121,11 +113,9 @@ def train_epoch(model, dataloader, optimizer, criterion, device):
 
 
 def calculate_metrics(predictions, labels):
-    """Run the calculate metrics baseline operation."""
     predictions = np.array(predictions)
     labels = np.array(labels)
     
-    # Baseline workflow step.
     errors = predictions - labels
     abs_errors = np.abs(errors)
     squared_errors = errors ** 2
@@ -136,9 +126,8 @@ def calculate_metrics(predictions, labels):
     mae = np.mean(abs_errors)
     r2 = 1 - np.sum(squared_errors) / np.sum((labels - np.mean(labels, axis=0)) ** 2)
     
-    # Baseline workflow step.
-    sample_mae = np.mean(abs_errors, axis=1)  # Baseline workflow step.
-    sample_rmse = np.sqrt(np.mean(squared_errors, axis=1))  # Baseline workflow step.
+    sample_mae = np.mean(abs_errors, axis=1)
+    sample_rmse = np.sqrt(np.mean(squared_errors, axis=1))
     mae_std = np.std(sample_mae)
     rmse_std = np.std(sample_rmse)
     
@@ -154,7 +143,6 @@ def calculate_metrics(predictions, labels):
     mae_e = np.mean(e_abs_errors)
     r2_e = 1 - np.sum(e_squared_errors) / np.sum((e_labels - np.mean(e_labels, axis=0)) ** 2)
     
-    # Baseline workflow step.
     e_sample_mae = np.mean(e_abs_errors, axis=1)
     e_sample_rmse = np.sqrt(np.mean(e_squared_errors, axis=1))
     mae_e_std = np.std(e_sample_mae)
@@ -172,7 +160,6 @@ def calculate_metrics(predictions, labels):
     mae_r = np.mean(r_abs_errors)
     r2_r = 1 - np.sum(r_squared_errors) / np.sum((r_labels - np.mean(r_labels, axis=0)) ** 2)
     
-    # Baseline workflow step.
     r_sample_mae = np.mean(r_abs_errors, axis=1)
     r_sample_rmse = np.sqrt(np.mean(r_squared_errors, axis=1))
     mae_r_std = np.std(r_sample_mae)
@@ -203,7 +190,6 @@ def calculate_metrics(predictions, labels):
 
 
 def evaluate(model, dataloader, criterion, device):
-    """Run the evaluate baseline operation."""
     model.eval()
     total_loss = 0
     predictions_list = []
@@ -245,7 +231,6 @@ def evaluate(model, dataloader, criterion, device):
 def save_results(args, history, train_pred, train_true, val_pred, val_true,
                  test_pred, test_true, best_epoch, best_val_mse,
                  total_time, avg_time_per_epoch, val_metrics, test_metrics):
-    """Run the save results baseline operation."""
     
     # Save the generated artifacts.
     history_df = pd.DataFrame(history)
@@ -308,7 +293,6 @@ def save_results(args, history, train_pred, train_true, val_pred, val_true,
     
     # Save the generated artifacts.
     def format_metrics_txt(metrics_dict, prefix=""):
-        """Run the format metrics txt baseline operation."""
         lines = []
         if "mse" in metrics_dict:
             lines.append(f"{prefix}[ mean metrics ]")
@@ -343,7 +327,6 @@ def save_results(args, history, train_pred, train_true, val_pred, val_true,
     txt_lines.append("=" * 100)
     txt_lines.append("")
     
-    # Baseline workflow step.
     txt_lines.append("[ training information ]")
     txt_lines.append(f" best epoch: {best_epoch}")
     txt_lines.append(f" best validation MSE: {best_val_mse:.6f}")
@@ -392,26 +375,20 @@ def save_results(args, history, train_pred, train_true, val_pred, val_true,
 
 
 def load_csv_data(csv_path):
-    """Run the load csv data baseline operation."""
     df = pd.read_csv(csv_path)
     
     il_smiles = df['IL (Component 1) full name SMILES'].tolist()
     comp2_smiles = df['Component 2 SMILES'].tolist()
     comp3_smiles = df['Component 3 SMILES'].tolist()
     
-    # Baseline workflow step.
     labels = df[['Ex1', 'Ex2', 'Ex3', 'Rx1', 'Rx2', 'Rx3']].values.astype(np.float32)
     
-    # Baseline workflow step.
     temperatures = df['T/K'].values.astype(np.float32)
-    # Baseline workflow step.
-    temperatures = (temperatures - 250.0) / 150.0  # Baseline workflow step.
-    
+    temperatures = (temperatures - 250.0) / 150.0
     return il_smiles, comp2_smiles, comp3_smiles, labels, temperatures
 
 
 def print_config_info(args, train_size, val_size, test_size, device_info):
-    """Run the print config info baseline operation."""
     print("=" * 100)
     print("[ training configuration ]")
     print("=" * 100)
@@ -468,7 +445,6 @@ def print_config_info(args, train_size, val_size, test_size, device_info):
 
 
 def get_device_info(device):
-    """Run the get device info baseline operation."""
     info = {'device': device}
     if device == 'cuda' and torch.cuda.is_available():
         info['gpu_name'] = torch.cuda.get_device_name(0)
@@ -478,7 +454,6 @@ def get_device_info(device):
 
 
 def find_latest_checkpoint(checkpoint_dir):
-    """Run the find latest checkpoint baseline operation."""
     if not os.path.exists(checkpoint_dir):
         return None
     
@@ -490,13 +465,11 @@ def find_latest_checkpoint(checkpoint_dir):
     if not checkpoint_files:
         return None
     
-    # Baseline workflow step.
     checkpoint_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
     return checkpoint_files[0]
 
 
 def load_checkpoint(checkpoint_path, model, optimizer, device):
-    """Run the load checkpoint baseline operation."""
     print("=" * 100)
     print(f" Discovery checkpoint file : {checkpoint_path}")
     print(" True at load checkpoint in resume training ...")
@@ -511,7 +484,6 @@ def load_checkpoint(checkpoint_path, model, optimizer, device):
     if 'optimizer_state_dict' in checkpoint:
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     
-    # Run the training step.
     start_epoch = checkpoint.get('epoch', 0)
     history = checkpoint.get('history', [])
     
@@ -526,7 +498,7 @@ def load_checkpoint(checkpoint_path, model, optimizer, device):
         best_epoch = best_epoch_info.get('epoch', start_epoch)
         best_val_mse = best_epoch_info.get('val_mse', best_val_mse)
     
-    print(f" successful load checkpoint !")
+    print("Checkpoint loaded successfully.")
     print(f" - start epoch: {start_epoch}")
     print(f" - best epoch: {best_epoch}")
     print(f" - best validation MSE: {best_val_mse:.6f}")
@@ -545,7 +517,6 @@ def load_checkpoint(checkpoint_path, model, optimizer, device):
 
 
 def get_default_args():
-    """Run the get default args baseline operation."""
     import argparse
     args = argparse.Namespace()
     # Process the experiment data.
@@ -554,9 +525,7 @@ def get_default_args():
     
     # Save the generated artifacts.
     args.output_dir = str(EXPERIMENT_ROOT / 'runs' / 'cignn' / 'seed_2024')
-    args.results_dir = None  # Baseline workflow step.
-    
-    # Run the training step.
+    args.results_dir = None
     args.batch_size = 64
     args.epochs = 400
     args.lr = 0.001
@@ -568,10 +537,9 @@ def get_default_args():
     args.use_set2set = False
     args.use_temperature = True
     
-    # Run the training step.
     args.patience = 80
     args.checkpoint_freq = 10
-    args.rest_freq = 0  # Baseline workflow step.
+    args.rest_freq = 0
     args.rest_duration = 600
     
     # Configure the runtime device.
@@ -584,7 +552,6 @@ def get_default_args():
 
 
 def main(args=None):
-    """Run the main baseline operation."""
     if args is None:
         # Configure experiment parameters.
         has_cli_args = len(sys.argv) > 1
@@ -638,7 +605,6 @@ def main(args=None):
             print("=" * 100)
             args = get_default_args()
             
-            # Baseline workflow step.
             print("\n training configuration :")
             print(f" Training data : {args.data_path}")
             print(f" Test data : {args.test_data_path}")
@@ -657,13 +623,13 @@ def main(args=None):
             
             # Process the experiment data.
             if not os.path.exists(args.data_path):
-                print(f" error : Training data file does not exist : {args.data_path}")
-                print(" please check file path whether Correct , or use Command rows parameters Designation data path ")
+                print(f"Error: training data file does not exist: {args.data_path}")
+                print("Verify the file path or provide the dataset with --data_path.")
                 sys.exit(1)
             
             if args.test_data_path and not os.path.exists(args.test_data_path):
-                print(f" warning : Test data file does not exist : {args.test_data_path}")
-                print(" will Only use Training data Into rows Training ")
+                print(f"Warning: test data file does not exist: {args.test_data_path}")
+                print("Proceeding with the training data only.")
                 args.test_data_path = None
     
     # Set the random seed.
@@ -685,8 +651,6 @@ def main(args=None):
     print(f" data load complete , total {len(labels)} samples ", flush=True)
     
     # Process the experiment data.
-    # Run the training step.
-    # Run the training step.
     split_frame = pd.read_csv(args.data_path)
     canonical_indices = canonical_split_indices(split_frame) if not args.test_data_path else None
 
@@ -711,7 +675,6 @@ def main(args=None):
             # Load the input data.
             print(" load Separate test set file ...", flush=True)
             test_il_smiles, test_comp2_smiles, test_comp3_smiles, test_labels, test_temperatures = load_csv_data(args.test_data_path)
-            # Run the training step.
             train_idx, val_idx = train_test_split(
                 np.arange(len(labels)), 
                 test_size=0.2, 
@@ -720,7 +683,6 @@ def main(args=None):
             )
             print(f" use sklearn Divide : training set {len(train_idx)} bar , validation set {len(val_idx)} bar , test set {len(test_labels)} bar ", flush=True)
         else:
-            # Run the training step.
             print(" use sklearn from Total dataset in Divide training set , validation set and test set ...", flush=True)
             # Evaluate the test subset.
             train_val_idx, test_idx = train_test_split(
@@ -729,8 +691,6 @@ def main(args=None):
                 random_state=args.seed,
                 shuffle=True
             )
-            # Run the training step.
-            # Baseline workflow step.
             train_idx, val_idx = train_test_split(
                 train_val_idx,
                 test_size=0.235,  # Evaluate the validation subset.
@@ -749,7 +709,6 @@ def main(args=None):
                   f" validation set {len(val_idx)} bar ({len(val_idx)/len(labels)*100:.1f}%), "
                   f" test set {len(test_idx)} bar ({len(test_idx)/len(labels)*100:.1f}%)", flush=True)
     except ImportError:
-        # Baseline workflow step.
         print(" hint : sklearn unavailable , use numpy Implementation data Divide ( Features phase same )", flush=True)
         np.random.seed(args.seed)
         indices = np.arange(len(labels))
@@ -767,17 +726,14 @@ def main(args=None):
         elif args.test_data_path:
             # Load the input data.
             test_il_smiles, test_comp2_smiles, test_comp3_smiles, test_labels, test_temperatures = load_csv_data(args.test_data_path)
-            # Run the training step.
             split_idx = int(len(indices) * 0.8)
             train_idx = indices[:split_idx]
             val_idx = indices[split_idx:]
         else:
-            # Run the training step.
             test_split_idx = int(len(indices) * 0.15)
             test_idx = indices[:test_split_idx]
             train_val_idx = indices[test_split_idx:]
-            # Run the training step.
-            val_split_idx = int(len(train_val_idx) * 0.235)  # Baseline workflow step.
+            val_split_idx = int(len(train_val_idx) * 0.235)
             train_idx = train_val_idx[val_split_idx:]
             val_idx = train_val_idx[:val_split_idx]
             
@@ -799,7 +755,6 @@ def main(args=None):
     # Configure the runtime device.
     device_info = get_device_info(args.device)
     
-    # Baseline workflow step.
     print_config_info(args, train_size, val_size, test_size, device_info)
     
     # Process the experiment data.
@@ -840,10 +795,7 @@ def main(args=None):
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, 
                           shuffle=False, collate_fn=collate_fn)
     
-    # Baseline workflow step.
-    # Baseline workflow step.
     node_dim = 33
-    # Baseline workflow step.
     edge_dim = 9
     
     # Configure the baseline model.
@@ -881,8 +833,8 @@ def main(args=None):
     
     if latest_checkpoint:
         restored_state = load_checkpoint(latest_checkpoint, model, optimizer, args.device)
-        completed_epoch = restored_state['start_epoch']  # Baseline workflow step.
-        start_epoch = completed_epoch  # Run the training step.
+        completed_epoch = restored_state['start_epoch']
+        start_epoch = completed_epoch
         history = restored_state['history']
         best_val_mse = restored_state['best_val_mse']
         best_epoch = restored_state['best_epoch']
@@ -895,12 +847,9 @@ def main(args=None):
         print()
     start_time = time.time()
     
-    # Baseline workflow step.
-    rest_interval = 2 * 3600  # Baseline workflow step.
-    rest_duration = 5 * 60    # Baseline workflow step.
-    last_rest_time = time.time()  # Baseline workflow step.
-    
-    # Run the training step.
+    rest_interval = 2 * 3600
+    rest_duration = 5 * 60
+    last_rest_time = time.time()
     print("\n" + "="*100, flush=True)
     if start_epoch > 0:
         print(f" resume training ( from epoch {start_epoch + 1} Continue )...", flush=True)
@@ -913,7 +862,6 @@ def main(args=None):
     for epoch in range(start_epoch, args.epochs):
         epoch_start_time = time.time()
         
-        # Run the training step.
         train_loss = train_epoch(model, train_loader, optimizer, criterion, args.device)
         train_loss_val, train_metrics, train_pred, train_true = evaluate(
             model, train_loader, criterion, args.device
@@ -928,7 +876,6 @@ def main(args=None):
         
         epoch_time = time.time() - epoch_start_time
         
-        # Baseline workflow step.
         history.append({
             'epoch': epoch + 1,
             'train_loss': train_loss,
@@ -967,7 +914,6 @@ def main(args=None):
             'val_r2_R': val_metrics['r2_r']
         })
         
-        # Baseline workflow step.
         print("=" * 100)
         best_loss_str = f"{best_val_mse:.6f} (epoch {best_epoch})" if best_val_mse < float('inf') else f"{val_metrics['mse']:.6f} (initial)"
         print(f"Epoch {epoch+1}/{args.epochs} | training time : {epoch_time:.2f} seconds | Train Loss: {train_loss:.6f}")
@@ -1019,21 +965,19 @@ def main(args=None):
             print(f" checkpoint saved : {checkpoint_path}")
             print()
         
-        # Baseline workflow step.
         current_time = time.time()
         elapsed_since_last_rest = current_time - last_rest_time
         
         if elapsed_since_last_rest >= rest_interval and epoch < args.epochs - 1:
-            # Baseline workflow step.
             elapsed_hours = elapsed_since_last_rest / 3600
             print("=" * 100)
-            print(f" Already run {elapsed_hours:.2f} hours ({elapsed_since_last_rest:.0f} seconds ), current epoch completed ")
-            print(f" Break {rest_duration/60:.1f} minutes ({rest_duration} seconds ) allow CPU/GPU to allow a cooldown period ...")
+            print(f"Elapsed since the previous pause: {elapsed_hours:.2f} hours ({elapsed_since_last_rest:.0f} seconds).")
+            print(f"Pausing for {rest_duration/60:.1f} minutes ({rest_duration} seconds) to cool the hardware...")
             print("=" * 100)
             print()
             sys.stdout.flush()
             time.sleep(rest_duration)
-            last_rest_time = time.time()  # Baseline workflow step.
+            last_rest_time = time.time()
             print(" Break end , continue training ...")
             print()
             sys.stdout.flush()
@@ -1047,7 +991,6 @@ def main(args=None):
             print("=" * 100)
             break
     
-    # Run the training step.
     total_time = time.time() - start_time
     avg_time_per_epoch = total_time / len(history)
     
@@ -1063,7 +1006,7 @@ def main(args=None):
         checkpoint = torch.load(best_model_path, map_location=args.device, weights_only=False)
         model.load_state_dict(checkpoint['model_state_dict'])
     else:
-        print(" warning : not found best model file , use current model Into rows Assessment ")
+        print("Warning: best-model file not found; evaluating the in-memory model.")
         print()
     
     # Evaluate the test subset.
@@ -1105,7 +1048,7 @@ if __name__ == '__main__':
         print("\n\n Trained By User in Broken ")
         sys.exit(0)
     except Exception as e:
-        print(f"\n\n Training Process in Appearance error : {e}")
+        print(f"\n\nTraining failed: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)

@@ -1,4 +1,3 @@
-"""Implement the glam model __init__ baseline module."""
 from .blocks import (
     FeedforwardBlock,
     MessagePassingBlock,

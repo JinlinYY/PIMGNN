@@ -1,4 +1,3 @@
-"""Implement the cignn data_utils baseline module."""
 import numpy as np
 import torch
 from rdkit import Chem
@@ -7,10 +6,8 @@ from torch_geometric.data import Data, Batch
 
 
 def get_atom_features(atom):
-    """Run the get atom features baseline operation."""
     features = []
     
-    # Baseline workflow step.
     atom_types = ['H', 'C', 'N', 'O', 'F', 'P', 'S', 'Cl', 'Br', 'I', 'B', 'Si', 'Se', 'unknown']
     atom_type = atom.GetSymbol()
     if atom_type not in atom_types:
@@ -19,14 +16,9 @@ def get_atom_features(atom):
     features.extend(atom_type_onehot)
     
     # 2. Implicit Valence (Binary)
-    # Baseline workflow step.
-    # Baseline workflow step.
     try:
-        # Baseline workflow step.
         implicit_valence = atom.GetValence(getExplicit=False)
     except (TypeError, AttributeError):
-        # Baseline workflow step.
-        # Baseline workflow step.
         try:
             max_valence = atom.GetMaxValence()
             current_valence = atom.GetValence()
@@ -74,17 +66,14 @@ def get_atom_features(atom):
     # 9. Aromatic (Binary)
     features.append(1 if atom.GetIsAromatic() else 0)
     
-    # Baseline workflow step.
     features.append(1 if atom.GetNumRadicalElectrons() > 0 or atom.GetFormalCharge() < 0 else 0)
     
-    # Baseline workflow step.
     features.append(1 if atom.GetFormalCharge() > 0 else 0)
     
     return np.array(features, dtype=np.float32)
 
 
 def get_bond_features(bond):
-    """Run the get bond features baseline operation."""
     features = []
     
     # 1. Bond Type (one-hot: Single, Double, Triple, Aromatic)
@@ -119,22 +108,18 @@ def get_bond_features(bond):
 
 
 def smiles_to_graph(smiles):
-    """Run the smiles to graph baseline operation."""
     mol = Chem.MolFromSmiles(smiles)
     if mol is None:
         return None
     
-    # Baseline workflow step.
     mol = Chem.RemoveHs(mol)
     
-    # Baseline workflow step.
     node_features = []
     for atom in mol.GetAtoms():
         node_features.append(get_atom_features(atom))
     
     node_features = np.array(node_features)
     
-    # Baseline workflow step.
     edge_indices = []
     edge_features = []
     
@@ -142,24 +127,19 @@ def smiles_to_graph(smiles):
         i = bond.GetBeginAtomIdx()
         j = bond.GetEndAtomIdx()
         
-        # Baseline workflow step.
         edge_indices.append([i, j])
         edge_indices.append([j, i])
         
         bond_features = get_bond_features(bond)
         edge_features.append(bond_features)
-        edge_features.append(bond_features)  # Baseline workflow step.
-    
+        edge_features.append(bond_features)
     if len(edge_indices) == 0:
-        # Baseline workflow step.
-        # Baseline workflow step.
         edge_indices = [[0, 0]]
         edge_features = [np.zeros(9, dtype=np.float32)]
     
     edge_indices = np.array(edge_indices).T
     edge_features = np.array(edge_features)
     
-    # Baseline workflow step.
     data = Data(
         x=torch.tensor(node_features, dtype=torch.float32),
         edge_index=torch.tensor(edge_indices, dtype=torch.long),
@@ -170,6 +150,5 @@ def smiles_to_graph(smiles):
 
 
 def batch_graphs(graphs):
-    """Run the batch graphs baseline operation."""
     return Batch.from_data_list(graphs)
 

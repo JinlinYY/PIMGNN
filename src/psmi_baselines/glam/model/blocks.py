@@ -1,4 +1,3 @@
-"""Implement the glam model blocks baseline module."""
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -7,12 +6,10 @@ from torch_geometric.nn import global_mean_pool, global_max_pool, global_add_poo
 
 
 class FeedforwardBlock(nn.Module):
-    """Represent the FeedforwardBlock baseline component."""
     def __init__(self, in_dim, out_dim, norm_type='batch', dropout=0.0, activation='relu'):
         super(FeedforwardBlock, self).__init__()
         self.layers = nn.ModuleList()
         
-        # Baseline workflow step.
         if norm_type == 'batch':
             self.norm = nn.BatchNorm1d(in_dim)
         elif norm_type == 'layer':
@@ -22,13 +19,10 @@ class FeedforwardBlock(nn.Module):
         else:
             self.norm = None
         
-        # Baseline workflow step.
         self.dropout = nn.Dropout(dropout) if dropout > 0 else None
         
-        # Baseline workflow step.
         self.linear = nn.Linear(in_dim, out_dim)
         
-        # Baseline workflow step.
         if activation == 'relu':
             self.activation = nn.ReLU()
         elif activation == 'gelu':
@@ -41,7 +35,6 @@ class FeedforwardBlock(nn.Module):
             self.activation = None
     
     def forward(self, x):
-        # Baseline workflow step.
         if self.norm is not None:
             if len(x.shape) == 2:
                 x = self.norm(x)
@@ -52,10 +45,8 @@ class FeedforwardBlock(nn.Module):
         if self.dropout is not None:
             x = self.dropout(x)
         
-        # Baseline workflow step.
         x = self.linear(x)
         
-        # Baseline workflow step.
         if self.activation is not None:
             x = self.activation(x)
         
@@ -63,12 +54,10 @@ class FeedforwardBlock(nn.Module):
 
 
 class MessagePassingBlock(nn.Module):
-    """Represent the MessagePassingBlock baseline component."""
     def __init__(self, in_dim, out_dim, mp_type='gcn', norm_type='batch', 
                  dropout=0.0, activation='relu', heads=1):
         super(MessagePassingBlock, self).__init__()
         
-        # Baseline workflow step.
         if norm_type == 'batch':
             self.norm = nn.BatchNorm1d(in_dim)
         elif norm_type == 'layer':
@@ -78,10 +67,8 @@ class MessagePassingBlock(nn.Module):
         else:
             self.norm = None
         
-        # Baseline workflow step.
         self.dropout = nn.Dropout(dropout) if dropout > 0 else None
         
-        # Baseline workflow step.
         self.mp_type = mp_type
         if mp_type == 'gcn':
             self.mp_layer = GCNConv(in_dim, out_dim)
@@ -96,7 +83,6 @@ class MessagePassingBlock(nn.Module):
         else:
             raise ValueError(f"Unknown message passing type: {mp_type}")
         
-        # Baseline workflow step.
         if activation == 'relu':
             self.activation = nn.ReLU()
         elif activation == 'gelu':
@@ -109,7 +95,6 @@ class MessagePassingBlock(nn.Module):
             self.activation = None
     
     def forward(self, x, edge_index, edge_attr=None):
-        # Baseline workflow step.
         if self.norm is not None:
             x = self.norm(x)
         
@@ -117,13 +102,11 @@ class MessagePassingBlock(nn.Module):
         if self.dropout is not None:
             x = self.dropout(x)
         
-        # Baseline workflow step.
         if self.mp_type in ['gcn', 'gat']:
             x = self.mp_layer(x, edge_index)
         else:
             x = self.mp_layer(x, edge_index, edge_attr)
         
-        # Baseline workflow step.
         if self.activation is not None:
             x = self.activation(x)
         
@@ -186,14 +169,12 @@ class LightTriMPNLayer(MessagePassing):
 
 
 class GlobalPoolingBlock(nn.Module):
-    """Represent the GlobalPoolingBlock baseline component."""
     def __init__(self, pool_type='mean'):
         super(GlobalPoolingBlock, self).__init__()
         self.pool_type = pool_type
     
     def forward(self, x, batch=None):
         if batch is None:
-            # Baseline workflow step.
             if self.pool_type == 'mean':
                 return x.mean(dim=0, keepdim=True)
             elif self.pool_type == 'max':
@@ -212,7 +193,6 @@ class GlobalPoolingBlock(nn.Module):
 
 
 class FusionBlock(nn.Module):
-    """Represent the FusionBlock baseline component."""
     def __init__(self, in_dim1, in_dim2, out_dim, fusion_type='concat'):
         super(FusionBlock, self).__init__()
         self.fusion_type = fusion_type

@@ -1,4 +1,3 @@
-"""Implement the cignn evaluate baseline module."""
 import os
 import argparse
 import numpy as np
@@ -15,7 +14,6 @@ from .data_utils import smiles_to_graph, batch_graphs
 
 
 class LLEDataset(Dataset):
-    """Represent the LLEDataset baseline component."""
     def __init__(self, il_smiles_list, comp2_smiles_list, comp3_smiles_list, 
                  labels, temperatures=None):
         self.il_smiles_list = il_smiles_list
@@ -38,7 +36,6 @@ class LLEDataset(Dataset):
 
 
 def collate_fn(batch):
-    """Run the collate fn baseline operation."""
     il_graphs = []
     comp2_graphs = []
     comp3_graphs = []
@@ -74,7 +71,6 @@ def collate_fn(batch):
 
 
 def evaluate_model(model, dataloader, device, save_plot=False, plot_path=None):
-    """Run the evaluate model baseline operation."""
     model.eval()
     predictions_list = []
     labels_list = []
@@ -152,7 +148,6 @@ def evaluate_model(model, dataloader, device, save_plot=False, plot_path=None):
 
 
 def load_csv_data(csv_path):
-    """Run the load csv data baseline operation."""
     df = pd.read_csv(csv_path)
     
     il_smiles = df['IL (Component 1) full name SMILES'].tolist()
@@ -162,8 +157,7 @@ def load_csv_data(csv_path):
     labels = df[['Ex1', 'Ex2', 'Ex3', 'Rx1', 'Rx2', 'Rx3']].values.astype(np.float32)
     
     temperatures = df['T/K'].values.astype(np.float32)
-    temperatures = (temperatures - 250.0) / 150.0  # Baseline workflow step.
-    
+    temperatures = (temperatures - 250.0) / 150.0
     return il_smiles, comp2_smiles, comp3_smiles, labels, temperatures
 
 
@@ -218,7 +212,6 @@ def main():
     checkpoint = torch.load(args.model_path, map_location=args.device)
     model.load_state_dict(checkpoint['model_state_dict'])
     
-    # Baseline workflow step.
     results = evaluate_model(model, test_loader, args.device, 
                            args.save_plot, args.plot_path)
     

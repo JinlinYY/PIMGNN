@@ -57,7 +57,7 @@ class ModelPredictor:
 
     @staticmethod
     def _checkpoint_architecture(checkpoint: Dict[str, Any]) -> Dict[str, Any]:
-        """Return architecture metadata when it exists in a corrected checkpoint."""
+        """Return architecture metadata when it exists in a self-describing checkpoint."""
         provenance = checkpoint.get("provenance", {})
         if not isinstance(provenance, dict):
             return {}
@@ -67,9 +67,9 @@ class ModelPredictor:
     def _apply_checkpoint_contract(self, checkpoint: Dict[str, Any]) -> None:
         """Configure the runtime before model construction.
 
-        Corrected checkpoints are self-describing. The bundled historical Web
+        Sample-major checkpoints are self-describing. The bundled published Web
         checkpoint predates provenance metadata and is therefore assigned its
-        audited two-scalar, concatenation, legacy-batch contract explicitly.
+        audited two-scalar, concatenation, component-major contract explicitly.
         """
         architecture = self._checkpoint_architecture(checkpoint)
         if architecture:
@@ -97,7 +97,7 @@ class ModelPredictor:
         else:
             setattr(model_config, "SCALAR_DIM", 2)
             setattr(model_config, "FUSION_MODE", "concat")
-            setattr(model_config, "MIXTURE_NODE_LAYOUT", "legacy_component_major")
+            setattr(model_config, "MIXTURE_NODE_LAYOUT", "component_major")
 
     @property
     def pressure_supported(self) -> bool:
@@ -190,7 +190,7 @@ class ModelPredictor:
 
     def _normalized_pressure(self, pressure: float) -> np.float32:
         if self.pressure_scaler is None:
-            # Historical Web checkpoints predate the pressure feature. Their
+            # Published Web checkpoints predate the pressure feature. Their
             # compatibility column is zero, so zero preserves old predictions.
             return np.float32(0.0)
         value = self.pressure_scaler.transform(np.array([pressure], dtype=np.float32))[0]

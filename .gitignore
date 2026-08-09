@@ -28,3 +28,4 @@ private/
 
 # Local experiment reruns; curated public results are already tracked.
 *_reproduction/
+outputs/

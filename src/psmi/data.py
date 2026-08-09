@@ -446,7 +446,7 @@ class FunctionalGroupCache:
 
 class LLEDataset(Dataset):
     """
-    Legacy FP dataset:
+    Checkpoint-compatible FP dataset:
       x = [fp1, fp2, fp3, T_norm, t], y = [Ex1..3, Rx1..3]
     """
     def __init__(

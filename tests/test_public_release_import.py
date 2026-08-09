@@ -1,4 +1,4 @@
-"""Regression tests for the organized public code-and-weights archive."""
+"""Regression tests for the organized public code-and-weights package."""
 
 from __future__ import annotations
 
@@ -18,11 +18,11 @@ SRC_ROOT = PROJECT_ROOT / "src"
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
-from psmi_legacy_public.model import LLEGraphNet
-from psmi_legacy_public.paths import (
+from psmi_checkpoint_compat.model import LLEGraphNet
+from psmi_checkpoint_compat.paths import (
     BASE_TERNARY_CHECKPOINT,
     BIGSOLVDB_FINETUNED_CHECKPOINT,
-    BIGSOLVDB_TEMP_CHECKPOINT,
+    BIGSOLVDB_PRETRAINED_CHECKPOINT,
     COMPSOL_CHECKPOINT,
 )
 from scripts.data_preparation.public_release.build_freesolv_example import build_example
@@ -37,7 +37,7 @@ from scripts.experiments.transfer_learning.public_release.finetune_bigsoldb_dege
 EXPECTED_HASHES = {
     BASE_TERNARY_CHECKPOINT: "1BE55A3BFD4F953064B0FD46CFF0C7CF791919F20982CA14C38F72130DFB80BF",
     COMPSOL_CHECKPOINT: "AB509735FC2A2858F2D80782D47816C250C64730F5EEAB9A80B4C81E4B34A067",
-    BIGSOLVDB_TEMP_CHECKPOINT: "66345720CADA46470F97420D853A86C293669D22B1B03C5FF99AA2D20221AB92",
+    BIGSOLVDB_PRETRAINED_CHECKPOINT: "66345720CADA46470F97420D853A86C293669D22B1B03C5FF99AA2D20221AB92",
     BIGSOLVDB_FINETUNED_CHECKPOINT: "4A418C968A33E5E448CC17C1CDAAD7E6FC7090E2BEDFB07949AEDB07EEBDCA55",
 }
 
@@ -51,9 +51,9 @@ def checkpoint_state(path: Path):
 
 
 class PublicCheckpointTest(unittest.TestCase):
-    """Verify byte preservation and exact historical architecture compatibility."""
+    """Verify byte preservation and exact published architecture compatibility."""
 
-    def test_checkpoint_hashes_match_the_source_archive(self) -> None:
+    def test_checkpoint_hashes_match_the_reference_package(self) -> None:
         for path, expected in EXPECTED_HASHES.items():
             digest = hashlib.sha256(path.read_bytes()).hexdigest().upper()
             self.assertEqual(digest, expected, path.name)
@@ -62,7 +62,7 @@ class PublicCheckpointTest(unittest.TestCase):
         base = LLEGraphNet(use_mix_graph=True, use_fg=True, fg_vocab_size=512)
         base.load_state_dict(checkpoint_state(BASE_TERNARY_CHECKPOINT), strict=True)
 
-        for path in (COMPSOL_CHECKPOINT, BIGSOLVDB_TEMP_CHECKPOINT):
+        for path in (COMPSOL_CHECKPOINT, BIGSOLVDB_PRETRAINED_CHECKPOINT):
             binary = LLEGraphNet(is_binary=True)
             binary.load_state_dict(checkpoint_state(path), strict=True)
 

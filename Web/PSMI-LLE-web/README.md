@@ -72,7 +72,7 @@ python -c "import fastapi, torch, rdkit; print(f'FastAPI {fastapi.__version__}')
 
 ### 4. Verify the bundled model artifacts
 
-The bundled default directory should contain the three files below. `best_model.pt` and `fg_corpus.json` are required; `last_model.pt` provides fallback scaler metadata for compatible historical checkpoints.
+The bundled default directory should contain the three files below. `best_model.pt` and `fg_corpus.json` are required; `last_model.pt` provides fallback scaler metadata for compatible published checkpoints.
 
 ```powershell
 Test-Path Web/PSMI-LLE-web/checkpoints/default/best_model.pt
@@ -282,4 +282,4 @@ Check `http://localhost:8000/health` first, then inspect the backend terminal fo
 
 ### Pressure appears in the form but `pressure_used` is false
 
-This is expected for the bundled historical Web checkpoint because its scalar input is `[T, s]`. Load a compatible three-scalar `[T, s, P]` checkpoint with pressure scaler metadata to enable pressure-conditioned inference.
+This is expected for the bundled published Web checkpoint because its scalar input is `[T, s]`. Load a compatible three-scalar `[T, s, P]` checkpoint with pressure scaler metadata to enable pressure-conditioned inference.

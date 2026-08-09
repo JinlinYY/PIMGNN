@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Implement the mmgnn dataset baseline module."""
 
 from typing import Optional
 import pandas as pd
@@ -14,7 +13,6 @@ from psmi_baselines.common.utils import Scaler
 
 
 class MMGNNDataset(Dataset):
-    """Represent the MMGNNDataset baseline component."""
     
     def __init__(
         self,
@@ -37,7 +35,6 @@ class MMGNNDataset(Dataset):
             self._build_cache()
     
     def _build_cache(self):
-        """Run the build cache baseline operation."""
         graphs = []
         T_norm_list = []
         t_list = []
@@ -46,16 +43,12 @@ class MMGNNDataset(Dataset):
         for idx in range(len(self.df)):
             row = self.df.iloc[idx]
             
-            # Baseline workflow step.
             graph1 = self.graph_builder.smiles_to_graph(row["smiles1"])
             graph2 = self.graph_builder.smiles_to_graph(row["smiles2"])
             graph3 = self.graph_builder.smiles_to_graph(row["smiles3"])
             
-            # Baseline workflow step.
             merged_graph = self.graph_builder.merge_graphs([graph1, graph2, graph3])
             
-            # Baseline workflow step.
-            # Baseline workflow step.
             mol_ranges = merged_graph['molecule_ranges']
             data = Data(
                 x=torch.from_numpy(merged_graph['node_features']).float(),
@@ -63,19 +56,16 @@ class MMGNNDataset(Dataset):
                 edge_attr=torch.from_numpy(merged_graph['edge_features']).float(),
                 global_features=torch.from_numpy(merged_graph['global_features']).float(),
             )
-            # Baseline workflow step.
             data.molecule_ranges = mol_ranges
             data.num_molecules = len(mol_ranges)
             graphs.append(data)
             
-            # Baseline workflow step.
             T_norm = self.T_scaler.transform(
                 pd.Series([row["T"]]).values.astype('float32')
             )[0]
             T_norm_list.append(float(T_norm))
             t_list.append(float(row["t"]))
             
-            # Baseline workflow step.
             y = torch.tensor([
                 row["Ex1"], row["Ex2"], row["Ex3"],
                 row["Rx1"], row["Rx2"], row["Rx3"]
@@ -99,7 +89,6 @@ class MMGNNDataset(Dataset):
                 self._y[idx]
             )
         
-        # Baseline workflow step.
         row = self.df.iloc[idx]
         
         graph1 = self.graph_builder.smiles_to_graph(row["smiles1"])
@@ -130,10 +119,8 @@ class MMGNNDataset(Dataset):
 
 
 def collate_fn(batch):
-    """Run the collate fn baseline operation."""
     graphs, T_norm, t, y = zip(*batch)
     
-    # Baseline workflow step.
     batch_graphs = Batch.from_data_list(graphs)
     
     T_norm = torch.stack(T_norm)

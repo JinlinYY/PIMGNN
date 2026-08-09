@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Implement the bigsolvdb model baseline module."""
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -7,14 +6,12 @@ from typing import Dict
 
 
 def _split_fp_and_scalars(x: torch.Tensor, fp_bits: int) -> tuple:
-    """Run the split fp and scalars baseline operation."""
     fp = x[:, : 2 * fp_bits].view(x.shape[0], 2, fp_bits)
     scalars = x[:, 2 * fp_bits :]
     return fp, scalars
 
 
 class SolubilityMLP(nn.Module):
-    """Represent the SolubilityMLP baseline component."""
     def __init__(self, in_dim: int, hidden: int = 512, dropout: float = 0.15):
         super().__init__()
         self.net = nn.Sequential(
@@ -32,7 +29,6 @@ class SolubilityMLP(nn.Module):
 
 
 class SolubilityANN(nn.Module):
-    """Represent the SolubilityANN baseline component."""
     def __init__(self, in_dim: int, hidden: int = 768, dropout: float = 0.20):
         super().__init__()
         h1 = hidden
@@ -56,7 +52,6 @@ class SolubilityANN(nn.Module):
 
 
 class SolubilityLSTM(nn.Module):
-    """Represent the SolubilityLSTM baseline component."""
     def __init__(
         self,
         fp_bits: int,
@@ -68,7 +63,7 @@ class SolubilityLSTM(nn.Module):
         super().__init__()
         self.fp_bits = int(fp_bits)
         self.fp_proj = nn.Linear(fp_bits, d_model)
-        self.num_proj = nn.Linear(1, d_model)  # Baseline workflow step.
+        self.num_proj = nn.Linear(1, d_model)
         self.lstm = nn.LSTM(
             input_size=d_model,
             hidden_size=d_model,
@@ -96,7 +91,6 @@ class SolubilityLSTM(nn.Module):
 
 
 class SolubilityTransformer(nn.Module):
-    """Represent the SolubilityTransformer baseline component."""
     def __init__(
         self,
         fp_bits: int,
@@ -109,9 +103,8 @@ class SolubilityTransformer(nn.Module):
         super().__init__()
         self.fp_bits = int(fp_bits)
         self.fp_proj = nn.Linear(fp_bits, d_model)
-        self.num_proj = nn.Linear(1, d_model)  # Baseline workflow step.
-        
-        self.pos = nn.Parameter(torch.zeros(1, 3, d_model))  # Baseline workflow step.
+        self.num_proj = nn.Linear(1, d_model)
+        self.pos = nn.Parameter(torch.zeros(1, 3, d_model))
         enc_layer = nn.TransformerEncoderLayer(
             d_model=d_model,
             nhead=n_heads,
@@ -145,7 +138,6 @@ class SolubilityTransformer(nn.Module):
 
 
 class SolubilityTabKNet(nn.Module):
-    """Represent the SolubilityTabKNet baseline component."""
     def __init__(
         self,
         in_dim: int,
@@ -207,7 +199,6 @@ def build_solubility_model(
     dropout: float,
     **kwargs
 ) -> nn.Module:
-    """Run the build solubility model baseline operation."""
     name = model_name.lower()
     
     if name == "mlp":

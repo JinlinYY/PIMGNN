@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Implement the mmgnn main baseline module."""
 
 import os
 import argparse
@@ -32,7 +31,6 @@ def main():
     out_dir = args.out_dir
     os.makedirs(out_dir, exist_ok=True)
     
-    # Run the training step.
     results_dir = os.path.join(out_dir, "results")
     os.makedirs(results_dir, exist_ok=True)
     
@@ -44,11 +42,9 @@ def main():
     print("\n1) Loading datasets from specified CSV files...")
     from .data_loader import load_csv_data
     
-    # Run the training step.
     train_csv_path = os.path.join(args.data_dir, "train.csv")
     val_csv_path = os.path.join(args.data_dir, "validation.csv")
     
-    # Baseline workflow step.
     if not os.path.exists(train_csv_path):
         raise FileNotFoundError(f" training file does not exist : {train_csv_path}")
     if not os.path.exists(val_csv_path):
@@ -85,7 +81,6 @@ def main():
     print(f" validation set : {len(val_df)} rows | systems: {val_df['system_id'].nunique()}")
     print(f" test set : {len(test_df)} rows | systems: {test_df['system_id'].nunique()}")
     
-    # Run the training step.
     print("\n3) Training MMGNN...")
     if args.resume:
         print(f" checkpoint-resume mode : from {args.resume} resume training ")
@@ -106,8 +101,8 @@ def main():
         explainer_method='local_mask',
         dropout=C.DROPOUT,
         patience=150,  # Apply early stopping.
-        min_delta=0.0,  # Baseline workflow step.
-        resume_from=args.resume,  # Baseline workflow step.
+        min_delta=0.0,
+        resume_from=args.resume,
         save_checkpoint_every=args.checkpoint_every,  # Save the generated artifacts.
     )
     

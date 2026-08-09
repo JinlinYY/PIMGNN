@@ -26,7 +26,7 @@ def main() -> None:
     ap = argparse.ArgumentParser("Organize application-case results by system+temperature")
     ap.add_argument("--excel_path", type=str, required=True, help=" input Excel path ")
     ap.add_argument("--out_dir", type=str, required=True, help=" output directory ")
-    ap.add_argument("--group_by_temp", action="store_true", help=" whether by ( system identifier + temperature ) Grouping ")
+    ap.add_argument("--group_by_temp", action="store_true", help="Group records by system identifier and temperature.")
     args = ap.parse_args()
 
     df = pd.read_excel(Path(args.excel_path))

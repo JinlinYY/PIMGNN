@@ -43,7 +43,6 @@ apply_nature_style()
 def parity_plots(df_pred: pd.DataFrame, out_dir: str, backend: str = "auto", save_pdf: bool = True) -> None:
     os.makedirs(out_dir, exist_ok=True)
 
-    # Baseline workflow step.
     lo, hi = -0.05, 1.05
 
     # E parity
@@ -51,7 +50,7 @@ def parity_plots(df_pred: pd.DataFrame, out_dir: str, backend: str = "auto", sav
     ax = plt.gca()
     for k in [1, 2, 3]:
         ax.scatter(df_pred[f"Ex{k}"], df_pred[f"pred_Ex{k}"], s=10, label=f"E{k}")
-    ax.plot([lo, hi], [lo, hi], linewidth=1)  # Baseline workflow step.
+    ax.plot([lo, hi], [lo, hi], linewidth=1)
     ax.set_xlim(lo, hi)
     ax.set_ylim(lo, hi)
     ax.set_xlabel("True E")
@@ -89,12 +88,10 @@ def ternary_to_xy(x1: float, x2: float, x3: float) -> Tuple[float, float]:
 
 
 def draw_ternary_axes(ax, labels=("Comp1(IL)", "Comp2", "Comp3")) -> None:
-    """Run the draw ternary axes baseline operation."""
     A = (0.0, 0.0)
     B = (1.0, 0.0)
     C = (0.5, math.sqrt(3) / 2.0)
 
-    # Baseline workflow step.
     ax.plot([A[0], B[0]], [A[1], B[1]], color="black", linewidth=1.3)
     ax.plot([B[0], C[0]], [B[1], C[1]], color="black", linewidth=1.3)
     ax.plot([C[0], A[0]], [C[1], A[1]], color="black", linewidth=1.3)
@@ -104,7 +101,6 @@ def draw_ternary_axes(ax, labels=("Comp1(IL)", "Comp2", "Comp3")) -> None:
     ax.set_ylim(-0.05, math.sqrt(3) / 2 + 0.08)
     ax.axis("off")
 
-    # Baseline workflow step.
     ax.text(A[0] - 0.02, A[1] - 0.035, labels[0], ha="right", va="top", color="black")
     ax.text(B[0] + 0.02, B[1] - 0.035, labels[1], ha="left", va="top", color="black")
     ax.text(C[0], C[1] + 0.04, labels[2], ha="center", va="bottom", color="black")
@@ -257,7 +253,6 @@ def plot_test_group_ternary(model: torch.nn.Module, T_scaler,
     ax.legend(loc="upper left", fontsize=9)
 
     # ---- Metrics box: still top-right, but shift DOWN to avoid covering the top vertex label ----
-    # Baseline workflow step.
     # ax.text(
     #     0.985, 0.92, metrics_text,
     #     transform=ax.transAxes,
@@ -267,15 +262,13 @@ def plot_test_group_ternary(model: torch.nn.Module, T_scaler,
     # )
 
     # ---- Metrics table (4 rows x 3 cols): header + 3 rows, still top-right ----
-    # Baseline workflow step.
-
     # fallback values
     mae_all = rmse_all = r2_all = np.nan
     mae_E = rmse_E = r2_E = np.nan
     mae_R = rmse_R = r2_R = np.nan
 
     if len(gp) > 0:
-        # you already computed these above; if not, keep this block
+        # Recompute the summary from the displayed pointwise predictions.
         y_true_6 = gp[["Ex1", "Ex2", "Ex3", "Rx1", "Rx2", "Rx3"]].to_numpy(dtype=np.float32)
         y_pred_6 = gp[["pred_Ex1", "pred_Ex2", "pred_Ex3", "pred_Rx1", "pred_Rx2", "pred_Rx3"]].to_numpy(dtype=np.float32)
         mae_all, rmse_all, r2_all = calc_mae_rmse_r2(y_true_6, y_pred_6)
@@ -293,7 +286,6 @@ def plot_test_group_ternary(model: torch.nn.Module, T_scaler,
             return "N/A"
         return f"{x:.4f}"
 
-    # Baseline workflow step.
     def _line(group: str, metric: str, value: str) -> str:
         return f"{group:<8} {metric:<5} {value:<8}"
 
@@ -316,7 +308,7 @@ def plot_test_group_ternary(model: torch.nn.Module, T_scaler,
         ha="right", va="top",
         fontsize=10,
         linespacing=1.15,
-        fontfamily="DejaVu Sans Mono",  # Baseline workflow step.
+        fontfamily="DejaVu Sans Mono",
         bbox=dict(
             boxstyle="round,pad=0.30",
             facecolor="white",

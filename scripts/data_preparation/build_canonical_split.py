@@ -1,4 +1,4 @@
-"""Build a disjoint PSMI split manifest with a locked historical test set."""
+"""Build a disjoint PSMI split with a fixed reference test partition."""
 
 import argparse
 import hashlib
@@ -43,7 +43,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
-    """Create and validate the canonical corrected-model split."""
+    """Create and validate the canonical system-level split."""
     args = parse_args()
     dataset_path = args.dataset.resolve()
     prediction_path = args.locked_test_predictions.resolve()
@@ -73,17 +73,18 @@ def main() -> None:
 
     payload = {
         "schema_version": 1,
-        "name": "main_benchmark_corrected_v2",
+        "name": "main_benchmark_system_split",
         "dataset_path": str(dataset_path.relative_to(PROJECT_ROOT)),
         "dataset_sha256": sha256_file(dataset_path),
         "filter": {"minimum_tie_lines_per_system_temperature": int(args.min_points)},
         "seed": int(args.seed),
-        "strategy": "locked_historical_test_then_seeded_train_validation",
+        "strategy": "fixed_reference_test_then_seeded_train_validation",
         "test_lock_source": str(prediction_path.relative_to(PROJECT_ROOT)),
         "test_lock_source_sha256": sha256_file(prediction_path),
         "selection_policy": (
-            "The historical 78-system test set is locked for comparability. "
-            "Corrected-model selection must use validation data only; the test set is evaluated once."
+            "The 78-system reference test partition is fixed. Model selection "
+            "uses validation systems only; the test partition is evaluated once "
+            "after selection."
         ),
         "counts": {
             "records_without_augmentation": int(len(raw)),

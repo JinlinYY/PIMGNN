@@ -19,7 +19,15 @@ except ModuleNotFoundError:  # Support ``import scripts.run_application_case``.
     from scripts._bootstrap import add_src_to_path
 
 PROJECT_ROOT = add_src_to_path()
-DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "experiments" / "14_industrial_cases" / "00_application_workflow" / "results" / "reproduction"
+DEFAULT_OUTPUT_DIR = (
+    PROJECT_ROOT
+    / "experiments"
+    / "section_3_results"
+    / "3_4_industrial_extraction_design"
+    / "application_workflow"
+    / "results"
+    / "reproduction"
+)
 
 import numpy as np
 import pandas as pd
@@ -269,14 +277,14 @@ def load_model_and_scaler(ckpt_path: str, device: str) -> tuple:
                 model_state = ckpt
             else:
                 
-                print(f" warning : unable to Identify checkpoint format . checkpoint Key : {list(ckpt.keys())}")
+                print(f"Warning: unrecognized checkpoint format; keys={list(ckpt.keys())}")
                 model_state = ckpt
     else:
         
         model_state = ckpt
     
     if model_state is None:
-        raise ValueError(f" unable to from checkpoint in Extract model checkpoint . checkpoint format : {ckpt.keys() if isinstance(ckpt, dict) else type(ckpt)}")
+        raise ValueError(f"Unable to extract a state dictionary from checkpoint format: {ckpt.keys() if isinstance(ckpt, dict) else type(ckpt)}")
     
     print(f"  T_mean: {T_mean}, T_std: {T_std}")
     
@@ -367,7 +375,7 @@ def test_application_case(
     print(f" model loaded successfully ")
     
     
-    print("\n========== Into rows prediction ==========")
+    print("\n========== Running prediction ==========")
     with torch.no_grad():
         df_pred = predict_pointwise_df_raw(model, T_scaler, df_aug, device=device)
     
@@ -827,7 +835,7 @@ def print_statistics(df_pred: pd.DataFrame, out_dir: str) -> None:
 def analyze_application_case(csv_path: str, out_dir: str = str(DEFAULT_OUTPUT_DIR)) -> None:
     """Analyze application case."""
     if not os.path.isfile(csv_path):
-        print(f" error : CSV file does not exist : {csv_path}")
+        print(f"Error: CSV file does not exist: {csv_path}")
         sys.exit(1)
     
     print(f" load data : {csv_path}")
@@ -858,12 +866,12 @@ def main():
 Examples:
  # Complete workflow: Excel -> prediction -> analysis
  python scripts/run_application_case.py --excel datasets/raw/application_case_1.xlsx \\
- --ckpt models/paper_historical/figure2a_psmi/best_model.pt \\
- --out_dir experiments/14_industrial_cases/00_application_workflow/results/reproduction
+ --ckpt experiments/section_3_results/3_1_lle_prediction/main_benchmark/models/figure_2a_psmi/best_model.pt \\
+ --out_dir experiments/section_3_results/3_4_industrial_extraction_design/application_workflow/results/reproduction
  
  # Analyze an existing prediction table 
- python scripts/run_application_case.py --csv experiments/14_industrial_cases/00_application_workflow/results/application_case_predictions.csv \\
- --out_dir experiments/14_industrial_cases/00_application_workflow/results/reproduction --analyze_only
+ python scripts/run_application_case.py --csv experiments/section_3_results/3_4_industrial_extraction_design/application_workflow/results/application_case_predictions.csv \\
+ --out_dir experiments/section_3_results/3_4_industrial_extraction_design/application_workflow/results/reproduction --analyze_only
  """
     )
     
@@ -921,7 +929,7 @@ Examples:
     
     if args.excel is not None and args.ckpt is None:
         if not os.path.isfile(args.excel):
-            print(f" error : Excel file does not exist : {args.excel}")
+            print(f"Error: Excel file does not exist: {args.excel}")
             sys.exit(1)
         df_plot = load_application_case_plot_excel(args.excel)
         plot_ternary_models_vs_experiment(df_plot, args.out_dir)
@@ -934,11 +942,11 @@ Examples:
         sys.exit(1)
 
     if not os.path.isfile(args.excel):
-        print(f" error : Excel file does not exist : {args.excel}")
+        print(f"Error: Excel file does not exist: {args.excel}")
         sys.exit(1)
 
     if not os.path.isfile(args.ckpt):
-        print(f" error : model checkpoint does not exist : {args.ckpt}")
+        print(f"Error: model checkpoint does not exist: {args.ckpt}")
         sys.exit(1)
 
     

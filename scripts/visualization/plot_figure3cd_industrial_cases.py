@@ -1,10 +1,8 @@
 """Plot Figure 3c-d for the industrial extraction case studies.
 
-All experimental and model endpoints are read from the supplied application-
-case workbook.  Relative to the original ECNU plotting script, marker linear
-dimensions are enlarged by 1.5x (Matplotlib scatter area: 36 -> 81 pt^2), tie lines are
-made lighter, experimental observations are drawn last, and archived model
-labels are normalized to PSMI.
+All experimental and model endpoints are read from the chapter-aligned
+application workbook. Experimental observations are drawn above the model
+predictions, and tie lines remain visually subordinate to the phase endpoints.
 """
 
 from __future__ import annotations
@@ -28,10 +26,8 @@ MODEL_COLORS = {
     "UNIFAC": "#3C5488",
 }
 PHASE_MARKERS = {"Extract": "o", "Raffinate": "^"}
-ARCHIVED_MODEL_LABEL = "PI" + "MGNN"
-
-# The original script used s=36.  Because scatter ``s`` is marker area, a
-# 1.5x linear enlargement requires 2.25x area: 36 * 1.5^2 = 81 pt^2.
+# Matplotlib interprets ``s`` as marker area. A 1.5x linear scale therefore
+# requires 2.25x the base area: 36 * 1.5^2 = 81 pt^2.
 ORIGINAL_MARKER_AREA = 36.0
 MARKER_LINEAR_SCALE = 1.5
 MARKER_AREA = ORIGINAL_MARKER_AREA * MARKER_LINEAR_SCALE**2
@@ -39,29 +35,23 @@ MARKER_AREA = ORIGINAL_MARKER_AREA * MARKER_LINEAR_SCALE**2
 
 def parse_args() -> argparse.Namespace:
     project_root = Path(__file__).resolve().parents[2]
-    archived_experiment_root = (
+    public_experiment_root = (
         project_root
         / "experiments"
-        / "09_application_cases"
-        / "industrial_extraction_process_design"
+        / "section_3_results"
+        / "3_4_industrial_extraction_design"
     )
-    public_experiment_root = project_root / "experiments" / "14_industrial_cases"
     public_data = (
         public_experiment_root
-        / "01_aromatic_extraction"
+        / "3_4_1_sulfolane_aromatic_extraction"
         / "data"
         / "industrial_extraction_lle_data.xlsx"
-    )
-    default_data = (
-        public_data
-        if public_data.is_file()
-        else archived_experiment_root / "data" / "industrial_extraction_lle_data.xlsx"
     )
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--data",
         type=Path,
-        default=default_data,
+        default=public_data,
     )
     parser.add_argument(
         "--output-dir",
@@ -69,7 +59,8 @@ def parse_args() -> argparse.Namespace:
         default=(
             project_root
             / "experiments"
-            / "14_industrial_cases"
+            / "section_3_results"
+            / "3_4_industrial_extraction_design"
             / "figures"
         ),
     )
@@ -111,9 +102,7 @@ def load_data(path: Path) -> pd.DataFrame:
         raise ValueError(f"Missing required columns: {sorted(missing)}")
 
     data = data.copy()
-    data["Model"] = data["Model"].replace(
-        {ARCHIVED_MODEL_LABEL: "PSMI", "COSMO-rs": "COSMO-RS"}
-    )
+    data["Model"] = data["Model"].replace({"COSMO-rs": "COSMO-RS"})
     unknown = sorted(set(data["Model"].dropna()) - set(MODEL_ORDER))
     if unknown:
         raise ValueError(f"Unexpected model labels: {unknown}")

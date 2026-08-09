@@ -303,7 +303,7 @@ def compute_physics_metrics(
         "param_cov": float(param_samples / total_samples) if total_samples > 0 else 0.0,
     }
     
-    # Physics metrics (only if we have NRTL params)
+    # Physics diagnostics require fitted NRTL parameters.
     if len(all_mu_res) > 0:
         mu_res = np.concatenate(all_mu_res).reshape(-1)
         metrics["mu_res_mae"] = float(np.mean(np.abs(mu_res)))

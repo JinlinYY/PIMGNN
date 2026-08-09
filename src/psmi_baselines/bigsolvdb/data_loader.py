@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Implement the bigsolvdb data_loader baseline module."""
 import os
 import warnings
 import numpy as np
@@ -9,12 +8,10 @@ from typing import Tuple
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-# Baseline workflow step.
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 
 
 def canonicalize_smiles(smi: str) -> str:
-    """Run the canonicalize smiles baseline operation."""
     if not isinstance(smi, str) or not smi.strip():
         return ""
     try:
@@ -27,12 +24,10 @@ def canonicalize_smiles(smi: str) -> str:
 
 
 def morgan_fp(smi: str, radius: int = 2, n_bits: int = 2048) -> np.ndarray:
-    """Run the morgan fp baseline operation."""
     mol = Chem.MolFromSmiles(smi)
     if mol is None:
         return np.zeros((n_bits,), dtype=np.float32)
     
-    # Baseline workflow step.
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", DeprecationWarning)
         warnings.simplefilter("ignore", UserWarning)
@@ -53,7 +48,6 @@ def load_bigsolvdb_data(
     fp_bits: int = 2048,
     fp_radius: int = 2
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Run the load bigsolvdb data baseline operation."""
     print(f" load dataset : {csv_path}")
     df = pd.read_csv(csv_path)
     
@@ -64,24 +58,19 @@ def load_bigsolvdb_data(
     df['SMILES_Solute'] = df['SMILES_Solute'].astype(str).map(canonicalize_smiles)
     df['SMILES_Solvent'] = df['SMILES_Solvent'].astype(str).map(canonicalize_smiles)
     
-    # Baseline workflow step.
     df = df[(df['SMILES_Solute'] != "") & (df['SMILES_Solvent'] != "")].copy()
     
-    # Baseline workflow step.
     if target_col not in df.columns:
         raise ValueError(f" target column '{target_col}' does not exist . available columns : {list(df.columns)}")
     
-    # Baseline workflow step.
     df = df.dropna(subset=[target_col, 'Temperature_K']).copy()
     
     print(f" number of cleaned records : {len(df)}")
     
-    # Baseline workflow step.
     print(" generate molecular fingerprints ...")
     solute_fps = []
     solvent_fps = []
     
-    # Baseline workflow step.
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", DeprecationWarning)
         warnings.simplefilter("ignore", UserWarning)
@@ -98,10 +87,8 @@ def load_bigsolvdb_data(
     df['T'] = df['Temperature_K'].astype(np.float32)
     df['target'] = df[target_col].astype(np.float32)
     
-    # Run the training step.
     print(f" split dataset : test set {test_size:.1%}, validation set {val_size:.1%}")
     
-    # Run the training step.
     train_val_df, test_df = train_test_split(
         df,
         test_size=test_size,
@@ -109,8 +96,7 @@ def load_bigsolvdb_data(
         shuffle=True
     )
     
-    # Run the training step.
-    val_ratio = val_size / (1 - test_size)  # Baseline workflow step.
+    val_ratio = val_size / (1 - test_size)
     train_df, val_df = train_test_split(
         train_val_df,
         test_size=val_ratio,

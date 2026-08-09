@@ -149,10 +149,10 @@ def main() -> None:
     ap.add_argument("--excel_path", type=str, required=True, help=" input Excel path ")
     ap.add_argument("--out_dir", type=str, required=True, help=" output directory ")
     ap.add_argument("--group_by_temp", action="store_true",
-                    help=" whether put ( system identifier + temperature ) Treat as Different system ( only for Original Excel valid )")
-    ap.add_argument("--draw_curve", action="store_true", help=" whether to plot Ex/Rx boundary curve (PCA ordered polyline )")
-    ap.add_argument("--draw_tielines", action="store_true", help=" whether to plot tie-lines( Connect Ex/Rx)")
-    ap.add_argument("--make_pdf", action="store_true", help=" whether to export a multipage document PDF")
+                    help="Treat each system-temperature pair as a separate phase diagram.")
+    ap.add_argument("--draw_curve", action="store_true", help="Draw PCA-ordered extract and raffinate boundary curves.")
+    ap.add_argument("--draw_tielines", action="store_true", help="Connect paired extract and raffinate compositions.")
+    ap.add_argument("--make_pdf", action="store_true", help="Export all systems as a multipage PDF.")
     ap.add_argument("--max_systems", type=int, default=-1, help=" maximum number of systems to export (-1= all )")
     args = ap.parse_args()
 

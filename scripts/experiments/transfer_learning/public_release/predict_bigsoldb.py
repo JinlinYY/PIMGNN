@@ -13,13 +13,13 @@ except ImportError:
 
 add_src_to_path()
 
-from psmi_legacy_public import config as C
-from psmi_legacy_public.data import GraphCache, collate_graph_batch
-from psmi_legacy_public.model import LLEGraphNet
-from psmi_legacy_public.paths import (
+from psmi_checkpoint_compat import config as C
+from psmi_checkpoint_compat.data import GraphCache, collate_graph_batch
+from psmi_checkpoint_compat.model import LLEGraphNet
+from psmi_checkpoint_compat.paths import (
     BIGSOLVDB_DATA,
     BIGSOLVDB_EXPERIMENT_ROOT,
-    BIGSOLVDB_TEMP_CHECKPOINT,
+    BIGSOLVDB_PRETRAINED_CHECKPOINT,
 )
 
 class BigSolDataset(Dataset):
@@ -35,19 +35,16 @@ class BigSolDataset(Dataset):
         row = self.df.iloc[idx]
         def fetch_g(s):
             s_str = str(s)
-            # Legacy public-release workflow step.
             for attr in ['graphs', 'cache', '_graphs']:
                 if hasattr(self.g_cache, attr):
                     d = getattr(self.g_cache, attr)
                     if s in d: return d[s]
                     if s_str in d: return d[s_str]
                     
-                    # Legacy public-release workflow step.
                     if pd.isna(s) or s_str == '-' or s_str == 'nan':
                         if '' in d: return d['']
                         return list(d.values())[0]
             
-            # Legacy public-release workflow step.
             for attr in ['graphs', 'cache', '_graphs']:
                 if hasattr(self.g_cache, attr):
                     return list(getattr(self.g_cache, attr).values())[0]
@@ -61,9 +58,9 @@ class BigSolDataset(Dataset):
                torch.tensor(self.y_log[idx], dtype=torch.float32)
 
 def main():
-    parser = argparse.ArgumentParser(description="Predict BigSolDB with the archived binary checkpoint.")
+    parser = argparse.ArgumentParser(description="Predict BigSolDB with the reference binary checkpoint.")
     parser.add_argument("--data", type=Path, default=BIGSOLVDB_DATA)
-    parser.add_argument("--checkpoint", type=Path, default=BIGSOLVDB_TEMP_CHECKPOINT)
+    parser.add_argument("--checkpoint", type=Path, default=BIGSOLVDB_PRETRAINED_CHECKPOINT)
     parser.add_argument(
         "--output",
         type=Path,
@@ -74,7 +71,7 @@ def main():
     csv_path = str(args.data)
     batch_size = args.batch_size
     
-    print(f"🚀 launch Training-Free Extraction Mode ...")
+    print("Starting checkpoint-only BigSolDB prediction...")
     df = pd.read_csv(csv_path)
     g_cache = GraphCache(add_hs=C.GRAPH_ADD_HS, use_gasteiger=C.GRAPH_USE_GASTEIGER, max_atoms=C.GRAPH_MAX_ATOMS)
     
@@ -87,13 +84,12 @@ def main():
     
     model = LLEGraphNet(gnn_hidden=C.GNN_HIDDEN, gnn_layers=C.GNN_LAYERS, mlp_hidden=C.GNN_HEAD_HIDDEN, is_binary=True).to(C.DEVICE)
     
-    # Legacy public-release workflow step.
     model_path = str(args.checkpoint)
     if os.path.exists(model_path):
         model.load_state_dict(torch.load(model_path, map_location=C.DEVICE, weights_only=True))
-        print("✅ successful load Already training complete model checkpoint ! skip Training Session .")
+        print(f"Loaded checkpoint: {model_path}")
     else:
-        print("❌ Not Found weights file , verify whether at current directory down .")
+        raise FileNotFoundError(f"Checkpoint not found: {model_path}")
         return
         
     print(" True at Sweep Tail generate results file , Never False ...")
@@ -102,13 +98,12 @@ def main():
     with torch.no_grad():
         for batch_x, batch_y in full_loader:
             batch_x = {k: (v.to(C.DEVICE) if isinstance(v, torch.Tensor) else v) for k, v in batch_x.items()}
-            # Legacy public-release workflow step.
             all_preds.extend(10**model(batch_x).cpu().numpy()) 
             all_trues.extend(10**batch_y.numpy())
             
     args.output.parent.mkdir(parents=True, exist_ok=True)
     pd.DataFrame({'y_true': all_trues, 'y_pred': all_preds}).to_csv(args.output, index=False)
-    print("✅ Perfect Closing ! results Added BigSolDB_results_new.csv")
+    print(f"Prediction complete. Results written to {args.output}")
 
 if __name__ == "__main__":
     main()

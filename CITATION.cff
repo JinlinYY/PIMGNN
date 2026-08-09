@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If PSMI supports your research, please cite the associated article and this software release."
+title: "PSMI: Physics-Informed Prediction of Ternary Liquid-Liquid Equilibria"
+type: software
+version: 0.1.0
+date-released: 2026-08-09
+authors:
+  - name: "PSMI Contributors"
+license: MIT

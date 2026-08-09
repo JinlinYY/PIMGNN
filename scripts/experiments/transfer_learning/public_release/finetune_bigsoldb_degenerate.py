@@ -14,10 +14,10 @@ except ImportError:
 
 add_src_to_path()
 
-from psmi_legacy_public import config as C
-from psmi_legacy_public.data import GraphCache, collate_graph_batch
-from psmi_legacy_public.model import LLEGraphNet
-from psmi_legacy_public.paths import (
+from psmi_checkpoint_compat import config as C
+from psmi_checkpoint_compat.data import GraphCache, collate_graph_batch
+from psmi_checkpoint_compat.model import LLEGraphNet
+from psmi_checkpoint_compat.paths import (
     BASE_TERNARY_CHECKPOINT,
     BIGSOLVDB_DATA,
     BIGSOLVDB_EXPERIMENT_ROOT,
@@ -26,7 +26,6 @@ from psmi_legacy_public.paths import (
 class BigSolDataset(Dataset):
     def __init__(self, df, g_cache, target_col='y_true'):
         self.df = df.dropna(subset=['smiles1', target_col]).reset_index(drop=True)
-        # Legacy public-release workflow step.
         self.y_log = np.log10(self.df[target_col].values + 1e-12)
         self.g_cache = g_cache
         
@@ -43,12 +42,10 @@ class BigSolDataset(Dataset):
                     if s in d: return d[s]
                     if s_str in d: return d[s_str]
                     
-                    # Legacy public-release workflow step.
                     if pd.isna(s) or s_str.lower() in ['-', 'nan', '', 'smiles']:
                         if '' in d: return d['']
                         if len(d) > 0: return list(d.values())[0]
             
-            # Legacy public-release workflow step.
             for attr in ['graphs', 'cache', '_graphs']:
                 if hasattr(self.g_cache, attr):
                     d = getattr(self.g_cache, attr)
@@ -58,11 +55,8 @@ class BigSolDataset(Dataset):
         g1 = fetch_g(row['smiles1'])
         g2 = fetch_g(row['smiles2'])
         
-        # Legacy public-release workflow step.
-        # Legacy public-release workflow step.
         g3 = g2  
         
-        # Legacy public-release workflow step.
         scalars = torch.tensor([row['T'] / 298.15 if 'T' in row else 1.0, 0.5], dtype=torch.float32) 
         
         return {'g1': g1, 'g2': g2, 'g3': g3, 'scalars': scalars, 
@@ -72,7 +66,7 @@ class BigSolDataset(Dataset):
 
 
 def compatible_backbone_weights(checkpoint, model_state):
-    """Select shape-compatible non-head tensors from a historical checkpoint."""
+    """Select shape-compatible non-head tensors from a published checkpoint."""
     pretrained = checkpoint.get("state_dict", checkpoint.get("model", checkpoint))
     return {
         key: value
@@ -84,7 +78,7 @@ def compatible_backbone_weights(checkpoint, model_state):
     }
 
 def main():
-    parser = argparse.ArgumentParser(description="Fine-tune the legacy binary model on BigSolDB.")
+    parser = argparse.ArgumentParser(description="Fine-tune the checkpoint-compatible binary model on BigSolDB.")
     parser.add_argument("--data", type=Path, default=BIGSOLVDB_DATA)
     parser.add_argument("--pretrained", type=Path, default=BASE_TERNARY_CHECKPOINT)
     parser.add_argument(
@@ -103,7 +97,6 @@ def main():
     df = pd.read_csv(csv_path)
     
     g_cache = GraphCache(add_hs=C.GRAPH_ADD_HS, use_gasteiger=C.GRAPH_USE_GASTEIGER, max_atoms=C.GRAPH_MAX_ATOMS)
-    # Legacy public-release workflow step.
     smiles_clean = [s for s in pd.concat([df["smiles1"], df["smiles2"]]).unique() if pd.notna(s) and str(s) != '-']
     g_cache.build_from_smiles(smiles_clean)
     
@@ -115,21 +108,19 @@ def main():
     
     model = LLEGraphNet(gnn_hidden=C.GNN_HIDDEN, gnn_layers=C.GNN_LAYERS, mlp_hidden=C.GNN_HEAD_HIDDEN, is_binary=True).to(C.DEVICE)
     
-    # Legacy public-release workflow step.
     model_path = str(args.pretrained)
     if os.path.exists(model_path):
-        print(f"📦 loading Ternary pretraining Pedestal : {model_path}...")
+        print(f"Loading ternary pretrained checkpoint: {model_path}")
         checkpoint = torch.load(model_path, map_location=C.DEVICE, weights_only=True)
         model_dict = model.state_dict()
         transfer_dict = compatible_backbone_weights(checkpoint, model_dict)
         model_dict.update(transfer_dict)
         model.load_state_dict(model_dict)
-        print(f"✅ successful Fusion {len(transfer_dict)} Layer Ternary Interaction feature !")
+        print(f"Transferred {len(transfer_dict)} compatible ternary-interaction layers.")
     else:
         print(f"Pretrained checkpoint not found: {model_path}")
         return
         
-    # Legacy public-release workflow step.
     head_params, base_params = [], []
     for name, param in model.named_parameters():
         if 'head' in name: head_params.append(param)
@@ -142,7 +133,7 @@ def main():
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.5)
     criterion = nn.MSELoss()
     
-    print("\n🔥 Degeneration Limit fine-tuning Formal start ...")
+    print("\nDegenerate-composition fine-tuning started...")
     for epoch in range(epochs):
         model.train() 
         total_loss = 0.0
@@ -169,7 +160,7 @@ def main():
             
     args.output.parent.mkdir(parents=True, exist_ok=True)
     pd.DataFrame({'y_true': all_trues, 'y_pred': all_preds}).to_csv(args.output, index=False)
-    print("✅ Pinnacle task complete ! Please check BigSolDB_results_transfer.csv")
+    print(f"Fine-tuning complete. Predictions written to {args.output}")
 
 if __name__ == "__main__":
     main()

@@ -2,10 +2,9 @@
 """
 Temperature and composition sensitivity analysis for the PSMI LLE model.
 
-This script is intentionally independent from the training entry point. It
-reuses an existing checkpoint and the saved raw test predictions, then writes
-paper-ready tables and figures to the structured temperature-robustness
-experiment directory.
+The analysis reuses a trained checkpoint and its pointwise test predictions,
+then exports finite-difference tables, diagnostic figures, and a concise
+scientific report to the temperature-robustness experiment directory.
 """
 from __future__ import annotations
 
@@ -68,21 +67,18 @@ def parse_args() -> argparse.Namespace:
         dest="results_dir",
         default=str(
             ROOT
-            / "experiments"
-            / "08_temperature_robustness"
-            / "01_local_perturbation"
-            / "runs"
-            / "current"
+            / "outputs"
+            / "temperature_sensitivity"
+            / "results"
         ),
-        help="Output directory for tables, predictions, and the manuscript draft.",
+        help="Output directory for tables, predictions, and the analysis report.",
     )
     parser.add_argument(
         "--figures-dir",
         default=str(
             ROOT
-            / "experiments"
-            / "08_temperature_robustness"
-            / "01_local_perturbation"
+            / "outputs"
+            / "temperature_sensitivity"
             / "figures"
         ),
         help="Output directory for generated figures.",
@@ -202,22 +198,11 @@ def find_data_path(user_path: str, checkpoint_path: Path) -> Optional[Path]:
             raise FileNotFoundError(f"Data workbook not found: {p}")
         return p
 
-    candidates: List[Path] = []
-    if "aichej" in str(checkpoint_path.parent).lower():
-        candidates.extend(
-            [
-                ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles_min3.xlsx",
-                ROOT / "datasets" / "raw" / "AIChEj-LLE-all.xlsx",
-            ]
-        )
-    candidates.extend(
-        [
-            ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles_min3.xlsx",
-            ROOT / "datasets" / "processed" / "LLE-literature-data-boosted.xlsx",
-            ROOT / "datasets" / "raw" / "AIChEj-LLE-all.xlsx",
-            Path(getattr(C, "EXCEL_PATH", "")),
-        ]
-    )
+    candidates: List[Path] = [
+        ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles.xlsx",
+        ROOT / "datasets" / "processed" / "LLE-literature-data-boosted.xlsx",
+        Path(getattr(C, "EXCEL_PATH", "")),
+    ]
     for p in candidates:
         if str(p) and p.is_file():
             return p
@@ -989,8 +974,8 @@ def write_markdown(
     )
 
     paragraph = (
-        "To evaluate whether the PSMI predictions are robust to the variables that most strongly affect "
-        "liquid-liquid equilibrium, we performed a deterministic temperature and composition sensitivity "
+        "PSMI robustness to variables that strongly affect liquid-liquid equilibrium was evaluated with a "
+        "deterministic temperature and composition sensitivity "
         f"analysis on {len(selected_systems)} representative test systems (IDs {selected_ids}). "
         f"For temperature, the component identities and path variable t were fixed and T was perturbed by "
         f"{list(temp_deltas)} K. The resulting finite-difference sensitivity was small, with an overall "
@@ -1062,7 +1047,7 @@ Overall:
 - `{display_path(figures_dir / "temperature_sensitivity_bar.png")}`: finite-difference temperature sensitivity for selected systems.
 - `{display_path(figures_dir / "concentration_sweep_curves.png")}`: predicted extract/raffinate composition curves along t.
 """
-    (out_dir / "main_text_sensitivity_analysis.md").write_text(text, encoding="utf-8")
+    (out_dir / "analysis_report.md").write_text(text, encoding="utf-8")
 
 
 def main() -> None:
@@ -1137,7 +1122,7 @@ def main() -> None:
     conc_by_system, conc_summary = summarize_concentration_sensitivity(conc_pred)
     conc_by_system.to_csv(results_dir / "concentration_sensitivity_by_system.csv", index=False, encoding="utf-8-sig")
 
-    print("[7/7] Writing summary tables, figures, and manuscript draft")
+    print("[7/7] Writing summary tables, figures, and analysis report")
     summary_df = write_summary_csv(
         results_dir,
         checkpoint_path,

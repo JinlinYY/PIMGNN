@@ -14,15 +14,15 @@ except ImportError:
 
 add_src_to_path()
 
-from psmi_legacy_public.data import (
+from psmi_checkpoint_compat.data import (
     FunctionalGroupCache,
     GraphCache,
     GraphLLEDataset,
     collate_graph_batch,
 )
-from psmi_legacy_public.model import LLEGraphNet
-from psmi_legacy_public.utils import Scaler
-from psmi_legacy_public.paths import (
+from psmi_checkpoint_compat.model import LLEGraphNet
+from psmi_checkpoint_compat.utils import Scaler
+from psmi_checkpoint_compat.paths import (
     BASE_TERNARY_CHECKPOINT,
     BIGSOLVDB_EXPERIMENT_ROOT,
     BIGSOLVDB_FINETUNED_CHECKPOINT,
@@ -189,7 +189,7 @@ def train_and_evaluate(
 
 def main() -> None:
     """Parse CLI options and run frozen-head fine-tuning."""
-    parser = argparse.ArgumentParser(description="Fine-tune the archived BigSolDB binary head.")
+    parser = argparse.ArgumentParser(description="Fine-tune the reference BigSolDB binary head.")
     parser.add_argument("--train-data", type=Path, default=BIGSOLVDB_TRAIN_DATA)
     parser.add_argument("--test-data", type=Path, default=BIGSOLVDB_TEST_DATA)
     parser.add_argument("--pretrained", type=Path, default=BASE_TERNARY_CHECKPOINT)

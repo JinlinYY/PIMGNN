@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "description": "Checkpoint evaluation registry for the expanded-LLE transfer-learning runs.",
+  "runs": [
+    {
+      "id": "expanded_seed42",
+      "group": "expanded_transfer",
+      "seed": 42,
+      "config": "configs/experiments/expanded_lle_finetune.yaml",
+      "checkpoint": "experiments/section_3_results/3_4_industrial_extraction_design/expanded_lle_adaptation/results/multiseed_reference/seed42/best_model.pt"
+    },
+    {
+      "id": "expanded_seed43",
+      "group": "expanded_transfer",
+      "seed": 43,
+      "config": "configs/experiments/expanded_lle_finetune.yaml",
+      "checkpoint": "experiments/section_3_results/3_4_industrial_extraction_design/expanded_lle_adaptation/results/multiseed_reference/seed43/best_model.pt"
+    },
+    {
+      "id": "expanded_seed44",
+      "group": "expanded_transfer",
+      "seed": 44,
+      "config": "configs/experiments/expanded_lle_finetune.yaml",
+      "checkpoint": "experiments/section_3_results/3_4_industrial_extraction_design/expanded_lle_adaptation/results/multiseed_reference/seed44/best_model.pt"
+    }
+  ]
+}

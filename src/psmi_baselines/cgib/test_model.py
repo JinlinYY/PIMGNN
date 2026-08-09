@@ -1,4 +1,3 @@
-"""Implement the cgib test_model baseline module."""
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, random_split
@@ -14,7 +13,6 @@ from psmi_baselines.paths import TOTAL_CSV
 
 
 def load_model_from_checkpoint(checkpoint_path, device='cuda'):
-    """Run the load model from checkpoint baseline operation."""
     print(f" loading checkpoint: {checkpoint_path}")
     
     if not os.path.exists(checkpoint_path):
@@ -22,13 +20,11 @@ def load_model_from_checkpoint(checkpoint_path, device='cuda'):
     
     checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
     
-    # Baseline workflow step.
     if 'args' in checkpoint:
         args_dict = checkpoint['args']
-        # Baseline workflow step.
         args = argparse.Namespace(**args_dict)
     else:
-        raise ValueError("Checkpoint in not found args parameters , unable to reconstruct the model ")
+        raise ValueError("Checkpoint arguments are missing; the model cannot be reconstructed.")
     
     print(f" model parameters :")
     print(f"    seed: {args.seed}")
@@ -44,7 +40,6 @@ def load_model_from_checkpoint(checkpoint_path, device='cuda'):
 
 
 def create_model_from_args(args, input_dim, output_dim=6, device='cuda'):
-    """Run the create model from args baseline operation."""
     constrain_output = getattr(args, 'constrain_output', True)
     
     model = CGIB(
@@ -128,7 +123,6 @@ def main():
     # Process the experiment data.
     dataset = MolecularDataset(smiles1_list, smiles2_list, targets)
     
-    # Run the training step.
     total_size = len(dataset)
     train_size = int(0.7 * total_size)
     val_size = int(0.15 * total_size)
@@ -145,7 +139,6 @@ def main():
     print(f" number of validation samples : {len(val_dataset)} ({len(val_dataset)/total_size*100:.1f}%)")
     print(f" number of test samples : {len(test_dataset)} ({len(test_dataset)/total_size*100:.1f}%)")
     
-    # Baseline workflow step.
     sample_graph = dataset.graphs1[0]
     input_dim = sample_graph.x.size(1)
     output_dim = 6

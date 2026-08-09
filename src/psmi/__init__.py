@@ -9,7 +9,7 @@ def __getattr__(name: str):
     if name in {"PSMI", "LLEGraphNet"}:
         from .model import LLEGraphNet
 
-        # Public model name. The internal class name is retained so historical
+        # Public model name. The internal class name is retained so published
         # checkpoint state dictionaries remain loadable.
         return LLEGraphNet
     raise AttributeError(name)

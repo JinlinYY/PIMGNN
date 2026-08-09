@@ -10,11 +10,11 @@ TRAIN_CSV = DATA_DIR / "train.csv"
 VALIDATION_CSV = DATA_DIR / "validation.csv"
 TEST_CSV = DATA_DIR / "test.csv"
 
-EXPERIMENT_ROOT = PROJECT_ROOT / "experiments" / "01_baselines" / "comparative_models"
-MODEL_ROOT = PROJECT_ROOT / "models" / "01_baselines" / "comparative_models"
-FIGURE_ROOT = PROJECT_ROOT / "figures" / "01_baselines" / "comparative_models"
+EXPERIMENT_ROOT = PROJECT_ROOT / "outputs" / "baselines"
+MODEL_ROOT = EXPERIMENT_ROOT / "models"
+FIGURE_ROOT = EXPERIMENT_ROOT / "figures"
 
 BIGSOLVDB_CSV = PROJECT_ROOT / "datasets" / "external" / "BigSolDBv2.0.csv"
 BIGSOLVDB_EXPERIMENT_ROOT = (
-    PROJECT_ROOT / "experiments" / "07_external_validation" / "bigsolvdb"
+    PROJECT_ROOT / "outputs" / "binary_solubility" / "bigsolvdb"
 )

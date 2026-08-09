@@ -1,4 +1,3 @@
-"""Implement the cignn example_usage baseline module."""
 import torch
 from .model import CIGIN
 from .data_utils import smiles_to_graph, batch_graphs
@@ -7,8 +6,8 @@ from .data_utils import smiles_to_graph, batch_graphs
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Configure the baseline model.
-node_dim = 33  # Baseline workflow step.
-edge_dim = 10  # Baseline workflow step.
+node_dim = 33
+edge_dim = 10
 model = CIGIN(
     node_dim=node_dim,
     edge_dim=edge_dim,
@@ -18,15 +17,12 @@ model = CIGIN(
 ).to(device)
 
 # Generate model predictions.
-solute_smiles = "CCO"  # Baseline workflow step.
-solvent_smiles = "O"   # Baseline workflow step.
-
-# Baseline workflow step.
+solute_smiles = "CCO"
+solvent_smiles = "O"
 solute_graph = smiles_to_graph(solute_smiles)
 solvent_graph = smiles_to_graph(solvent_smiles)
 
 if solute_graph is not None and solvent_graph is not None:
-    # Baseline workflow step.
     solute_batch = batch_graphs([solute_graph])
     solvent_batch = batch_graphs([solvent_graph])
     
@@ -43,5 +39,5 @@ if solute_graph is not None and solvent_graph is not None:
         print(f" prediction solvent Transforming Free Energy : {prediction.item():.4f} kcal/mol")
         print(f" Interaction Mapping shape : {interaction_map.shape}")
 else:
-    print(" unable to parse SMILES String ")
+    print("Unable to parse the SMILES string.")
 

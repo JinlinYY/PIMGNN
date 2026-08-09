@@ -186,7 +186,7 @@ def main() -> None:
     parser.add_argument(
         "--dataset",
         type=Path,
-        default=PROJECT_ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles_no-missing-smiles.xlsx",
+        default=PROJECT_ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles.xlsx",
     )
     parser.add_argument("--thresholds", type=parse_thresholds, default=parse_thresholds("3,4,5,6,7,8,9"))
     parser.add_argument("--split-threshold", type=int, default=3)
@@ -204,7 +204,7 @@ def main() -> None:
     parser.add_argument(
         "--output-root",
         type=Path,
-        default=PROJECT_ROOT / "experiments" / "11_tieline_sensitivity",
+        default=PROJECT_ROOT / "outputs" / "tieline_density_sensitivity",
     )
     args = parser.parse_args()
 

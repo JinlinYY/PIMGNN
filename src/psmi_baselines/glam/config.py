@@ -1,4 +1,3 @@
-"""Implement the glam config baseline module."""
 import os
 from dataclasses import dataclass
 from typing import Optional
@@ -8,18 +7,14 @@ from psmi_baselines.paths import EXPERIMENT_ROOT, MODEL_ROOT, TOTAL_CSV
 
 @dataclass
 class DataConfig:
-    """Represent the DataConfig baseline component."""
     csv_path: str = str(TOTAL_CSV)
     test_size: float = 0.2
     val_size: float = 0.1
     random_state: int = 42
     batch_size: int = 32
-    num_workers: int = 0  # Baseline workflow step.
-
-
+    num_workers: int = 0
 @dataclass
 class ModelConfig:
-    """Represent the ModelConfig baseline component."""
     node_dim: int = 8  # Process the experiment data.
     out_dim: int = 6   # Configure the output artifacts.
     hidden_dim: int = 128
@@ -35,7 +30,6 @@ class ModelConfig:
 
 @dataclass
 class TrainingConfig:
-    """Represent the TrainingConfig baseline component."""
     num_epochs: int = 100
     learning_rate: float = 0.001
     weight_decay: float = 0.0001
@@ -43,33 +37,29 @@ class TrainingConfig:
     scheduler: str = 'plateau'  # 'plateau', 'step', 'cosine'
     scheduler_patience: int = 10
     scheduler_factor: float = 0.5
-    early_stop_patience: int = 100  # Baseline workflow step.
+    early_stop_patience: int = 100
     early_stop_min_delta: float = 0.0  # Apply early stopping.
     checkpoint_save_freq: int = 10  # Save the generated artifacts.
-    rest_interval_hours: float = 3.0  # Baseline workflow step.
-    rest_duration: int = 600  # Baseline workflow step.
+    rest_interval_hours: float = 3.0
+    rest_duration: int = 600
     gradient_clip: Optional[float] = None  # Update model gradients.
 
 
 @dataclass
 class Config:
-    """Represent the Config baseline component."""
     # Configure the runtime device.
-    device: str = 'cuda'  # Baseline workflow step.
-    seed: int = 2024  # Baseline workflow step.
-    
+    device: str = 'cuda'
+    seed: int = 2024
     # Configure repository paths.
     model_save_dir: str = str(MODEL_ROOT / "glam")
     log_dir: str = str(EXPERIMENT_ROOT / "runs" / "glam" / "logs")
     result_dir: str = str(EXPERIMENT_ROOT / "runs" / "glam" / "results")
     
-    # Baseline workflow step.
     data: DataConfig = None
     model: ModelConfig = None
     training: TrainingConfig = None
     
     def __post_init__(self):
-        """Run the post init baseline operation."""
         if self.data is None:
             self.data = DataConfig()
         if self.model is None:
@@ -83,7 +73,6 @@ class Config:
         os.makedirs(self.result_dir, exist_ok=True)
     
     def to_dict(self):
-        """Run the to dict baseline operation."""
         return {
             'device': self.device,
             'seed': self.seed,
@@ -108,6 +97,5 @@ class Config:
         }
 
 
-# Baseline workflow step.
 default_config = Config()
 

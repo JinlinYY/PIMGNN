@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "description": "Manuscript checkpoint registry for Figure 2a and Table 3 on the fixed 612/75/78 system split.",
+  "runs": [
+    {
+      "id": "figure2a_psmi",
+      "group": "paper_figure_2a",
+      "seed": 42,
+      "config": "configs/experiments/main_benchmark_stage1.yaml",
+      "checkpoint": "experiments/section_3_results/3_1_lle_prediction/main_benchmark/models/figure_2a_psmi/best_model.pt",
+      "fg_corpus": "experiments/section_3_results/3_1_lle_prediction/main_benchmark/artifacts/figure_2a_fg_corpus.json",
+      "reference_predictions": "experiments/section_3_results/3_1_lle_prediction/main_benchmark/data/figure_2a_predictions.csv",
+      "set": [
+        "MIXTURE_NODE_LAYOUT=component_major"
+      ],
+      "allow_input_hash_mismatch": true
+    },
+    {
+      "id": "table3_data_driven",
+      "group": "paper_table_3",
+      "seed": 42,
+      "config": "configs/experiments/main_benchmark_stage1.yaml",
+      "checkpoint": "experiments/section_3_results/3_1_lle_prediction/3_1_2_ablation_analysis/physics_regularization/models/data_driven/best_model.pt",
+      "fg_corpus": "experiments/section_3_results/3_1_lle_prediction/3_1_2_ablation_analysis/physics_regularization/artifacts/data_driven_fg_corpus.json",
+      "reference_predictions": "experiments/section_3_results/3_1_lle_prediction/3_1_2_ablation_analysis/physics_regularization/data/data_driven_predictions.csv",
+      "set": [
+        "MIXTURE_NODE_LAYOUT=component_major"
+      ],
+      "allow_input_hash_mismatch": true
+    },
+    {
+      "id": "table3_physics_informed",
+      "group": "paper_table_3",
+      "seed": 42,
+      "config": "configs/experiments/main_benchmark_stage1.yaml",
+      "checkpoint": "experiments/section_3_results/3_1_lle_prediction/3_1_2_ablation_analysis/physics_regularization/models/physics_informed/best_model.pt",
+      "fg_corpus": "experiments/section_3_results/3_1_lle_prediction/3_1_2_ablation_analysis/physics_regularization/artifacts/physics_informed_fg_corpus.json",
+      "reference_predictions": "experiments/section_3_results/3_1_lle_prediction/3_1_2_ablation_analysis/physics_regularization/data/physics_informed_predictions.csv",
+      "set": [
+        "MIXTURE_NODE_LAYOUT=component_major"
+      ],
+      "allow_input_hash_mismatch": true,
+      "allow_derived_scalers": true
+    }
+  ]
+}

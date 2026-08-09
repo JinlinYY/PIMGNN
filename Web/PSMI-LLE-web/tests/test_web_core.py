@@ -36,7 +36,7 @@ def test_plot_generator_returns_png_data_url() -> None:
     assert result.startswith("data:image/png;base64,")
 
 
-def test_legacy_checkpoint_loads_through_psmi_compatibility_layer() -> None:
+def test_two_scalar_checkpoint_loads_through_psmi_compatibility_layer() -> None:
     predictor = ModelPredictor(device="cpu")
     assert predictor.model is not None
     assert predictor.temperature_scaler.std > 0

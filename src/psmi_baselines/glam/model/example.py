@@ -1,4 +1,3 @@
-"""Implement the glam model example baseline module."""
 import torch
 import torch.nn as nn
 from torch_geometric.data import Data, Batch
@@ -6,13 +5,12 @@ from .glam import GLAM, GLAMEnsemble, ConfigurationSpace
 
 
 def example_single_graph():
-    """Run the example single graph baseline operation."""
     print("=" * 50)
     print(" Single graph Architecture example - molecule Nature prediction ")
     print("=" * 50)
     
     # Configure the baseline model.
-    node_dim = 9  # Baseline workflow step.
+    node_dim = 9
     out_dim = 1   # Configure the output artifacts.
     
     # Configure the baseline model.
@@ -27,13 +25,11 @@ def example_single_graph():
     # Process the experiment data.
     num_nodes = 10
     num_edges = 20
-    x = torch.randn(num_nodes, node_dim)  # Baseline workflow step.
-    edge_index = torch.randint(0, num_nodes, (2, num_edges))  # Baseline workflow step.
-    
+    x = torch.randn(num_nodes, node_dim)
+    edge_index = torch.randint(0, num_nodes, (2, num_edges))
     data = Data(x=x, edge_index=edge_index)
     batch = Batch.from_data_list([data])
     
-    # Baseline workflow step.
     model.eval()
     with torch.no_grad():
         output = model(
@@ -50,15 +46,13 @@ def example_single_graph():
 
 
 def example_pair_graph():
-    """Run the example pair graph baseline operation."""
     print("=" * 50)
     print(" Double graph Architecture example - molecule phase Interaction prediction ")
     print("=" * 50)
     
     # Configure the baseline model.
     node_dim = 9
-    out_dim = 1  # Baseline workflow step.
-    
+    out_dim = 1
     # Configure the baseline model.
     model = GLAM(
         node_dim=node_dim,
@@ -80,7 +74,6 @@ def example_pair_graph():
     x2 = torch.randn(num_nodes2, node_dim)
     edge_index2 = torch.randint(0, num_nodes2, (2, num_edges2))
     
-    # Baseline workflow step.
     model.eval()
     with torch.no_grad():
         output = model(
@@ -96,7 +89,6 @@ def example_pair_graph():
 
 
 def example_ensemble():
-    """Run the example ensemble baseline operation."""
     print("=" * 50)
     print(" Integration model example ")
     print("=" * 50)
@@ -124,7 +116,6 @@ def example_ensemble():
     data = Data(x=x, edge_index=edge_index)
     batch = Batch.from_data_list([data])
     
-    # Baseline workflow step.
     ensemble_model.eval()
     with torch.no_grad():
         output = ensemble_model(
@@ -139,14 +130,12 @@ def example_ensemble():
 
 
 def example_config_space():
-    """Run the example config space baseline operation."""
     print("=" * 50)
     print(" configuration Space example ")
     print("=" * 50)
     
     config_space = ConfigurationSpace()
     
-    # Baseline workflow step.
     print(" sampling 5 molecule Nature prediction configuration :")
     configs_property = config_space.sample_configs(5, task_type='property')
     for i, config in enumerate(configs_property):
@@ -168,7 +157,6 @@ def example_config_space():
 
 
 def example_training():
-    """Run the example training baseline operation."""
     print("=" * 50)
     print(" Training example ")
     print("=" * 50)
@@ -200,7 +188,6 @@ def example_training():
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     
-    # Run the training step.
     model.train()
     optimizer.zero_grad()
     
@@ -217,7 +204,6 @@ def example_training():
 
 
 if __name__ == "__main__":
-    # Baseline workflow step.
     example_single_graph()
     example_pair_graph()
     example_ensemble()

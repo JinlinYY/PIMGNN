@@ -1,363 +1,388 @@
 {
-  "schema_version": 1,
-  "project": "PSMI",
-  "experiments": [
-    {
-      "path": "00_dataset_construction",
-      "title": "Dataset Construction, Filtering, and Distribution Analysis",
-      "paper_sections": [
-        "Main text Section 2.1",
-        "SI Section S5",
-        "Tables S15-S16",
-        "Figure S8"
-      ],
-      "availability": "Code, processed data, split manifests, summary tables, and distribution figures are available.",
-      "evidence_status": "Executable code and reference artifacts available",
-      "code": [
-        "scripts/data_preparation/build_canonical_split.py",
-        "scripts/data_preparation/build_expanded_split.py",
-        "scripts/data_preparation/filter_sparse_systems.py",
-        "scripts/analysis/analyze_dataset_distribution.py",
-        "scripts/analysis/export_temperature_range_audit.py"
-      ],
-      "commands": [
-        "python scripts/analysis/analyze_dataset_distribution.py --help",
-        "python scripts/data_preparation/build_canonical_split.py --help"
-      ]
-    },
-    {
-      "path": "01_main_benchmark",
-      "title": "PSMI Main Benchmark and Multi-Seed Evaluation",
-      "paper_sections": [
-        "Main text Section 3.1",
-        "Table 1",
-        "Figure 2a"
-      ],
-      "availability": "Code, pointwise predictions, multi-seed metrics, functional-group vocabularies, and checkpoints are available.",
-      "evidence_status": "Executable code and reference artifacts available",
-      "code": [
-        "scripts/train.py",
-        "src/psmi/predict.py",
-        "scripts/experiments/run_corrected_multiseed.py"
-      ],
-      "commands": [
-        "python scripts/experiments/run_corrected_multiseed.py --help"
-      ]
-    },
-    {
-      "path": "02_baseline_comparison",
-      "title": "Machine-Learning and Graph-Neural-Network Baselines",
-      "paper_sections": [
-        "Main text Section 3.1.1",
-        "Table 1"
-      ],
-      "availability": "Baseline implementations and five-seed reference summaries are available.",
-      "evidence_status": "Executable code and reference artifacts available",
-      "code": [
-        "scripts/experiments/baselines/run_classical_multi_seed.py",
-        "scripts/experiments/baselines/run_cignn.py",
-        "scripts/experiments/baselines/run_cgib.py",
-        "scripts/experiments/baselines/run_glam.py",
-        "src/psmi_baselines"
-      ],
-      "commands": [
-        "python scripts/experiments/baselines/run_classical_multi_seed.py --help"
-      ]
-    },
-    {
-      "path": "03_architecture_ablation",
-      "title": "Multi-Scale Representation and Fusion Ablations",
-      "paper_sections": [
-        "Main text Section 3.1.2",
-        "Table 2"
-      ],
-      "availability": "Model implementations, configurations, and best-metric records for the architecture variants are available.",
-      "evidence_status": "Executable code and reference artifacts available",
-      "code": [
-        "scripts/train.py",
-        "src/psmi/model.py",
-        "configs/experiments"
-      ],
-      "commands": [
-        "python scripts/train.py --help"
-      ]
-    },
-    {
-      "path": "04_physics_regularization",
-      "title": "Physics-Regularized Learning",
-      "paper_sections": [
-        "Main text Section 2.3",
-        "Main text Section 3.1.2",
-        "Table 3"
-      ],
-      "availability": "The supervised and physics-regularized configurations, checkpoints, prediction metrics, and thermodynamic diagnostics are available.",
-      "evidence_status": "Executable code and reference artifacts available",
-      "code": [
-        "scripts/train.py",
-        "src/psmi/loss.py",
-        "src/psmi/ge_models.py",
-        "src/psmi/nrtl_flash.py"
-      ],
-      "commands": [
-        "python scripts/train.py --help"
-      ]
-    },
-    {
-      "path": "05_prediction_error_analysis",
-      "title": "Prediction Error and Bias Analysis",
-      "paper_sections": [
-        "SI Section S3.1",
-        "Figures S1-S3"
-      ],
-      "availability": "Pointwise test predictions and the corresponding error-distribution figures are available.",
-      "evidence_status": "Executable code and reference artifacts available",
-      "code": [
-        "scripts/visualize_predictions_extra.py"
-      ],
-      "commands": [
-        "python scripts/visualize_predictions_extra.py --help"
-      ]
-    },
-    {
-      "path": "06_interpretability",
-      "title": "Model Interpretability and Feature Attribution",
-      "paper_sections": [
-        "Main text Section 3.2",
-        "Figures 2b-2e"
-      ],
-      "availability": "Global and system-level attribution tables, molecular feature summaries, and visualization assets are available.",
-      "evidence_status": "Executable code and reference artifacts available",
-      "code": [
-        "scripts/explain.py",
-        "scripts/visualization/explainability"
-      ],
-      "commands": [
-        "python scripts/explain.py --help"
-      ]
-    },
-    {
-      "path": "07_external_transfer",
-      "title": "External Solubility Validation and Expanded-LLE Adaptation",
-      "paper_sections": [
-        "Main text Section 3.3",
-        "Figure 2f",
-        "Table S2"
-      ],
-      "availability": "Transfer-learning code, expanded-LLE checkpoints, pointwise predictions, and compatibility tools for external solubility models are available.",
-      "evidence_status": "Executable code and reference artifacts available",
-      "code": [
-        "scripts/experiments/transfer_learning/public_release",
-        "src/psmi_legacy_public"
-      ],
-      "commands": [
-        "python scripts/experiments/transfer_learning/public_release/evaluate_predictions.py --help"
-      ]
-    },
-    {
-      "path": "08_temperature_robustness/01_local_perturbation",
-      "title": "Local Temperature Perturbation and Phase-Path Sensitivity",
-      "paper_sections": [
-        "SI Section S3.3.1",
-        "Figure S4"
-      ],
-      "availability": "The finite-difference temperature-sensitivity and phase-path analysis implementation is available.",
-      "evidence_status": "Executable implementation available",
-      "code": [
-        "scripts/analysis/run_sensitivity_analysis.py"
-      ],
-      "commands": [
-        "python scripts/analysis/run_sensitivity_analysis.py --help"
-      ]
-    },
-    {
-      "path": "08_temperature_robustness/02_encoding_and_tail",
-      "title": "Temperature Encoding and Tail Robustness",
-      "paper_sections": [
-        "SI Section S3.3.2",
-        "Tables S3-S4",
-        "Figure S5"
-      ],
-      "availability": "Encoding metrics, distance-binned metrics, multi-seed summaries, and figures are available.",
-      "evidence_status": "Executable code and reference artifacts available",
-      "code": [
-        "scripts/run_temperature_encoding_sensitivity.py",
-        "scripts/plot_temperature_encoding_sensitivity.py"
-      ],
-      "commands": [
-        "python scripts/plot_temperature_encoding_sensitivity.py --help"
-      ]
-    },
-    {
-      "path": "09_data_splitting",
-      "title": "System-Level Splitting and Cross-Validation",
-      "paper_sections": [
-        "SI Section S3.4",
-        "Table S5"
-      ],
-      "availability": "System-level split generators, cross-validation code, and split manifests are available.",
-      "evidence_status": "Executable code and reference artifacts available",
-      "code": [
-        "scripts/experiments/data_splitting/run_kfold_cv.py",
-        "scripts/experiments/data_splitting/run_split_strategy_benchmark.py"
-      ],
-      "commands": [
-        "python scripts/experiments/data_splitting/run_kfold_cv.py --help"
-      ]
-    },
-    {
-      "path": "10_tieline_sensitivity",
-      "title": "Tie-Line Density and Phase-Path Sensitivity",
-      "paper_sections": [
-        "SI Section S3.5",
-        "Tables S6-S7",
-        "Figure S6"
-      ],
-      "availability": "Threshold metrics, path-location metrics, confidence intervals, predictions, and figures are available.",
-      "evidence_status": "Executable code and reference artifacts available",
-      "code": [
-        "scripts/run_tieline_threshold_sensitivity.py",
-        "scripts/plot_tieline_threshold_sensitivity.py",
-        "scripts/data_preparation/filter_sparse_systems.py"
-      ],
-      "commands": [
-        "python scripts/plot_tieline_threshold_sensitivity.py --help"
-      ]
-    },
-    {
-      "path": "11_ge_model_sensitivity",
-      "title": "Excess-Gibbs-Energy Model Sensitivity",
-      "paper_sections": [
-        "SI Section S3.6",
-        "Table S8"
-      ],
-      "availability": "Data-only, NRTL, Margules, and van Laar comparisons are provided with per-seed metrics and parameter records.",
-      "evidence_status": "Executable code and reference artifacts available",
-      "code": [
-        "scripts/experiments/ge_model_sensitivity.py",
-        "src/psmi/ge_models.py"
-      ],
-      "commands": [
-        "python scripts/experiments/ge_model_sensitivity.py --help"
-      ]
-    },
-    {
-      "path": "12_thermodynamic_audit",
-      "title": "Thermodynamic Residual Audit",
-      "paper_sections": [
-        "SI Section S3.7",
-        "Tables S9-S10"
-      ],
-      "availability": "Per-prediction chemical-potential residuals, threshold sensitivity, and aggregate diagnostics are available.",
-      "evidence_status": "Executable code and reference artifacts available",
-      "code": [
-        "scripts/analysis/evaluate_thermodynamic_consistency.py",
-        "src/psmi/ge_models.py",
-        "src/psmi/nrtl_flash.py"
-      ],
-      "commands": [
-        "python scripts/analysis/evaluate_thermodynamic_consistency.py --help"
-      ]
-    },
-    {
-      "path": "13_system_generalization",
-      "title": "System-Level Generalization and Phase-Diagram Categories",
-      "paper_sections": [
-        "SI Section S3.8",
-        "Tables S11-S14",
-        "Table S17",
-        "SI Section S6"
-      ],
-      "availability": "System classifications, category summaries, and tolerance-sensitivity tables are available.",
-      "evidence_status": "Executable code and reference artifacts available",
-      "code": [
-        "scripts/analysis/classify_phase_diagram_generalization.py"
-      ],
-      "commands": [
-        "python scripts/analysis/classify_phase_diagram_generalization.py --help"
-      ]
-    },
-    {
-      "path": "14_industrial_cases/00_application_workflow",
-      "title": "Industrial Application Workflow",
-      "paper_sections": [
-        "Main text Section 3.4"
-      ],
-      "availability": "The end-to-end application interface and an example pointwise prediction table are available.",
-      "evidence_status": "Executable code and reference artifacts available",
-      "code": [
-        "scripts/run_application_case.py",
-        "scripts/evaluate_case.py"
-      ],
-      "commands": [
-        "python scripts/run_application_case.py --help"
-      ]
-    },
-    {
-      "path": "14_industrial_cases/01_aromatic_extraction",
-      "title": "Sulfolane Aromatic-Extraction Case Study",
-      "paper_sections": [
-        "Main text Section 3.4.1",
-        "Figure 3c"
-      ],
-      "availability": "Standardized LLE data and publication figures for the aromatic-extraction case are available.",
-      "evidence_status": "Executable code and reference artifacts available",
-      "code": [
-        "scripts/run_application_case.py",
-        "scripts/visualization/plot_figure3cd_industrial_cases.py"
-      ],
-      "commands": [
-        "python scripts/visualization/plot_figure3cd_industrial_cases.py --help"
-      ]
-    },
-    {
-      "path": "14_industrial_cases/02_dem_recovery",
-      "title": "DEM Recovery Case Study",
-      "paper_sections": [
-        "Main text Section 3.4.2",
-        "Figure 3d"
-      ],
-      "availability": "Standardized LLE data and publication figures for the DEM recovery case are available.",
-      "evidence_status": "Executable code and reference artifacts available",
-      "code": [
-        "scripts/run_application_case.py",
-        "scripts/visualization/plot_figure3cd_industrial_cases.py"
-      ],
-      "commands": [
-        "python scripts/visualization/plot_figure3cd_industrial_cases.py --help"
-      ]
-    },
-    {
-      "path": "15_efficiency",
-      "title": "Inference Efficiency and Runtime Benchmark",
-      "paper_sections": [
-        "SI Section S3.9"
-      ],
-      "availability": "Raw and aggregate latency measurements collected on an NVIDIA RTX 3090 Ti are available.",
-      "evidence_status": "Executable code and reference artifacts available",
-      "code": [
-        "scripts/benchmark_efficiency.py",
-        "scripts/summarize_efficiency_benchmarks.py"
-      ],
-      "commands": [
-        "python scripts/summarize_efficiency_benchmarks.py --help"
-      ]
-    },
-    {
-      "path": "16_web_application",
-      "title": "PSMI-LLE Web Application",
-      "paper_sections": [
-        "SI Section S4",
-        "Figure S7"
-      ],
-      "availability": "The FastAPI backend, Vue frontend, default checkpoint, and launch scripts are available.",
-      "evidence_status": "Executable code and reference artifacts available",
-      "code": [
-        "Web/PSMI-LLE-web"
-      ],
-      "commands": [
-        "Web/PSMI-LLE-web/scripts/run_backend.ps1",
-        "Web/PSMI-LLE-web/scripts/run_frontend.ps1"
-      ]
-    }
-  ]
+    "schema_version":  3,
+    "organization":  "Paper-aligned scientific experiment catalog",
+    "experiments":  [
+                        {
+                            "path":  "section_3_results/3_1_lle_prediction/main_benchmark",
+                            "title":  "PSMI Main Benchmark",
+                            "paper_sections":  [
+                                                   "Main text Section 3.1",
+                                                   "Figures 2a and 2d",
+                                                   "Table 1"
+                                               ],
+                            "summary":  "The fixed-split benchmark, multi-seed summaries, Figure 2 source predictions, figures, and the corresponding checkpoint are available.",
+                            "code":  [
+                                         "scripts/train.py",
+                                         "src/psmi/predict.py",
+                                         "scripts/experiments/run_multiseed_benchmark.py",
+                                         "scripts/visualization/build_paper_figure2_assets.py"
+                                     ],
+                            "commands":  [
+                                             "python scripts/evaluate_checkpoint_registry.py --registry configs/reproduction/published_checkpoint_registry.json --device cuda",
+                                             "python scripts/visualization/build_paper_figure2_assets.py"
+                                         ]
+                        },
+                        {
+                            "path":  "section_3_results/3_1_lle_prediction/3_1_1_baseline_comparison",
+                            "title":  "Comparison with Baseline Methods",
+                            "paper_sections":  [
+                                                   "Main text Section 3.1.1",
+                                                   "SI Section S3.2",
+                                                   "Table 1"
+                                               ],
+                            "summary":  "Baseline implementations and the five-seed reference summaries used for the comparison are available.",
+                            "code":  [
+                                         "scripts/experiments/baselines/run_classical_multi_seed.py",
+                                         "scripts/experiments/baselines/run_cignn.py",
+                                         "scripts/experiments/baselines/run_cgib.py",
+                                         "scripts/experiments/baselines/run_glam.py",
+                                         "src/psmi_baselines"
+                                     ],
+                            "commands":  [
+                                             "python scripts/experiments/baselines/run_classical_multi_seed.py --help"
+                                         ]
+                        },
+                        {
+                            "path":  "section_3_results/3_1_lle_prediction/3_1_2_ablation_analysis/architecture_ablation",
+                            "title":  "Architecture Ablation",
+                            "paper_sections":  [
+                                                   "Main text Section 3.1.2",
+                                                   "Table 2"
+                                               ],
+                            "summary":  "Model configurations and best-metric records for the multi-scale and fusion variants are available.",
+                            "code":  [
+                                         "scripts/train.py",
+                                         "src/psmi/model.py",
+                                         "configs/experiments"
+                                     ],
+                            "commands":  [
+                                             "python scripts/train.py --help"
+                                         ]
+                        },
+                        {
+                            "path":  "section_3_results/3_1_lle_prediction/3_1_2_ablation_analysis/physics_regularization",
+                            "title":  "Physics-Regularization Ablation",
+                            "paper_sections":  [
+                                                   "Main text Sections 2.3 and 3.1.2",
+                                                   "Table 3"
+                                               ],
+                            "summary":  "Data-driven and physics-informed checkpoints, prediction tables, parity figures, and multi-seed stage metrics are available.",
+                            "code":  [
+                                         "scripts/train.py",
+                                         "src/psmi/loss.py",
+                                         "src/psmi/ge_models.py",
+                                         "src/psmi/nrtl_flash.py"
+                                     ],
+                            "commands":  [
+                                             "python scripts/train.py --help"
+                                         ]
+                        },
+                        {
+                            "path":  "section_3_results/3_2_molecular_interaction_mechanisms",
+                            "title":  "Molecular Interaction Mechanisms",
+                            "paper_sections":  [
+                                                   "Main text Section 3.2",
+                                                   "Figures 2b-2e"
+                                               ],
+                            "summary":  "Global and system-level attribution tables and the manuscript-aligned Figure 2b and Figure 2c assets are available.",
+                            "code":  [
+                                         "scripts/explain.py",
+                                         "scripts/visualization/build_paper_figure2_assets.py"
+                                     ],
+                            "commands":  [
+                                             "python scripts/explain.py --help",
+                                             "python scripts/visualization/build_paper_figure2_assets.py"
+                                         ]
+                        },
+                        {
+                            "path":  "section_3_results/3_3_binary_solubility_validation",
+                            "title":  "Binary Solubility Validation",
+                            "paper_sections":  [
+                                                   "Main text Section 3.3",
+                                                   "Figure 2f",
+                                                   "Table S2"
+                                               ],
+                            "summary":  "Transfer-learning interfaces and the available base, Compsol, and BigSolDB checkpoints are provided.",
+                            "code":  [
+                                         "scripts/experiments/transfer_learning/public_release",
+                                         "src/psmi_checkpoint_compat"
+                                     ],
+                            "commands":  [
+                                             "python scripts/experiments/transfer_learning/public_release/evaluate_predictions.py --help"
+                                         ]
+                        },
+                        {
+                            "path":  "section_3_results/3_4_industrial_extraction_design/application_workflow",
+                            "title":  "Industrial Extraction Workflow",
+                            "paper_sections":  [
+                                                   "Main text Section 3.4"
+                                               ],
+                            "summary":  "The end-to-end application interface and an example pointwise prediction table are available.",
+                            "code":  [
+                                         "scripts/run_application_case.py",
+                                         "scripts/run_application_case.py"
+                                     ],
+                            "commands":  [
+                                             "python scripts/run_application_case.py --help"
+                                         ]
+                        },
+                        {
+                            "path":  "section_3_results/3_4_industrial_extraction_design/3_4_1_sulfolane_aromatic_extraction",
+                            "title":  "Sulfolane Aromatic Extraction",
+                            "paper_sections":  [
+                                                   "Main text Section 3.4.1",
+                                                   "Figure 3c"
+                                               ],
+                            "summary":  "Standardized LLE data and the publication figure for the aromatic-extraction case are available.",
+                            "code":  [
+                                         "scripts/run_application_case.py",
+                                         "scripts/visualization/plot_figure3cd_industrial_cases.py"
+                                     ],
+                            "commands":  [
+                                             "python scripts/visualization/plot_figure3cd_industrial_cases.py --help"
+                                         ]
+                        },
+                        {
+                            "path":  "section_3_results/3_4_industrial_extraction_design/3_4_2_diethoxymethane_recovery",
+                            "title":  "Diethoxymethane Recovery",
+                            "paper_sections":  [
+                                                   "Main text Section 3.4.2",
+                                                   "Figure 3d"
+                                               ],
+                            "summary":  "Standardized LLE data and the publication figure for the diethoxymethane-recovery case are available.",
+                            "code":  [
+                                         "scripts/run_application_case.py",
+                                         "scripts/visualization/plot_figure3cd_industrial_cases.py"
+                                     ],
+                            "commands":  [
+                                             "python scripts/visualization/plot_figure3cd_industrial_cases.py --help"
+                                         ]
+                        },
+                        {
+                            "path":  "section_3_results/3_4_industrial_extraction_design/expanded_lle_adaptation",
+                            "title":  "Expanded-LLE Adaptation",
+                            "paper_sections":  [
+                                                   "Main text Section 3.4"
+                                               ],
+                            "summary":  "The expanded-LLE fixed-split metrics, predictions, functional-group vocabularies, and checkpoints are available.",
+                            "code":  [
+                                         "scripts/train.py",
+                                         "configs/experiments/expanded_lle_finetune.yaml"
+                                     ],
+                            "commands":  [
+                                             "python scripts/train.py --config configs/experiments/expanded_lle_finetune.yaml"
+                                         ]
+                        },
+                        {
+                            "path":  "supporting_information/s3_additional_evaluation_and_validation/s3_1_prediction_error_analysis",
+                            "title":  "Prediction Error Analysis",
+                            "paper_sections":  [
+                                                   "SI Section S3.1",
+                                                   "Figures S1-S3"
+                                               ],
+                            "summary":  "Pointwise test predictions, manuscript figures, and supplementary diagnostics are available.",
+                            "code":  [
+                                         "scripts/visualize_predictions_extra.py"
+                                     ],
+                            "commands":  [
+                                             "python scripts/visualize_predictions_extra.py --help"
+                                         ]
+                        },
+                        {
+                            "path":  "supporting_information/s3_additional_evaluation_and_validation/s3_2_comparison_with_reported_methods",
+                            "title":  "Comparison with Reported Methods",
+                            "paper_sections":  [
+                                                   "SI Section S3.2",
+                                                   "Table 1"
+                                               ],
+                            "summary":  "The implementations and comparison outputs are stored with Main text Section 3.1.1 to keep one authoritative baseline record.",
+                            "code":  [
+                                         "scripts/experiments/baselines",
+                                         "src/psmi_baselines"
+                                     ],
+                            "commands":  [
+                                             "python scripts/experiments/baselines/run_classical_multi_seed.py --help"
+                                         ]
+                        },
+                        {
+                            "path":  "supporting_information/s3_additional_evaluation_and_validation/s3_3_temperature_robustness/01_local_perturbation",
+                            "title":  "Local Temperature Perturbation",
+                            "paper_sections":  [
+                                                   "SI Section S3.3.1",
+                                                   "Figure S4"
+                                               ],
+                            "summary":  "The finite-difference temperature-sensitivity and phase-path analysis implementation is available.",
+                            "code":  [
+                                         "scripts/analysis/run_sensitivity_analysis.py"
+                                     ],
+                            "commands":  [
+                                             "python scripts/analysis/run_sensitivity_analysis.py --help"
+                                         ]
+                        },
+                        {
+                            "path":  "supporting_information/s3_additional_evaluation_and_validation/s3_3_temperature_robustness/02_encoding_and_tail",
+                            "title":  "Temperature Encoding and Tail Robustness",
+                            "paper_sections":  [
+                                                   "SI Section S3.3.2",
+                                                   "Tables S3-S4",
+                                                   "Figure S5"
+                                               ],
+                            "summary":  "Encoding metrics, distance-binned metrics, multi-seed summaries, and figures are available.",
+                            "code":  [
+                                         "scripts/run_temperature_encoding_sensitivity.py",
+                                         "scripts/plot_temperature_encoding_sensitivity.py"
+                                     ],
+                            "commands":  [
+                                             "python scripts/plot_temperature_encoding_sensitivity.py --help"
+                                         ]
+                        },
+                        {
+                            "path":  "supporting_information/s3_additional_evaluation_and_validation/s3_4_data_splitting",
+                            "title":  "Data-Splitting Strategies",
+                            "paper_sections":  [
+                                                   "SI Section S3.4",
+                                                   "Table S5"
+                                               ],
+                            "summary":  "System-level split generators, cross-validation code, and split manifests are available.",
+                            "code":  [
+                                         "scripts/experiments/data_splitting/run_kfold_cv.py",
+                                         "scripts/experiments/data_splitting/run_split_strategy_benchmark.py"
+                                     ],
+                            "commands":  [
+                                             "python scripts/experiments/data_splitting/run_kfold_cv.py --help"
+                                         ]
+                        },
+                        {
+                            "path":  "supporting_information/s3_additional_evaluation_and_validation/s3_5_tieline_density_and_phase_path",
+                            "title":  "Tie-Line Density and Phase-Path Sensitivity",
+                            "paper_sections":  [
+                                                   "SI Section S3.5",
+                                                   "Tables S6-S7",
+                                                   "Figure S6"
+                                               ],
+                            "summary":  "Threshold metrics, phase-path-location metrics, confidence intervals, predictions, and figures are available.",
+                            "code":  [
+                                         "scripts/run_tieline_threshold_sensitivity.py",
+                                         "scripts/plot_tieline_threshold_sensitivity.py"
+                                     ],
+                            "commands":  [
+                                             "python scripts/plot_tieline_threshold_sensitivity.py --help"
+                                         ]
+                        },
+                        {
+                            "path":  "supporting_information/s3_additional_evaluation_and_validation/s3_6_excess_gibbs_energy_model_sensitivity",
+                            "title":  "Excess-Gibbs-Energy Model Sensitivity",
+                            "paper_sections":  [
+                                                   "SI Section S3.6",
+                                                   "Table S8"
+                                               ],
+                            "summary":  "Data-only, NRTL, Margules, and van Laar comparisons are provided with per-seed metrics and parameter records.",
+                            "code":  [
+                                         "scripts/experiments/ge_model_sensitivity.py",
+                                         "src/psmi/ge_models.py"
+                                     ],
+                            "commands":  [
+                                             "python scripts/experiments/ge_model_sensitivity.py --help"
+                                         ]
+                        },
+                        {
+                            "path":  "supporting_information/s3_additional_evaluation_and_validation/s3_7_thermodynamic_consistency_audit",
+                            "title":  "Thermodynamic Consistency Audit",
+                            "paper_sections":  [
+                                                   "SI Section S3.7",
+                                                   "Tables S9-S10"
+                                               ],
+                            "summary":  "Per-prediction chemical-potential residuals, threshold sensitivity, and aggregate diagnostics are available.",
+                            "code":  [
+                                         "scripts/analysis/evaluate_thermodynamic_consistency.py",
+                                         "src/psmi/ge_models.py",
+                                         "src/psmi/nrtl_flash.py"
+                                     ],
+                            "commands":  [
+                                             "python scripts/analysis/evaluate_thermodynamic_consistency.py --help"
+                                         ]
+                        },
+                        {
+                            "path":  "supporting_information/s3_additional_evaluation_and_validation/s3_8_system_generalization",
+                            "title":  "System-Level Generalization",
+                            "paper_sections":  [
+                                                   "SI Section S3.8",
+                                                   "Tables S11-S14 and S17"
+                                               ],
+                            "summary":  "System classifications, category summaries, and tolerance-sensitivity tables are available.",
+                            "code":  [
+                                         "scripts/analysis/classify_phase_diagram_generalization.py"
+                                     ],
+                            "commands":  [
+                                             "python scripts/analysis/classify_phase_diagram_generalization.py --help"
+                                         ]
+                        },
+                        {
+                            "path":  "supporting_information/s3_additional_evaluation_and_validation/s3_9_inference_efficiency",
+                            "title":  "Inference Efficiency",
+                            "paper_sections":  [
+                                                   "SI Section S3.9"
+                                               ],
+                            "summary":  "Raw and aggregate latency measurements collected on an NVIDIA RTX 3090 Ti are available.",
+                            "code":  [
+                                         "scripts/benchmark_efficiency.py",
+                                         "scripts/summarize_efficiency_benchmarks.py"
+                                     ],
+                            "commands":  [
+                                             "python scripts/summarize_efficiency_benchmarks.py --help"
+                                         ]
+                        },
+                        {
+                            "path":  "supporting_information/s4_web_application",
+                            "title":  "PSMI-LLE Web Application",
+                            "paper_sections":  [
+                                                   "SI Section S4",
+                                                   "Figure S7"
+                                               ],
+                            "summary":  "The FastAPI backend, Vue frontend, default checkpoint, and launch scripts are available.",
+                            "code":  [
+                                         "Web/PSMI-LLE-web"
+                                     ],
+                            "commands":  [
+                                             "Web/PSMI-LLE-web/scripts/run_backend.ps1",
+                                             "Web/PSMI-LLE-web/scripts/run_frontend.ps1"
+                                         ]
+                        },
+                        {
+                            "path":  "supporting_information/s5_dataset_construction_and_distribution",
+                            "title":  "Dataset Construction and Distribution",
+                            "paper_sections":  [
+                                                   "Main text Section 2.1",
+                                                   "SI Section S5",
+                                                   "Tables S15-S16",
+                                                   "Figure S8"
+                                               ],
+                            "summary":  "Processed data, fixed split manifests, component summaries, and distribution figures are available.",
+                            "code":  [
+                                         "scripts/data_preparation/build_canonical_split.py",
+                                         "scripts/data_preparation/build_expanded_split.py",
+                                         "scripts/analysis/analyze_dataset_distribution.py",
+                                         "scripts/analysis/export_temperature_range_audit.py"
+                                     ],
+                            "commands":  [
+                                             "python scripts/analysis/analyze_dataset_distribution.py --help",
+                                             "python scripts/data_preparation/build_canonical_split.py --help"
+                                         ]
+                        },
+                        {
+                            "path":  "supporting_information/s6_system_classification",
+                            "title":  "Phase-Diagram System Classification",
+                            "paper_sections":  [
+                                                   "SI Section S6",
+                                                   "Table S17"
+                                               ],
+                            "summary":  "The classification implementation and result tables are stored with SI Section S3.8 to keep one authoritative system-level record.",
+                            "code":  [
+                                         "scripts/analysis/classify_phase_diagram_generalization.py"
+                                     ],
+                            "commands":  [
+                                             "python scripts/analysis/classify_phase_diagram_generalization.py --help"
+                                         ]
+                        }
+                    ]
 }

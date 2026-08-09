@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Implement the bigsolvdb predict_test baseline module."""
 import os
 import re
 import warnings
@@ -9,7 +8,6 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-# Baseline workflow step.
 warnings.filterwarnings('ignore')
 os.environ['PYTHONWARNINGS'] = 'ignore'
 
@@ -19,7 +17,6 @@ from .model import build_solubility_model
 from .train import SolubilityDataset, compute_metrics, evaluate
 from psmi_baselines.paths import BIGSOLVDB_CSV, BIGSOLVDB_EXPERIMENT_ROOT
 
-# Baseline workflow step.
 try:
     from rdkit import RDLogger
     RDLogger.DisableLog('rdApp.*')
@@ -29,8 +26,6 @@ except:
 
 def load_best_model(seed_dir: str, model_name: str, device: str, fp_bits: int = 2048, 
                     hidden: int = 512, dropout: float = 0.15):
-    """Run the load best model baseline operation."""
-    # Baseline workflow step.
     import glob
     checkpoint_pattern = os.path.join(seed_dir, "checkpoint_epoch_*.pt")
     checkpoint_files = glob.glob(checkpoint_pattern)
@@ -38,7 +33,6 @@ def load_best_model(seed_dir: str, model_name: str, device: str, fp_bits: int = 
     if not checkpoint_files:
         raise FileNotFoundError(f" checkpoint file not found : {seed_dir}")
     
-    # Baseline workflow step.
     def extract_epoch(fpath):
         try:
             return int(os.path.basename(fpath).replace("checkpoint_epoch_", "").replace(".pt", ""))
@@ -84,12 +78,11 @@ def load_best_model(seed_dir: str, model_name: str, device: str, fp_bits: int = 
 def predict_test_set(seed: int, results_dir: str, data_path: str, model_name: str = 'mlp',
                      device: str = 'cuda', batch_size: int = 1024, fp_bits: int = 2048,
                      hidden: int = 512, dropout: float = 0.15, all_results_stats: dict = None):
-    """Run the predict test set baseline operation."""
     
     seed_dir = os.path.join(results_dir, f"seed_{seed}")
     
     if not os.path.exists(seed_dir):
-        print(f" warning : Seeds {seed} directory does not exist : {seed_dir}")
+        print(f"Warning: output directory is absent for seed {seed}: {seed_dir}")
         return None
     
     print(f"\n{'='*80}")
@@ -121,7 +114,7 @@ def predict_test_set(seed: int, results_dir: str, data_path: str, model_name: st
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=0)
     
     # Generate model predictions.
-    print(" for test set Into rows prediction ...")
+    print("Generating test-set predictions...")
     test_metrics, test_preds, test_targets = evaluate(model, test_loader, device)
     
     print(f" test metrics :")
@@ -219,16 +212,14 @@ def main():
             if result:
                 all_results.append(result)
         except Exception as e:
-            print(f"\n error : Seed {seed} prediction failed : {e}")
+            print(f"\nError: prediction failed for seed {seed}: {e}")
             import traceback
             traceback.print_exc()
     
-    # Baseline workflow step.
     stats = {}
     if all_results:
         df = pd.DataFrame(all_results)
         
-        # Baseline workflow step.
         for metric in ['test_mae', 'test_rmse', 'test_r2']:
             if metric in df.columns:
                 values = df[metric].dropna()
@@ -253,7 +244,6 @@ def main():
                 with open(summary_txt_path, 'r', encoding='utf-8') as f:
                     content = f.read()
                 
-                # Baseline workflow step.
                 if " test-prediction statistics across all seeds " not in content:
                     with open(summary_txt_path, 'a', encoding='utf-8') as f:
                         f.write("\n" + "="*80 + "\n")
@@ -279,7 +269,6 @@ def main():
         
         df = pd.DataFrame(all_results)
         
-        # Baseline workflow step.
         stats = {}
         for metric in ['test_mae', 'test_rmse', 'test_r2']:
             if metric in df.columns:
@@ -320,7 +309,7 @@ def main():
         print(" prediction complete !")
         print("="*80)
     else:
-        print("\n error : None successful complete Any prediction ")
+        print("\nNo predictions were generated.")
 
 
 if __name__ == "__main__":

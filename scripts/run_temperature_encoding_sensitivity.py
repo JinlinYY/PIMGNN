@@ -207,7 +207,7 @@ def main() -> None:
     parser.add_argument(
         "--dataset",
         type=Path,
-        default=PROJECT_ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles_no-missing-smiles.xlsx",
+        default=PROJECT_ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles.xlsx",
     )
     parser.add_argument("--encodings", type=parse_encodings, default=parse_encodings("linear_quadratic,inverse"))
     parser.add_argument("--temperature-low-k", type=float, default=293.15)
@@ -224,7 +224,7 @@ def main() -> None:
     parser.add_argument(
         "--output-root",
         type=Path,
-        default=PROJECT_ROOT / "experiments" / "12_temperature_encoding",
+        default=PROJECT_ROOT / "outputs" / "temperature_encoding_sensitivity",
     )
     args = parser.parse_args()
 

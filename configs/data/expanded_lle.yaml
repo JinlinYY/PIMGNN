@@ -2,7 +2,7 @@ EXCEL_PATH: datasets/processed/LLE-literature-data-boosted.xlsx
 MIN_POINTS_PER_GROUP: 6
 PERMUTE_23_AUG: true
 SPLIT_STRATEGY: manifest
-SPLIT_MANIFEST_PATH: datasets/splits/expanded_lle_corrected_v2.json
+SPLIT_MANIFEST_PATH: datasets/splits/expanded_lle_system_split.json
 TRAIN_RATIO: 0.8
 VAL_RATIO: 0.1
 SEED: 42

@@ -1,4 +1,3 @@
-"""Implement the glam model glam baseline module."""
 import torch
 import torch.nn as nn
 import random
@@ -7,9 +6,7 @@ from .architectures import SingleGraphArchitecture, PairGraphArchitecture, Tripl
 
 
 class ConfigurationSpace:
-    """Represent the ConfigurationSpace baseline component."""
     def __init__(self):
-        # Baseline workflow step.
         self.norm_types = ['batch', 'layer', 'instance', None]
         self.activations = ['relu', 'gelu', 'celu', 'tanh']
         self.mp_types = ['gcn', 'gat', 'mpn', 'tri_mpn', 'light_tri_mpn']
@@ -19,14 +16,12 @@ class ConfigurationSpace:
         self.num_mp_layers_range = [1, 2, 3, 4, 5, 6]
         self.hidden_dims = [64, 128, 256, 512]
         
-        # Run the training step.
         self.batch_sizes = [16, 32, 64, 128]
         self.learning_rates = [1e-4, 5e-4, 1e-3, 5e-3]
         self.optimizers = ['adam', 'sgd', 'adamw']
         self.loss_functions = ['mse', 'mae', 'bce', 'ce']
     
     def sample_config(self, task_type='property'):
-        """Run the sample config baseline operation."""
         config = {
             'norm_type': random.choice(self.norm_types),
             'activation': random.choice(self.activations),
@@ -47,20 +42,16 @@ class ConfigurationSpace:
         return config
     
     def sample_configs(self, n, task_type='property'):
-        """Run the sample configs baseline operation."""
         return [self.sample_config(task_type) for _ in range(n)]
 
 
 class GLAM(nn.Module):
-    """Represent the GLAM baseline component."""
     def __init__(self, node_dim, out_dim, task_type='property', 
                  config=None, ensemble_size=3):
-        """Run the init baseline operation."""
         super(GLAM, self).__init__()
         self.task_type = task_type
         self.ensemble_size = ensemble_size
         
-        # Baseline workflow step.
         if config is None:
             config = {
                 'norm_type': 'batch',
@@ -75,7 +66,6 @@ class GLAM(nn.Module):
         
         self.config = config
         
-        # Baseline workflow step.
         if task_type == 'property':
             self.model = SingleGraphArchitecture(
                 node_dim=node_dim,
@@ -105,20 +95,16 @@ class GLAM(nn.Module):
             raise ValueError(f"Unknown task type: {task_type}")
     
     def forward(self, *args, **kwargs):
-        """Run the forward baseline operation."""
         return self.model(*args, **kwargs)
 
 
 class GLAMEnsemble(nn.Module):
-    """Represent the GLAMEnsemble baseline component."""
     def __init__(self, node_dim, out_dim, task_type='property',
                  configs=None, ensemble_size=3):
-        """Run the init baseline operation."""
         super(GLAMEnsemble, self).__init__()
         self.task_type = task_type
         self.ensemble_size = ensemble_size
         
-        # Baseline workflow step.
         if configs is None:
             config_space = ConfigurationSpace()
             configs = config_space.sample_configs(ensemble_size, task_type)
@@ -130,18 +116,15 @@ class GLAMEnsemble(nn.Module):
         ])
     
     def forward(self, *args, **kwargs):
-        """Run the forward baseline operation."""
         outputs = []
         for model in self.models:
             output = model(*args, **kwargs)
             outputs.append(output)
         
-        # Baseline workflow step.
         ensemble_output = torch.stack(outputs).mean(dim=0)
         return ensemble_output
     
     def predict_with_weights(self, *args, weights=None, **kwargs):
-        """Run the predict with weights baseline operation."""
         outputs = []
         for model in self.models:
             output = model(*args, **kwargs)
@@ -150,18 +133,14 @@ class GLAMEnsemble(nn.Module):
         if weights is None:
             weights = [1.0 / len(self.models)] * len(self.models)
         
-        # Baseline workflow step.
         ensemble_output = sum(w * out for w, out in zip(weights, outputs))
         return ensemble_output
 
 
 class GLAM_LLE(nn.Module):
-    """Represent the GLAM_LLE baseline component."""
     def __init__(self, node_dim, out_dim, config=None):
-        """Run the init baseline operation."""
         super(GLAM_LLE, self).__init__()
         
-        # Baseline workflow step.
         if config is None:
             config = {
                 'norm_type': 'batch',
@@ -176,7 +155,6 @@ class GLAM_LLE(nn.Module):
         
         self.config = config
         
-        # Baseline workflow step.
         self.model = TripleGraphArchitecture(
             node_dim=node_dim,
             hidden_dim=config['hidden_dim'],
@@ -191,7 +169,6 @@ class GLAM_LLE(nn.Module):
         )
     
     def forward(self, il_graph, comp2_graph, comp3_graph, temperature=None):
-        """Run the forward baseline operation."""
         return self.model(
             il_graph.x, il_graph.edge_index,
             comp2_graph.x, comp2_graph.edge_index,

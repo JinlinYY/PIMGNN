@@ -20,7 +20,7 @@ from psmi.data import load_and_prepare_excel  # noqa: E402
 DATASETS = [
     (
         "Curated IL-LLE",
-        PROJECT_ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles_min3.xlsx",
+        PROJECT_ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles.xlsx",
         "LLE system NO.",
     ),
     (
@@ -32,7 +32,8 @@ DATASETS = [
 OUTPUT = (
     PROJECT_ROOT
     / "experiments"
-    / "00_dataset_construction"
+    / "supporting_information"
+    / "s5_dataset_construction_and_distribution"
     / "results"
     / "temperature_range_audit.xlsx"
 )

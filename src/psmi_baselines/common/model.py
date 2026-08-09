@@ -7,7 +7,7 @@ All torch models output 6 numbers in [0,1] with:
 and each triplet sums to 1 (softmax constraint).
 
 Model names (torch):
-  - "mlp" (default): LLECurveNet (your original)
+  - "mlp" (default): LLECurveNet
   - "ann": deeper MLP
   - "lstm": sequence model over [fp1, fp2, fp3, (T,t)]
   - "transformer": transformer encoder over same 4 tokens
@@ -43,7 +43,7 @@ def _split_fp_and_scalars(x: torch.Tensor, fp_bits: int) -> tuple[torch.Tensor, 
 
 
 # -------------------------
-# Baseline (your original)
+# Multilayer-perceptron baseline
 # -------------------------
 class LLECurveNet(nn.Module):
     def __init__(self, in_dim: int, hidden: int = 512, dropout: float = 0.15):

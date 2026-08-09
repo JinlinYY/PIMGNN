@@ -33,8 +33,17 @@ from psmi.utils import set_seed
 
 
 DEFAULT_DATASET = PROJECT_ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles.xlsx"
-DEFAULT_CHECKPOINT = PROJECT_ROOT / "models" / "paper_historical" / "figure2a_psmi" / "best_model.pt"
-DEFAULT_OUTPUT = PROJECT_ROOT / "experiments" / "11_ge_model_sensitivity" / "results"
+DEFAULT_CHECKPOINT = (
+    PROJECT_ROOT
+    / "experiments"
+    / "section_3_results"
+    / "3_1_lle_prediction"
+    / "main_benchmark"
+    / "models"
+    / "figure_2a_psmi"
+    / "best_model.pt"
+)
+DEFAULT_OUTPUT = PROJECT_ROOT / "outputs" / "excess_gibbs_energy_model_sensitivity"
 GE_MODELS = ("nrtl", "margules", "van_laar")
 
 

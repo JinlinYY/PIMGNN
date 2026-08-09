@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Implement the mmgnn data_loader baseline module."""
 
 import pandas as pd
 import numpy as np
@@ -16,11 +15,9 @@ def load_csv_data(
     min_points_per_group: int = 6,
     permute_23_aug: bool = True
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Run the load csv data baseline operation."""
     # Read the input data.
     df = pd.read_csv(csv_path)
     
-    # Baseline workflow step.
     df = df.rename(columns={
         "LLE system NO.": "system_id",
         "T/K": "T",
@@ -29,24 +26,20 @@ def load_csv_data(
         "Component 3 SMILES": "smiles3",
     })
     
-    # Baseline workflow step.
     needed = ["system_id", "T", "smiles1", "smiles2", "smiles3",
               "Ex1", "Ex2", "Ex3", "Rx1", "Rx2", "Rx3"]
     for c in needed:
         if c not in df.columns:
             raise ValueError(f" missing required columns : {c}. available columns : {list(df.columns)}")
     
-    # Baseline workflow step.
     for c in ["smiles1", "smiles2", "smiles3"]:
         df[c] = df[c].astype(str).map(canonicalize_smiles)
     df = df[(df["smiles1"] != "") & (df["smiles2"] != "") & (df["smiles3"] != "")].copy()
     
-    # Baseline workflow step.
     for c in ["T", "Ex1", "Ex2", "Ex3", "Rx1", "Rx2", "Rx3"]:
         df[c] = pd.to_numeric(df[c], errors="coerce")
     df = df.dropna(subset=["T", "Ex1", "Ex2", "Ex3", "Rx1", "Rx2", "Rx3"]).copy()
     
-    # Baseline workflow step.
     E = df[["Ex1", "Ex2", "Ex3"]].to_numpy(dtype=np.float32)
     R = df[["Rx1", "Rx2", "Rx3"]].to_numpy(dtype=np.float32)
     E = np.vstack([renorm3(e) for e in E])
@@ -86,7 +79,6 @@ def load_split_datasets(
     min_points_per_group: int = 6,
     permute_23_aug: bool = True
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Run the load split datasets baseline operation."""
     train_path = os.path.join(dataset_dir, train_file)
     val_path = os.path.join(dataset_dir, val_file)
     test_path = os.path.join(dataset_dir, test_file)
@@ -109,11 +101,9 @@ def split_by_system_id(
     val_ratio: float = 0.1,
     seed: int = SEED
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Run the split by system id baseline operation."""
     if system_col not in df.columns:
         raise ValueError(f" column '{system_col}' does not exist . available columns : {list(df.columns)}")
     
-    # Baseline workflow step.
     systems = sorted(df[system_col].unique().tolist())
     print(f" Total total Yes {len(systems)} Different system ID")
     
@@ -121,12 +111,10 @@ def split_by_system_id(
     rng = np.random.RandomState(seed)
     rng.shuffle(systems)
     
-    # Baseline workflow step.
     n = len(systems)
     n_train = int(n * train_ratio)
     n_val = int(n * val_ratio)
     
-    # Baseline workflow step.
     train_sys = set(systems[:n_train])
     val_sys = set(systems[n_train:n_train + n_val])
     test_sys = set(systems[n_train + n_val:])
@@ -150,11 +138,11 @@ def split_by_system_id(
 
 
 def split_dataset_main():
-    """Create an optional MMGNN-specific legacy split without replacing shared data."""
+    """Create an optional MMGNN-specific split without replacing shared data."""
     input_file = str(TOTAL_CSV)
     
     # Configure the output artifacts.
-    output_dir = str(DATA_DIR / "legacy_mmgnn_split")
+    output_dir = str(DATA_DIR / "model_specific_mmgnn_split")
     os.makedirs(output_dir, exist_ok=True)
     
     print("=" * 80)
@@ -167,9 +155,8 @@ def split_dataset_main():
     print("\n reading data ...")
     df = pd.read_csv(input_file)
     print(f" data shape : {df.shape}")
-    print(f" column First Name : {list(df.columns)}")
+    print(f"Columns: {list(df.columns)}")
     
-    # Baseline workflow step.
     required_cols = ['LLE system NO.']
     for col in required_cols:
         if col not in df.columns:

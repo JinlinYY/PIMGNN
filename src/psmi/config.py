@@ -17,7 +17,7 @@ MODELS_DIR = PROJECT_ROOT / "models"
 FIGURES_DIR = PROJECT_ROOT / "figures"
 
 EXCEL_PATH = str(DATASETS_DIR / "processed" / "LLE-literature-data-boosted.xlsx")
-OUT_DIR = str(EXPERIMENTS_DIR / "07_external_validation" / "runs" / "literature_reproduction")
+OUT_DIR = str(PROJECT_ROOT / "outputs" / "training" / "expanded_lle")
 
 # Reproducibility
 SEED = 42
@@ -62,9 +62,8 @@ MIX_PACKING_BUFFER = 0.8
 MIX_LAYERS = 2
 MIX_HIDDEN = 256
 MIX_DROPOUT = 0.30
-# Mixture graph batches store nodes sample by sample. Historical checkpoints
-# were trained with component-major embeddings; use ``legacy_component_major``
-# only when reproducing those archived results.
+# Mixture-graph batches use sample-major node ordering by default. Select
+# ``component_major`` only for checkpoints that declare that batch layout.
 MIXTURE_NODE_LAYOUT = "sample_major"
 
 # Molecular graph construction
@@ -153,9 +152,11 @@ MIX_TRIPLE_CACHE_SIZE = 4096
 
 # Optional checkpoint used to resume training or run evaluation.
 LOAD_CKPT_PATH = str(
-    MODELS_DIR
-    / "06_transfer_learning"
-    / "public_release"
+    PROJECT_ROOT
+    / "experiments"
+    / "section_3_results"
+    / "3_3_binary_solubility_validation"
+    / "models"
     / "base_ternary"
     / "best_model.pt"
 )
@@ -191,14 +192,14 @@ FG_CROSS_ATTN = True
 FG_ATTN_HEADS = 8
 
 # Permutation-aware component fusion
-# Current name: enables only the S3-aware component embedding, not full-model
-# output equivariance. The legacy alias remains for historical profiles.
+# This option enables the S3-aware component embedding, not full-model output
+# equivariance. The alias is retained for compatible configuration profiles.
 USE_S3_COMPONENT_EMBEDDING = None
 S3_EQUIVARIANT = True
 
-# Saved main-model checkpoints used multiscale concatenation. Historical run
-# names used the ambiguous label ``tf`` even though their state dictionaries
-# contain no Transformer module.
+# Published main-model checkpoints use multiscale concatenation. Some saved
+# configuration tables label this profile ``tf`` although the state dictionary
+# contains no Transformer module.
 FUSION_MODE = "concat"
 
 # Transformer fusion settings

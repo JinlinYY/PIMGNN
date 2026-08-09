@@ -13,14 +13,13 @@ except ImportError:
 
 add_src_to_path()
 
-from psmi_legacy_public import config as C
-from psmi_legacy_public.data import GraphCache, collate_graph_batch
-from psmi_legacy_public.model import LLEGraphNet
-from psmi_legacy_public.paths import ABRAHAM_DATA, ABRAHAM_EXPERIMENT_ROOT
+from psmi_checkpoint_compat import config as C
+from psmi_checkpoint_compat.data import GraphCache, collate_graph_batch
+from psmi_checkpoint_compat.model import LLEGraphNet
+from psmi_checkpoint_compat.paths import ABRAHAM_DATA, ABRAHAM_EXPERIMENT_ROOT
 
 class AbrahamDataset(Dataset):
     def __init__(self, df, g_cache, target_col):
-        # Legacy public-release workflow step.
         self.df = df.dropna(subset=[target_col]).reset_index(drop=True)
         # Build molecular graph features.
         self.df = self.df[~self.df['smiles1'].astype(str).str.lower().isin(['smiles', '-', 'nan', ''])]
@@ -62,7 +61,7 @@ class AbrahamDataset(Dataset):
                y_true
 
 def main():
-    parser = argparse.ArgumentParser(description="Train the archived Abraham binary head.")
+    parser = argparse.ArgumentParser(description="Train the reference Abraham binary head.")
     parser.add_argument("--data", type=Path, default=ABRAHAM_DATA)
     parser.add_argument(
         "--output",
@@ -79,15 +78,14 @@ def main():
     batch_size = args.batch_size
     base_lr = args.learning_rate
     
-    print(f"🚀 launch Abraham Special Tune task ( Auto Fault Tolerant Mode )...")
+    print("Starting Abraham-data fine-tuning...")
     if not os.path.exists(file_path):
-        print(f"❌ file not found {file_path}")
+        print(f"File not found: {file_path}")
         return
 
     df = pd.read_excel(file_path)
-    print(f"📊 current Excel Contains column Famous : {df.columns.tolist()}")
+    print(f"Workbook columns: {df.columns.tolist()}")
     
-    # Legacy public-release workflow step.
     target_col = None
     possible_targets = ['value', 'L', 'S', 'A', 'B', 'V', 'E', 'y', 'target', 'exp']
     for pt in possible_targets:
@@ -95,20 +93,18 @@ def main():
             target_col = pt
             break
             
-    # Legacy public-release workflow step.
     if target_col is None:
-        print("⚠️ unable to Automatically identify prediction column ! Please will Below code in `target_col = None` Modified is Do you want to prediction column First Name ( Ex. 'L' or 'S').")
-        target_col = df.columns[-1] # Legacy public-release workflow step.
-        print(f"👉 Temporarily Auto use most after M column [{target_col}] By is prediction Goal .")
+        print("Target column was not identified from known aliases; using the final column.")
+        target_col = df.columns[-1]
+        print(f"Selected target column: {target_col}")
     else:
-        print(f"🎯 successful Locked prediction target column : [{target_col}]")
+        print(f"Selected target column: {target_col}")
 
-    # Legacy public-release workflow step.
     g_cache = GraphCache(add_hs=C.GRAPH_ADD_HS, use_gasteiger=C.GRAPH_USE_GASTEIGER, max_atoms=C.GRAPH_MAX_ATOMS)
     smiles_all = pd.concat([df["smiles1"], df.get("smiles2", pd.Series()), df.get("smiles3", pd.Series())]).unique()
     smiles_clean = [s for s in smiles_all if pd.notna(s) and str(s).strip().lower() not in ['-', 'smiles', 'nan', '']]
     
-    print(f" building {len(smiles_clean)} molecule graph Cache ...")
+    print(f"Building graph cache for {len(smiles_clean)} molecules...")
     g_cache.build_from_smiles(smiles_clean)
     
     dataset = AbrahamDataset(df, g_cache, target_col)
@@ -123,7 +119,7 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=base_lr)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
     
-    print("\n🔥 training started ...")
+    print("\nTraining started...")
     model.train()
     for epoch in range(epochs):
         total_loss = 0.0
@@ -136,7 +132,6 @@ def main():
             optimizer.zero_grad()
             preds = model(batch_x).squeeze()
             
-            # Legacy public-release workflow step.
             valid_mask = batch_y > -100.0
             if valid_mask.sum() > 0:
                 loss = nn.functional.mse_loss(preds[valid_mask], batch_y[valid_mask])
@@ -165,7 +160,7 @@ def main():
             
     args.output.parent.mkdir(parents=True, exist_ok=True)
     pd.DataFrame({'y_true': all_trues, 'y_pred': all_preds}).to_csv(args.output, index=False)
-    print("✅ Abraham In-Depth Training Successful complete ! results Already update to Abraham_results_new.csv")
+    print(f"Training complete. Predictions written to {args.output}")
 
 if __name__ == "__main__":
     main()

@@ -130,9 +130,9 @@ def main():
     ap.add_argument("--excel_path", type=str, required=True, help=" input Excel path ")
     ap.add_argument("--out_dir", type=str, required=True, help=" output directory ")
     ap.add_argument("--group_by_temp", action="store_true",
-                    help=" whether put ( system identifier + temperature ) Treat as Different system ( Referral On , Avoid the same identifier multiple temperature Override )")
-    ap.add_argument("--draw_curve", action="store_true", help=" whether to plot Ex/Rx boundary curve (PCA ordered polyline )")
-    ap.add_argument("--make_pdf", action="store_true", help=" whether to export a multipage document PDF")
+                    help="Treat each system-temperature pair as a separate phase diagram.")
+    ap.add_argument("--draw_curve", action="store_true", help="Draw PCA-ordered extract and raffinate boundary curves.")
+    ap.add_argument("--make_pdf", action="store_true", help="Export all systems as a multipage PDF.")
     ap.add_argument("--max_systems", type=int, default=-1, help=" maximum number of systems to export (-1= all )")
     args = ap.parse_args()
 
@@ -152,7 +152,7 @@ def main():
     need_cols = ["LLE system NO.", "T/K", "Ex1", "Ex2", "Ex3", "Rx1", "Rx2", "Rx3"]
     for c in need_cols:
         if c not in df.columns:
-            raise ValueError(f" missing columns :{c}, verify You Excel column First Name Already update is Ex*/Rx*")
+            raise ValueError(f"Missing required column {c!r}; expected Ex*/Rx* composition fields.")
 
     keys = ["LLE system NO.", "T/K"] if args.group_by_temp else ["LLE system NO."]
     grouped = df.groupby(keys, dropna=False, sort=False)

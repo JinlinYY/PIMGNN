@@ -11,31 +11,22 @@ import unittest
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-_APPLICATION_CSV_CANDIDATES = (
+APPLICATION_CSV = (
     PROJECT_ROOT
     / "experiments"
-    / "14_industrial_cases"
-    / "00_application_workflow"
+    / "section_3_results"
+    / "3_4_industrial_extraction_design"
+    / "application_workflow"
     / "results"
-    / "application_case_predictions.csv",
-    PROJECT_ROOT
-    / "experiments"
-    / "09_application_cases"
-    / "runs"
-    / "current"
-    / "predictions"
     / "application_case_predictions.csv"
-)
-APPLICATION_CSV = next(
-    (path for path in _APPLICATION_CSV_CANDIDATES if path.is_file()),
-    _APPLICATION_CSV_CANDIDATES[0],
 )
 APPLICATION_EXCEL = PROJECT_ROOT / "datasets" / "raw" / "application_case_1.xlsx"
 DEFAULT_CHECKPOINT = (
     PROJECT_ROOT
+    / "experiments"
+    / "section_3_results"
+    / "3_3_binary_solubility_validation"
     / "models"
-    / "06_transfer_learning"
-    / "public_release"
     / "base_ternary"
     / "best_model.pt"
 )

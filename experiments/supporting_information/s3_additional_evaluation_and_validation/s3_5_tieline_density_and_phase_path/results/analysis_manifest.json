@@ -1,0 +1,12 @@
+{
+  "bootstrap_samples": 10000,
+  "bootstrap_unit": "system-temperature group",
+  "reference_threshold": 6,
+  "outputs": {
+    "threshold_metrics": "threshold_metrics_with_ci.csv",
+    "location_metrics": "location_metrics_with_ci.csv",
+    "coverage": "dataset_threshold_counts.csv",
+    "figure_png": "../figures/tieline_threshold_sensitivity.png",
+    "figure_pdf": "../figures/tieline_threshold_sensitivity.pdf"
+  }
+}

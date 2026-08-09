@@ -1,78 +1,139 @@
 # PSMI: Physics-Informed Prediction of Ternary Liquid-Liquid Equilibria
 
-PSMI is a graph-neural-network framework for predicting ternary liquid-liquid equilibrium (LLE) tie lines. The repository provides curated datasets, fixed system-level splits, model implementations, thermodynamic regularization, baseline comparisons, trained checkpoints, paper-aligned experiments, result tables, figures, and a web application.
+PSMI predicts tie-line compositions for ternary liquid-liquid equilibrium (LLE) systems from molecular graphs and operating conditions. This repository provides the model implementation, thermodynamic regularization, curated datasets, fixed system-level splits, trained checkpoints, baseline comparisons, paper-aligned experiments, reference results, and a browser-based prediction interface.
+
+## Scientific scope
+
+PSMI is designed for data-driven prediction of coexisting extract- and raffinate-phase compositions. Each sample contains three molecular components, temperature, pressure where applicable, and a phase-path coordinate. The repository supports:
+
+- ternary LLE prediction on chemical systems excluded from training;
+- NRTL-based chemical-potential regularization;
+- architecture and thermodynamic-loss ablations;
+- comparison with molecular graph and language-model baselines;
+- temperature, data-splitting, tie-line-density, and system-generalization analyses;
+- expanded-LLE adaptation and industrial extraction case studies.
+
+The [scientific model contract](docs/architecture/scientific_model_contract.md) defines the executable architecture, thermodynamic objective, output constraints, and checkpoint conventions.
+
+## Model architecture
+
+The maintained `sample_major` architecture contains five principal stages:
+
+1. a shared message-passing encoder converts each molecular graph into atom- and molecule-level representations;
+2. cross-molecular functional-group attention captures interactions among the three components;
+3. a three-node mixture graph combines molecular embeddings with normalized operating variables;
+4. multi-scale features are fused across molecular and mixture representations;
+5. separate heads predict the three-component extract and raffinate compositions.
+
+The physics-informed training stage evaluates phase activity coefficients with an NRTL excess-Gibbs-energy model and penalizes chemical-potential mismatch between the predicted phases. The NRTL formulation supplies the thermodynamically consistent Gibbs-energy representation; the neural objective does not introduce a separate Gibbs-Duhem residual term.
+
+Paper checkpoints use the `component_major` node layout and are evaluated through explicit checkpoint registries. Maintained training configurations use `sample_major`. Layouts must not be mixed within a metric comparison.
 
 ## Repository layout
 
 ```text
-PSMI/
-|- configs/                 Data, model, training, and reproduction configurations
-|- datasets/                Processed datasets, split manifests, and thermodynamic parameters
+PSMI-public/
+|- configs/                 Dataset, model, training, and checkpoint registries
+|- datasets/                Processed workbooks, fixed splits, and NRTL parameters
 |- src/psmi/                Maintained PSMI implementation
-|- src/psmi_baselines/      Baseline model implementations
-|- scripts/                 Training, evaluation, analysis, and visualization entry points
-|- experiments/             Paper-aligned experiment index and reference artifacts
-|- models/                  Published checkpoints and transfer-learning models
-|- results/                 Paper tables, pointwise predictions, figures, and audit manifests
-|- Web/PSMI-LLE-web/        FastAPI and Vue web application
-|- tests/                   Unit, regression, and interface tests
-`- docs/                    Architecture, results, and usage documentation
+|- src/psmi_baselines/      Baseline implementations used in the comparison study
+|- scripts/                 Training, evaluation, analysis, and plotting commands
+|- experiments/             Experiments organized by paper section
+|- results/                 Figure 2a and reference physics-objective result packages
+|- Web/PSMI-LLE-web/        FastAPI backend and Vue frontend
+|- tests/                   Unit, regression, interface, and release-hygiene tests
+`- docs/                    Architecture, result, and usage documentation
 ```
 
-## Environment
+## Installation
 
-```powershell
+The reference environment is named `ggnn39` and uses Python 3.9.
+
+```bash
 conda env create -f environment.yml
 conda activate ggnn39
 ```
 
-An existing Python environment can also use `python -m pip install -r requirements.txt`.
+For CPU-only evaluation and analysis:
 
-## Checkpoint-based reproduction
-
-The following commands evaluate published checkpoints and organize the outputs into paper-aligned tables and figures:
-
-```powershell
-python scripts/reproduce_current_weights.py --device cuda
-python scripts/reproduce_current_weights.py `
-  --registry configs/reproduction/historical_paper_weight_registry.json `
-  --output-root results/paper_reproduction/historical_weight_inference `
-  --device cuda
-python scripts/analysis/build_paper_reproduction_bundle.py
+```bash
+conda env create -f environment-cpu.yml
+conda activate psmi-cpu
 ```
 
-The current corrected protocol and the paper's historical protocol are represented by separate registries because they use different mixture-node layouts. See `results/paper_reproduction/README.md` for numerical alignment and provenance details.
+An existing compatible environment can install the package and its declared dependencies with:
 
-## Training
+```bash
+python -m pip install -e .
+```
 
-```powershell
+RDKit and PyTorch Geometric binary compatibility depends on the selected PyTorch/CUDA combination. Conda installation is recommended when building a new GPU environment.
+
+## Quick start
+
+List the distributed checkpoint entries:
+
+```bash
+python scripts/evaluate_checkpoint_registry.py \
+  --registry configs/reproduction/published_checkpoint_registry.json \
+  --list
+```
+
+Evaluate the Figure 2a checkpoint on the fixed test systems:
+
+```bash
+python scripts/evaluate_checkpoint_registry.py \
+  --registry configs/reproduction/published_checkpoint_registry.json \
+  --only figure2a_psmi \
+  --device cpu \
+  --no-plots
+```
+
+Export the canonical Figure 2a result bundle:
+
+```bash
+python scripts/analysis/export_figure_2a_results.py
+```
+
+Training entry points are configuration driven:
+
+```bash
 python scripts/train.py --config configs/experiments/main_benchmark_stage1.yaml
 python scripts/train.py --config configs/experiments/main_benchmark_stage2.yaml
 python scripts/train.py --config configs/experiments/expanded_lle_finetune.yaml
 ```
 
-## Experiments
+## Data contract
 
-The `experiments/` index maps every main-text and Supporting Information experiment to its implementation, command-line entry point, data products, checkpoints, tables, and figures.
+The main workbook contains 8,343 experimental records from 860 ternary systems. Applying the fixed minimum density of six records per `(system_id, temperature)` group produces 7,683 modeling records from 765 systems. The expanded workbook contains 7,134 raw records and 6,709 filtered records.
+
+Splits are disjoint at the `system_id` level. Component-permutation augmentation is applied only to training examples after splitting; it does not change the reported number of experimental records. File identities, exact partition counts, preprocessing rules, field aliases, and reuse guidance are documented in the [Dataset Card](datasets/DATASET_CARD.md).
+
+## Experiments and reference results
+
+The [experiment index](experiments/README.md) maps each main-text and Supporting Information section to its implementation, command, checkpoint, source data, table, or figure. It includes the main benchmark, baseline comparison, ablation studies, molecular-interaction analysis, solubility transfer, industrial extraction cases, expanded-LLE adaptation, and all supplementary robustness analyses.
+
+The [results directory](results/README.md) contains the canonical Figure 2a and two reference result packages for the data-driven and chemical-potential-regularized models. Each package includes its validation-selected checkpoint, pointwise test predictions, metrics, figures, and SHA-256 artifact manifest.
+
+Run the test suite from the repository root:
+
+```bash
+python -m pytest -q
+```
 
 ## Web application
 
-```powershell
-Web/PSMI-LLE-web/scripts/run_backend.ps1
-Web/PSMI-LLE-web/scripts/run_frontend.ps1
-```
-
-Open `http://localhost:3000` for the interface and `http://localhost:8000/docs` for the API schema.
-
-See `Web/PSMI-LLE-web/README.md` for the complete local deployment guide, environment variables, API checks, GPU configuration, and troubleshooting.
-
-## Scientific scope
-
-The main physics-regularized configuration uses an NRTL excess-Gibbs-energy model to evaluate phase-wise activity coefficients and penalize chemical-potential mismatch. The current configuration does not add a separate Gibbs-Duhem residual term. The distinction between thermodynamic model consistency and an explicit neural-network loss term is documented in `docs/architecture/scientific_model_contract.md`.
-
-## Testing
+The web application provides molecule entry, operating-condition input, checkpoint-backed inference, and ternary composition visualization. Windows launch scripts are included:
 
 ```powershell
-$env:PYTHONPATH='src'
-python -m pytest -q
+Web\PSMI-LLE-web\scripts\run_backend.ps1
+Web\PSMI-LLE-web\scripts\run_frontend.ps1
 ```
+
+After startup, open `http://localhost:3000`; the FastAPI schema is available at `http://localhost:8000/docs`. See the [Web deployment guide](Web/PSMI-LLE-web/README.md) for Windows, Linux, and macOS setup, GPU configuration, environment variables, API verification, and troubleshooting.
+
+## Citation and license
+
+Citation metadata are provided in [`CITATION.cff`](CITATION.cff). Please cite the PSMI article and the original experimental sources when reusing the datasets. Baseline-method references and dependency notices are listed in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+
+Original PSMI source code is released under the [MIT License](LICENSE). Dataset measurements and third-party components retain their respective attribution and reuse requirements. Contributions are welcome; see [`CONTRIBUTING.md`](CONTRIBUTING.md).

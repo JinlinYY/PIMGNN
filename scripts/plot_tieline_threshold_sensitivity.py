@@ -119,17 +119,24 @@ def main() -> None:
     parser.add_argument(
         "--experiment-root",
         type=Path,
-        default=PROJECT_ROOT / "experiments" / "11_tieline_sensitivity",
+        default=(
+            PROJECT_ROOT
+            / "experiments"
+            / "supporting_information"
+            / "s3_additional_evaluation_and_validation"
+            / "s3_5_tieline_density_and_phase_path"
+            / "results"
+        ),
     )
     parser.add_argument(
         "--dataset",
         type=Path,
-        default=PROJECT_ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles_no-missing-smiles.xlsx",
+        default=PROJECT_ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles.xlsx",
     )
     parser.add_argument(
         "--figure-dir",
         type=Path,
-        default=PROJECT_ROOT / "figures" / "11_tieline_sensitivity",
+        default=PROJECT_ROOT / "outputs" / "figures" / "tieline_density_sensitivity",
     )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--reference-threshold", type=int, default=6)

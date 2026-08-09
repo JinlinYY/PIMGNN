@@ -1,4 +1,4 @@
-"""Download FreeSolv and export the legacy pseudo-ternary workbook."""
+"""Download FreeSolv and export the checkpoint-compatible pseudo-ternary workbook."""
 
 from __future__ import annotations
 

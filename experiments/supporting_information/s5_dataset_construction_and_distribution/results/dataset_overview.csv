@@ -1,0 +1,5 @@
+﻿dataset_id,dataset_name,stage,source_file,min_points_per_system_temperature_group,experimental_or_analysis_rows,training_rows_if_component23_swap_augmented,unique_system_id,unique_system_temperature_groups,temperature_min_K,temperature_max_K,unique_temperatures
+Curated IL-LLE,Curated ionic-liquid LLE workbook,raw_workbook,datasets\processed\update-LLE-all-with-smiles.xlsx,,8343,,860,872,278.15,353.2,35
+Curated IL-LLE,Curated ionic-liquid LLE workbook,filtered_min6_no_aug,datasets\processed\update-LLE-all-with-smiles.xlsx,6,7683,15366,765,766,278.15,353.2,33
+Expanded literature LLE,Expanded literature-collected LLE workbook,raw_workbook,datasets\processed\LLE-literature-data-boosted.xlsx,,7134,,830,883,278.15,373.15,85
+Expanded literature LLE,Expanded literature-collected LLE workbook,filtered_min6_no_aug,datasets\processed\LLE-literature-data-boosted.xlsx,6,6709,13418,719,764,278.15,373.15,66

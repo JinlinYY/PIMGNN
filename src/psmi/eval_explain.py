@@ -29,27 +29,11 @@ import pandas as pd
 import torch
 
 from rdkit import RDLogger
-RDLogger.DisableLog("rdApp.*")
-
-
-import os
-import re
-import json
-import math
-import time
-import argparse
-from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple, List
-
-os.environ.setdefault("MPLBACKEND", "Agg")
-
-import numpy as np
-import pandas as pd
-
-import torch
 from torch.utils.data import DataLoader
 
-# --- import your project modules (no modification) ---
+RDLogger.DisableLog("rdApp.*")
+
+# PSMI model, data, and feature utilities.
 from . import config as C
 from .utils import (
     set_seed,
@@ -204,7 +188,8 @@ def _infer_ckpt_path(ckpt_arg: str, out_dir: str) -> str:
         if os.path.isfile(p):
             return p
     raise FileNotFoundError(
-        f"[CKPT] auto not found checkpoint. specify explicitly --ckpt path . Already attempt :\n" + "\n".join(cand)
+        "No checkpoint was found automatically. Provide an explicit --ckpt path. "
+        "Searched:\n" + "\n".join(cand)
     )
 
 
@@ -1700,7 +1685,7 @@ def explain_system_and_plot(
     # Build caches
     use_graph = bool(getattr(C, "USE_GRAPH", False))
     if not use_graph:
-        raise RuntimeError(" current configuration USE_GRAPH=False, unable to DO node / edge-level interpretability ( supports only FP/FG level ).")
+        raise RuntimeError("Node- and edge-level attribution requires USE_GRAPH=True; fingerprint and functional-group attribution remain available.")
 
     # FG cache
     fg_cache = None
@@ -1743,7 +1728,7 @@ def explain_system_and_plot(
         collate_fn=collate_graph_batch,
     )
 
-    # We'll average importance across all points in system
+    # Aggregate importance across all points in the selected system.
     atom_imp_sum = {"g1": None, "g2": None, "g3": None}
     bond_imp_sum = {"g1": None, "g2": None, "g3": None}
     fg_imp_sum = None
@@ -1763,7 +1748,7 @@ def explain_system_and_plot(
                 model, x, y, device=device, objective=objective, target=target, steps=ig_steps
             )
             # IG returns keys: g1_node_attr, g1_edge_attr, fg_feat, mix_edge_attr ...
-            # For plotting we want per-node scalar + per-bond scalar
+            # Collapse feature attributions to node and bond scalars for plotting.
             for gi in ["g1", "g2", "g3"]:
                 key_n = f"{gi}_node_attr"
                 key_e = f"{gi}_edge_attr"
@@ -1881,7 +1866,7 @@ def explain_system_and_plot(
         n_points += 1
 
     if n_points <= 0:
-        raise RuntimeError("system data are empty or explain failed .")
+        raise RuntimeError("No system samples were available for attribution.")
 
     # average
     for gi in ["g1", "g2", "g3"]:
@@ -1915,7 +1900,7 @@ def explain_system_and_plot(
     # Mix edges: (directed edges count maybe 6)
     if mix_edge_sum is not None:
         # label by edge order in mix graph: typically 6 directed edges among 3 nodes
-        # we cannot rely on internal order 100%, but we can at least print indices
+        # Edge indices are used because mixture-edge ordering is implementation defined.
         labels = [f"mix_edge_{i}" for i in range(len(mix_edge_sum))]
         df_me = pd.DataFrame({"edge": labels, "importance": mix_edge_sum.astype(np.float64)})
         save_df_csv(df_me.sort_values("importance", ascending=False), os.path.join(out_dir, "importance_mix_edges.csv"))
@@ -1938,8 +1923,7 @@ def explain_system_and_plot(
                                     legend=f"{gi} atom importance ({explain})")
             if bond_imp_sum[gi] is not None and len(smi) > 0:
                 # Convert directed edge importance -> undirected bond importance by merging pairs
-                # We need access to edge_index from dataset sample; easiest: rebuild one sample
-                # Fetch one sample graph
+                # Rebuild one sample graph to recover its edge index.
                 if len(df_sys_raw) > 0:
                     # use GraphCache to get raw graph dict
                     gdict = g_cache.get(str(df_sys_raw.iloc[0][f"smiles{1 if gi=='g1' else 2 if gi=='g2' else 3}"]))
@@ -2198,7 +2182,7 @@ def run_mode_test(args: argparse.Namespace) -> None:
             
             
             try:
-                from viz_advanced import plot_importance_summary
+                from .viz_advanced import plot_importance_summary
                 
                 
                 importance_dict_adv = {}
@@ -2232,7 +2216,7 @@ def run_mode_test(args: argparse.Namespace) -> None:
                     print(f" [OK] advanced visualizations saved to : {adv_out_dir}")
             except Exception as e:
                 import traceback
-                print(f" [WARN] advanced visualization failed : {e}")
+                print(f"[WARN] Advanced visualization failed: {e}")
                 traceback.print_exc()
             
             

@@ -200,7 +200,7 @@ def _compare_reference_predictions(
     reproduced: pd.DataFrame,
     reference_path: Path,
 ) -> Dict[str, Any]:
-    """Compare newly inferred values with the archived pointwise predictions."""
+    """Compare newly inferred values with the reference pointwise predictions."""
     if not reference_path.is_file():
         return {
             "available": False,
@@ -360,7 +360,7 @@ def evaluate_saved_checkpoint(
             "path": str(prediction_path),
             "sha256": sha256_file(prediction_path),
         },
-        "archived_prediction_comparison": reference_comparison,
+        "reference_prediction_comparison": reference_comparison,
     }
     report_path = output_dir / "reproduction_report.json"
     with report_path.open("w", encoding="utf-8") as stream:

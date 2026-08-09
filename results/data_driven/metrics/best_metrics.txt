@@ -1,0 +1,55 @@
+Best epoch: 101
+
+============================================================
+Validation Metrics:
+============================================================
+  mse: 0.006131
+  rmse: 0.078299
+  r2: 0.946158
+  mae: 0.035509
+  rmse_E: 0.055745
+  rmse_R: 0.095676
+  r2_E: 0.969580
+  r2_R: 0.927104
+  mae_E: 0.032593
+  mae_R: 0.038426
+
+============================================================
+Test Metrics:
+============================================================
+
+Standard Metrics:
+  mse: 0.003044
+  mae: 0.033925
+  rmse: 0.055169
+  r2: 0.974053
+  mae_E: 0.036354
+  mae_R: 0.031497
+  rmse_E: 0.056120
+  rmse_R: 0.054201
+  r2_E: 0.967629
+  r2_R: 0.978605
+
+Physics Consistency Metrics:
+  sum_err_E: 0.000000
+  sum_err_R: 0.000000
+  sum_err_95: 0.000000
+  neg_frac: 0.000000
+  param_cov: 1.000000
+  mu_res_mae: 1.771093
+  mu_res_rmse: 2.612110
+  gd_penalty_mean: 0.000000
+  gd_penalty_p95: 0.000000
+  tpd_viol_rate: 0.244707
+  tpd_viol_mean: 0.000364
+
+============================================================
+
+Metric Descriptions:
+  sum_err_E/R: Sum-to-one constraint error (Extract/Raffinate)
+  sum_err_95: 95th percentile of sum-to-one error
+  neg_frac: Fraction of negative predictions
+  param_cov: Coverage rate of NRTL parameters
+  mu_res_*: Chemical potential equilibrium residual
+  gd_penalty_*: Gibbs-Duhem consistency violation
+  tpd_viol_*: Tangent-plane distance stability violation

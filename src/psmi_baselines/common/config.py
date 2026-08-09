@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Project config (single source of truth).
-Edit EXCEL_PATH / OUT_DIR here (or override via CLI in main.py).
+Shared configuration for fingerprint, sequence, and graph baselines.
 """
 
 from pathlib import Path
@@ -17,7 +16,7 @@ EXCEL_PATH = str(
     PROJECT_ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles.xlsx"
 )
 SPLIT_MANIFEST_PATH = str(
-    PROJECT_ROOT / "datasets" / "splits" / "main_benchmark_corrected_v2.json"
+    PROJECT_ROOT / "datasets" / "splits" / "main_benchmark_system_split.json"
 )
 OUT_DIR = str(EXPERIMENT_ROOT / "runs" / "classical")
 
@@ -61,11 +60,10 @@ DRAW_TIELINES_MAX = 14     # max tie-lines drawn per ternary plot (avoid clutter
 # -------------------------
 # Baseline comparison
 # -------------------------
-# Torch model name used by main.py / train.py (default keeps your original behavior)
+# Torch model selected by the baseline training entry point.
 MODEL_NAME = "ann"
 
-# If you want to run multiple models for comparison, use main_compare.py
-# Available:
+# Models available to the multi-model comparison entry point:
 #   torch: "mlp", "ann", "lstm", "transformer", "tabknet", "smiles_rnn", "gnn"
 #   sklearn: "xgboost", "random_forest", "tabnet" (requires pytorch-tabnet)
 MODELS_TO_RUN = [
@@ -81,11 +79,11 @@ MODELS_TO_RUN = [
     "xgboost",
 ]
 
-# Auto-load OUT_DIR/<model_name>.pt if exists (useful for repeated runs)
+# Reuse OUT_DIR/<model_name>.pt when a completed checkpoint is present.
 AUTO_LOAD_IF_EXISTS = True
 
 # Visualization control (viz.visualize_all_test_groups)
-SAVE_TERNARY_PDF = False          # set True if you also want the multi-page PDF
+SAVE_TERNARY_PDF = False          # Generate the multi-page phase-diagram PDF.
 COMPARE_DRAW_TERNARY = False      # set True to generate ternary plots for *each* model (slow)
 
 # -------------------------

@@ -349,9 +349,30 @@ def aggregate_across_seeds(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--experiment-root", type=Path, default=ROOT / "experiments" / "12_temperature_encoding")
-    parser.add_argument("--dataset", type=Path, default=ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles_no-missing-smiles.xlsx")
-    parser.add_argument("--output-dir", type=Path, default=ROOT / "figures" / "12_temperature_encoding")
+    parser.add_argument(
+        "--experiment-root",
+        type=Path,
+        default=(
+            ROOT
+            / "experiments"
+            / "supporting_information"
+            / "s3_additional_evaluation_and_validation"
+            / "s3_3_temperature_robustness"
+            / "02_encoding_and_tail"
+            / "results"
+            / "seed42_and_multiseed"
+        ),
+    )
+    parser.add_argument(
+        "--dataset",
+        type=Path,
+        default=ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles.xlsx",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=ROOT / "outputs" / "figures" / "temperature_encoding_sensitivity",
+    )
     parser.add_argument("--bootstrap-replicates", type=int, default=10000)
     parser.add_argument("--seed", type=int, default=20260806)
     parser.add_argument("--additional-experiment-roots", type=Path, nargs="*", default=[])

@@ -4,10 +4,8 @@
 loss.py
 NRTL-based mechanistic (physics) constraint for ternary LLE.
 
-This file is designed to be "additive": you can keep your existing training logic
-and simply replace the supervised loss with MechanisticNRTLLoss.
-
-Core idea (from your Word):
+`MechanisticNRTLLoss` augments the supervised composition objective with the
+following equilibrium condition:
 For each component k in {1,2,3}, at equilibrium:
     ln(xE_k * gammaE_k) == ln(xR_k * gammaR_k)
 Define residual:

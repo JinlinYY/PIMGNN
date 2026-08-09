@@ -1,0 +1,69 @@
+{
+  "dataset": "datasets/processed/update-LLE-all-with-smiles.xlsx",
+  "encodings": [
+    "linear_quadratic",
+    "inverse"
+  ],
+  "temperature_basis": {
+    "linear_quadratic": "scalar z-score(T); edge [T/T_ref, (T/T_ref)^2]",
+    "inverse": "scalar z-score(T_ref/T); edge [T_ref/T, (T_ref/T)^2]",
+    "temperature_reference_k": 500.0
+  },
+  "central_training_interval_k": [
+    293.15,
+    323.2
+  ],
+  "partitions": {
+    "train_unaugmented": {
+      "rows_tielines": 5566,
+      "systems": 554,
+      "system_temperature_groups": 554,
+      "temperature_min_k": 293.15,
+      "temperature_max_k": 323.2,
+      "temperature_unique": 16
+    },
+    "train_augmented_rows": 11132,
+    "validation": {
+      "rows_tielines": 700,
+      "systems": 69,
+      "system_temperature_groups": 70,
+      "temperature_min_k": 293.15,
+      "temperature_max_k": 323.2,
+      "temperature_unique": 10
+    },
+    "interpolation_test": {
+      "rows_tielines": 705,
+      "systems": 70,
+      "system_temperature_groups": 70,
+      "temperature_min_k": 293.15,
+      "temperature_max_k": 323.0,
+      "temperature_unique": 10
+    },
+    "extrapolation_test": {
+      "rows_tielines": 712,
+      "systems": 72,
+      "system_temperature_groups": 72,
+      "temperature_min_k": 278.15,
+      "temperature_max_k": 353.2,
+      "temperature_unique": 17
+    }
+  },
+  "system_overlap": 0,
+  "training": {
+    "seed": 2024,
+    "epochs_max": 60,
+    "learning_rate": 5e-05,
+    "batch_size": 512,
+    "patience": 10,
+    "early_stop_min_delta": 0.0002,
+    "component_23_augmentation": true,
+    "checkpoint_initialization": "from scratch and identical across encodings",
+    "loss": "supervised MSE"
+  },
+  "software_hardware": {
+    "python": "3.9.25",
+    "torch": "2.6.0+cu126",
+    "cuda_runtime": "12.6",
+    "gpu": "NVIDIA GeForce RTX 3090 Ti"
+  }
+}

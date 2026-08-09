@@ -5,7 +5,7 @@ import sys
 
 
 def _make_console_output_safe() -> None:
-    """Prevent Windows legacy code pages from crashing on report symbols."""
+    """Prevent non-UTF-8 Windows consoles from failing on report symbols."""
     for stream in (sys.stdout, sys.stderr):
         reconfigure = getattr(stream, "reconfigure", None)
         if reconfigure is not None:

@@ -1,4 +1,3 @@
-"""Implement the solvbert __init__ baseline module."""
 from .solvbert_model import SolvBERT, SolvBERTForMLM
 from .data_utils import (
     SolvDataset,

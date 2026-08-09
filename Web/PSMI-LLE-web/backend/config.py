@@ -23,7 +23,7 @@ MODEL_PATH = Path(os.getenv("PSMI_WEB_MODEL_PATH", str(MODEL_DIR / "best_model.p
 EXPLAIN_DIR = Path(
     os.getenv(
         "PSMI_WEB_EXPLAIN_DIR",
-        str(WEB_ROOT / "assets" / "explainability" / "explain_test_saliency_20260119-123603"),
+        str(WEB_ROOT / "assets" / "explainability" / "default_saliency"),
     )
 ).resolve()
 

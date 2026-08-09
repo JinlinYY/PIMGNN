@@ -1,4 +1,3 @@
-"""Implement the solvbert predict baseline module."""
 import argparse
 import torch
 import pandas as pd
@@ -10,7 +9,6 @@ from .data_utils import build_tokenizer, create_smiles_combination
 
 
 def load_model(model_path, tokenizer_path, device):
-    """Run the load model baseline operation."""
     # Load the input data.
     tokenizer = build_tokenizer(vocab_path=tokenizer_path)
     
@@ -20,7 +18,6 @@ def load_model(model_path, tokenizer_path, device):
     if 'config' in checkpoint:
         config = checkpoint['config']
     else:
-        # Baseline workflow step.
         config = {
             'vocab_size': len(tokenizer),
             'hidden_size': 256,
@@ -55,8 +52,6 @@ def load_model(model_path, tokenizer_path, device):
 
 
 def predict_single(model, tokenizer, solvent_smiles, solute_smiles, device, max_length=512):
-    """Run the predict single baseline operation."""
-    # Baseline workflow step.
     smiles_combination = create_smiles_combination(solvent_smiles, solute_smiles)
     
     # Tokenize
@@ -80,13 +75,11 @@ def predict_single(model, tokenizer, solvent_smiles, solute_smiles, device, max_
 
 def predict_batch(model, tokenizer, data_path, output_path, device, max_length=512, 
                   solvent_col='solvent', solute_col='solute', batch_size=32):
-    """Run the predict batch baseline operation."""
     # Read the input data.
     df = pd.read_csv(data_path)
     
     predictions = []
     
-    # Baseline workflow step.
     for i in tqdm(range(0, len(df), batch_size), desc=" prediction in "):
         batch_df = df.iloc[i:i+batch_size]
         
@@ -129,8 +122,8 @@ def main():
     parser.add_argument('--solute', type=str, default=None, help=' solute SMILES( single-sample prediction )')
     parser.add_argument('--input_data', type=str, default=None, help=' input data path ( batch prediction )')
     parser.add_argument('--output_data', type=str, default='predictions.csv', help=' output data path ')
-    parser.add_argument('--solvent_col', type=str, default='solvent', help=' solvent column First Name ')
-    parser.add_argument('--solute_col', type=str, default='solute', help=' solute column First Name ')
+    parser.add_argument('--solvent_col', type=str, default='solvent', help='solvent column name')
+    parser.add_argument('--solute_col', type=str, default='solute', help='solute column name')
     parser.add_argument('--batch_size', type=int, default=32, help=' batch size ')
     parser.add_argument('--max_length', type=int, default=512, help=' maximum sequence length ')
     parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', help=' device ')
@@ -162,7 +155,7 @@ def main():
         )
     
     else:
-        print(" error : Please provide --solvent and --solute ( single-sample prediction ) or --input_data ( batch prediction )")
+        print("Provide --solvent and --solute for one sample, or --input_data for batch prediction.")
 
 
 if __name__ == '__main__':
