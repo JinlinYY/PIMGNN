@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "experiment": "component_2_3_permutation_equivariance",
+  "execution_mode": "paired_checkpoint_inference",
+  "component_mapping": {
+    "model_inputs_after_exchange": [
+      "M1",
+      "M3",
+      "M2",
+      "temperature",
+      "phase_path_coordinate"
+    ],
+    "outputs_in_swapped_order": [
+      "Ex1",
+      "Ex3",
+      "Ex2",
+      "Rx1",
+      "Rx3",
+      "Rx2"
+    ],
+    "unchanged_model_inputs": [
+      "temperature",
+      "phase_path_coordinate"
+    ],
+    "unchanged_metadata": [
+      "system_id",
+      "pressure"
+    ]
+  },
+  "registry": "configs/reproduction/published_checkpoint_registry.json",
+  "registry_run_id": "figure2a_psmi",
+  "config": "configs/experiments/main_benchmark_stage1.yaml",
+  "configuration_overrides": [
+    "SEED=42",
+    "MIXTURE_NODE_LAYOUT=component_major"
+  ],
+  "checkpoint": {
+    "path": "experiments/section_3_results/3_1_lle_prediction/main_benchmark/models/figure_2a_psmi/best_model.pt",
+    "sha256": "72c432bc7fd48cb44b52402ad01393ba5a8b47737fa1e286658928670c10f380",
+    "epoch": 101,
+    "compatibility_adaptations": []
+  },
+  "functional_group_corpus": {
+    "path": "experiments/section_3_results/3_1_lle_prediction/main_benchmark/artifacts/figure_2a_fg_corpus.json",
+    "sha256": "d796da7492cee489f30141cc72f1b8e3b5f657386e131a2b31f9df5a7129e762"
+  },
+  "input_identity": {
+    "checkpoint_hashes_verified": false,
+    "checkpoint_provenance_available": false,
+    "dataset_path": "datasets/processed/update-LLE-all-with-smiles.xlsx",
+    "dataset_sha256": "76812d7a9ba8c6e6660e1acbf15817ff0725664d7fcf69b0fb0a84e133529f06",
+    "split_manifest_path": "datasets/splits/main_benchmark_system_split.json",
+    "split_manifest_sha256": "83b354d7aa91c0f94044f461d489d9a39ecf3729bcdfabc1c6e77899a18ede9a"
+  },
+  "test_partition": {
+    "records": 803,
+    "systems": 78
+  },
+  "bootstrap": {
+    "resampling_unit": "system_id",
+    "resamples": 10000,
+    "seed": 2026,
+    "confidence_level": 0.95
+  },
+  "runtime": {
+    "device": "cuda",
+    "paired_inference_seconds": 2.7498831,
+    "python": "3.9.25",
+    "torch": "2.6.0+cu126",
+    "numpy": "1.26.4",
+    "pandas": "2.3.3"
+  },
+  "outputs": {
+    "predictive_metrics": "experiments/supporting_information/s3_additional_evaluation_and_validation/s3_10_component_permutation_equivariance/results/predictive_metrics.csv",
+    "equivariance_metrics": "experiments/supporting_information/s3_additional_evaluation_and_validation/s3_10_component_permutation_equivariance/results/equivariance_metrics.csv",
+    "bootstrap_intervals": "experiments/supporting_information/s3_additional_evaluation_and_validation/s3_10_component_permutation_equivariance/results/system_cluster_bootstrap_intervals.csv",
+    "paired_predictions": "experiments/supporting_information/s3_additional_evaluation_and_validation/s3_10_component_permutation_equivariance/results/paired_predictions.csv",
+    "figures": [
+      "experiments/supporting_information/s3_additional_evaluation_and_validation/s3_10_component_permutation_equivariance/figures/component_23_permutation_equivariance.png",
+      "experiments/supporting_information/s3_additional_evaluation_and_validation/s3_10_component_permutation_equivariance/figures/component_23_permutation_equivariance.pdf"
+    ]
+  }
+}

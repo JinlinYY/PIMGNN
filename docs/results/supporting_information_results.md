@@ -17,6 +17,7 @@ sections are omitted unless they provide provenance for a reported result.
 | Tables S9-S10: thermodynamic-consistency audit | [`summary.json`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_7_thermodynamic_consistency_audit/results/summary.json), [`threshold_sensitivity.csv`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_7_thermodynamic_consistency_audit/results/threshold_sensitivity.csv), and per-prediction residuals | Complete |
 | Tables S11-S14 and S17: system-level reconstruction | [`s3_8_system_generalization/results`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_8_system_generalization/results) | Complete |
 | Section S3.9: inference efficiency | [`psmi_rtx3090_ti`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_9_inference_efficiency/results/psmi_rtx3090_ti) | Complete |
+| Section S3.10: Component-2/3 permutation equivariance | [`s3_10_component_permutation_equivariance`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_10_component_permutation_equivariance) | Complete; paired predictions, system-bootstrap intervals, and vector/raster figures are distributed |
 
 ### Tables S3-S4
 
