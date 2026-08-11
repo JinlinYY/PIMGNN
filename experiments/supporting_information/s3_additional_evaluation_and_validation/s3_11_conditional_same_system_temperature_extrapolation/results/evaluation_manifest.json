@@ -1,0 +1,104 @@
+{
+  "checkpoint": {
+    "path": "experiments/supporting_information/s3_additional_evaluation_and_validation/s3_11_conditional_same_system_temperature_extrapolation/models/reference_checkpoint/best_model.pt",
+    "sha256": "b3cc6f5ee5bd5d7a533af938f856afc58920b81f9d3f3a034be4afded5c0fc52"
+  },
+  "dataset": {
+    "path": "datasets/processed/update-LLE-all-with-smiles.xlsx",
+    "sha256": "76812d7a9ba8c6e6660e1acbf15817ff0725664d7fcf69b0fb0a84e133529f06"
+  },
+  "split_manifest": {
+    "path": "experiments/supporting_information/s3_additional_evaluation_and_validation/s3_11_conditional_same_system_temperature_extrapolation/splits/split_manifest.json",
+    "sha256": "19634dd5fd6f882dcc5eb2b2315a90ef15bbf433943ffa99f946fec05d0b01ef"
+  },
+  "checkpoint_epoch": 86,
+  "checkpoint_validation_metrics": {
+    "mse": 0.004723263655993756,
+    "rmse": 0.06872600421960931,
+    "r2": 0.9606478856635756,
+    "mae": 0.04085915894760318,
+    "rmse_E": 0.0653431437936673,
+    "rmse_R": 0.07194998868066367,
+    "r2_E": 0.9617224913805494,
+    "r2_R": 0.9597150901010761,
+    "mae_E": 0.041257495697818454,
+    "mae_R": 0.0404608221973879
+  },
+  "test_evaluated_during_training": false,
+  "system_grouping_column": "chemical_system_id",
+  "temperature_merge_tolerance_K": 0.1,
+  "test_summary": [
+    {
+      "scope": "overall",
+      "method": "PSMI",
+      "n_tie_lines": 623,
+      "n_system_temperature_groups": 64,
+      "temperature_gap_median_K": 11.0,
+      "mae": 0.0415849776,
+      "rmse": 0.0642520211,
+      "r2": 0.9096085425,
+      "median_tie_angle_deg": 3.7571889719,
+      "p90_tie_angle_deg": 12.8869000835
+    },
+    {
+      "scope": "overall",
+      "method": "Nearest observed temperature",
+      "n_tie_lines": 623,
+      "n_system_temperature_groups": 64,
+      "temperature_gap_median_K": 11.0,
+      "mae": 0.0248964236,
+      "rmse": 0.0455060802,
+      "r2": 0.9546588368,
+      "median_tie_angle_deg": 1.4980433262,
+      "p90_tie_angle_deg": 6.5445930133
+    },
+    {
+      "scope": "cold_extrapolation",
+      "method": "PSMI",
+      "n_tie_lines": 312,
+      "n_system_temperature_groups": 32,
+      "temperature_gap_median_K": 10.05,
+      "mae": 0.0430747127,
+      "rmse": 0.0673668678,
+      "r2": 0.8929353848,
+      "median_tie_angle_deg": 3.399381965,
+      "p90_tie_angle_deg": 12.6676072999
+    },
+    {
+      "scope": "cold_extrapolation",
+      "method": "Nearest observed temperature",
+      "n_tie_lines": 312,
+      "n_system_temperature_groups": 32,
+      "temperature_gap_median_K": 10.05,
+      "mae": 0.0279784248,
+      "rmse": 0.0509899206,
+      "r2": 0.9386630862,
+      "median_tie_angle_deg": 1.8224189801,
+      "p90_tie_angle_deg": 7.5321396596
+    },
+    {
+      "scope": "hot_extrapolation",
+      "method": "PSMI",
+      "n_tie_lines": 311,
+      "n_system_temperature_groups": 32,
+      "temperature_gap_median_K": 15.0,
+      "mae": 0.0400904524,
+      "rmse": 0.0609674611,
+      "r2": 0.9237005697,
+      "median_tie_angle_deg": 4.5748217403,
+      "p90_tie_angle_deg": 12.9846783865
+    },
+    {
+      "scope": "hot_extrapolation",
+      "method": "Nearest observed temperature",
+      "n_tie_lines": 311,
+      "n_system_temperature_groups": 32,
+      "temperature_gap_median_K": 15.0,
+      "mae": 0.0218045124,
+      "rmse": 0.0392419821,
+      "r2": 0.9683898217,
+      "median_tie_angle_deg": 1.2204757154,
+      "p90_tie_angle_deg": 5.7402041834
+    }
+  ]
+}

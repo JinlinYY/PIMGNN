@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Run the controlled PSMI temperature-extrapolation experiment.
+"""Compare polynomial and reciprocal temperature encodings for PSMI.
 
 The experiment deliberately withholds temperatures outside a central training
 interval.  Chemical systems are disjoint across the central train/validation/
@@ -202,19 +202,14 @@ def configure_training(args, encoding: str, output_dir: Path) -> None:
     C.COMPUTE_FINAL_PHYSICS_METRICS = False
 
 
-def parse_args(argv: List[str] | None = None) -> argparse.Namespace:
-    """Parse training and output options for one random seed."""
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--dataset",
         type=Path,
         default=PROJECT_ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles.xlsx",
     )
-    parser.add_argument(
-        "--encodings",
-        type=parse_encodings,
-        default=parse_encodings("linear_quadratic,inverse"),
-    )
+    parser.add_argument("--encodings", type=parse_encodings, default=parse_encodings("linear_quadratic,inverse"))
     parser.add_argument("--temperature-low-k", type=float, default=293.15)
     parser.add_argument("--temperature-high-k", type=float, default=323.20)
     parser.add_argument("--temperature-reference-k", type=float, default=500.0)
@@ -229,49 +224,20 @@ def parse_args(argv: List[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--output-root",
         type=Path,
-        default=None,
-        help=(
-            "Directory for one completed seed. The default is "
-            "outputs/temperature_extrapolation/runs/seed_<SEED>."
-        ),
+        default=PROJECT_ROOT / "outputs" / "temperature_encoding_sensitivity",
     )
-    return parser.parse_args(argv)
-
-
-def resolve_output_root(output_root: Path | None, seed: int) -> Path:
-    """Resolve the directory contract for one completed training seed."""
-    if output_root is None:
-        output_root = (
-            PROJECT_ROOT
-            / "outputs"
-            / "temperature_extrapolation"
-            / "runs"
-            / f"seed_{seed}"
-        )
-    return output_root.resolve()
-
-
-def main() -> None:
-    args = parse_args()
+    args = parser.parse_args()
 
     args.dataset = args.dataset.resolve()
-    args.output_root = resolve_output_root(args.output_root, args.seed)
+    args.output_root = args.output_root.resolve()
     if not args.dataset.exists():
         raise FileNotFoundError(args.dataset)
     if args.temperature_low_k >= args.temperature_high_k:
         raise ValueError("temperature-low-k must be smaller than temperature-high-k")
 
     raw, augmented = load_and_prepare_excel(str(args.dataset), 6, True)
-    inside_mask_raw = raw["T"].between(
-        args.temperature_low_k,
-        args.temperature_high_k,
-        inclusive="both",
-    )
-    inside_mask_aug = augmented["T"].between(
-        args.temperature_low_k,
-        args.temperature_high_k,
-        inclusive="both",
-    )
+    inside_mask_raw = raw["T"].between(args.temperature_low_k, args.temperature_high_k, inclusive="both")
+    inside_mask_aug = augmented["T"].between(args.temperature_low_k, args.temperature_high_k, inclusive="both")
     central_raw = raw[inside_mask_raw].copy()
     central_aug = augmented[inside_mask_aug].copy()
     extrapolation_raw = raw[~inside_mask_raw].copy()
@@ -341,25 +307,15 @@ def main() -> None:
         },
     }
     write_json(args.output_root / "experiment_manifest.json", manifest)
-    (
-        extrapolation_df.groupby(
-            ["distance_bin", "temperature_side"], observed=False
-        )
-        .size()
-        .rename("n_tielines")
-        .reset_index()
-        .to_csv(
-            args.output_root / "extrapolation_bin_counts.csv",
-            index=False,
-            encoding="utf-8-sig",
-        )
+    extrapolation_df.groupby(["distance_bin", "temperature_side"], observed=False).size().rename("n_tielines").reset_index().to_csv(
+        args.output_root / "extrapolation_bin_counts.csv", index=False, encoding="utf-8-sig"
     )
 
     summary_rows = []
     distance_frames = []
     side_frames = []
     for encoding in args.encodings:
-        run_dir = args.output_root / "encodings" / encoding
+        run_dir = args.output_root / "runs" / f"seed{args.seed}" / encoding
         summary_path = run_dir / "summary.json"
         if summary_path.exists() and not args.force:
             summary = json.loads(summary_path.read_text(encoding="utf-8"))
@@ -385,16 +341,8 @@ def main() -> None:
         extrapolation_pred = predict_pointwise_df_raw(
             model, temperature_scaler, extrapolation_df, device=C.DEVICE
         )
-        interpolation_pred.to_csv(
-            run_dir / "interpolation_predictions.csv",
-            index=False,
-            encoding="utf-8-sig",
-        )
-        extrapolation_pred.to_csv(
-            run_dir / "extrapolation_predictions.csv",
-            index=False,
-            encoding="utf-8-sig",
-        )
+        interpolation_pred.to_csv(run_dir / "interpolation_predictions.csv", index=False, encoding="utf-8-sig")
+        extrapolation_pred.to_csv(run_dir / "extrapolation_predictions.csv", index=False, encoding="utf-8-sig")
 
         distance = distance_metrics(extrapolation_pred)
         distance.insert(0, "encoding", encoding)
@@ -404,21 +352,12 @@ def main() -> None:
         side.to_csv(run_dir / "side_metrics.csv", index=False, encoding="utf-8-sig")
 
         best_path = run_dir / "best_metrics.json"
-        best_payload = (
-            json.loads(best_path.read_text(encoding="utf-8"))
-            if best_path.exists()
-            else {}
-        )
+        best_payload = json.loads(best_path.read_text(encoding="utf-8")) if best_path.exists() else {}
         interpolation_metrics = regression_metrics(interpolation_pred)
         extrapolation_metrics = regression_metrics(extrapolation_pred)
         table_row = {
             "encoding": encoding,
-            "best_epoch": int(
-                best_payload.get(
-                    "best_epoch",
-                    history["epoch"][-1] if history["epoch"] else -1,
-                )
-            ),
+            "best_epoch": int(best_payload.get("best_epoch", history["epoch"][-1] if history["epoch"] else -1)),
             "elapsed_seconds": float(elapsed),
             **{f"interpolation_{k}": v for k, v in interpolation_metrics.items()},
             **{f"extrapolation_{k}": v for k, v in extrapolation_metrics.items()},

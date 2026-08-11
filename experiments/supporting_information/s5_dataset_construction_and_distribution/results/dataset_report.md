@@ -21,7 +21,7 @@ The preprocessing summary reuses `psmi.data.load_and_prepare_excel(..., min_poin
 | Expanded literature LLE | validated_pre_density | 7125                          | 829              | 882                              | 278.15            | 373.15            | 85                  |                                             |
 | Expanded literature LLE | filtered_min6_no_aug  | 6709                          | 719              | 764                              | 278.15            | 373.15            | 66                  | 13418                                       |
 
-## Manuscript Table S15
+## Manuscript Table S18
 
 | dataset_id              | paper_stage      | repository_stage      | records | systems | system_temperature_groups |
 | ----------------------- | ---------------- | --------------------- | ------- | ------- | ------------------------- |
@@ -30,7 +30,7 @@ The preprocessing summary reuses `psmi.data.load_and_prepare_excel(..., min_poin
 | Expanded literature LLE | Before filtering | raw_workbook          | 7134    | 830     | 883                       |
 | Expanded literature LLE | After filtering  | filtered_min6_no_aug  | 6709    | 719     | 764                       |
 
-The final manuscript's `Before filtering` row maps to `validated_pre_density` for the curated benchmark and to `raw_workbook` for the expanded literature dataset. This explicit mapping preserves the reported Table S15 values without conflating workbook ingestion with molecular-record validation.
+The final manuscript's `Before filtering` row maps to `validated_pre_density` for the curated benchmark and to `raw_workbook` for the expanded literature dataset. This explicit mapping preserves the reported Table S18 values without conflating workbook ingestion with molecular-record validation.
 
 ## Points Per System
 

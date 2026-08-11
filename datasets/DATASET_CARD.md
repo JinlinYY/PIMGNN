@@ -38,7 +38,7 @@ retains only `(system_id, T)` groups containing at least six tie-line records.
 This threshold is encoded in both split manifests. All counts exclude
 component-permutation augmentation.
 
-The final manuscript Table S15 uses the main benchmark's validated pre-density
+The final manuscript Table S18 uses the main benchmark's validated pre-density
 count (7,953 / 830 / 842) and the expanded workbook count
 (7,134 / 830 / 883) for its two `Before filtering` rows. This exact mapping is
 stored in

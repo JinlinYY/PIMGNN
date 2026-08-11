@@ -1,5 +1,0 @@
-subset,encoding,n_seeds,n_tielines_min,n_tielines_max,n_groups_min,n_groups_max,mae_mean,mae_sd
-Interpolation,linear_quadratic,3,698,709,70,70,0.08808576717676753,0.00253197968155836
-Interpolation,inverse,3,698,709,70,70,0.0883969915327592,0.0025851538549345023
-Extrapolation,linear_quadratic,3,712,712,72,72,0.08636752001269117,0.0018644776178364326
-Extrapolation,inverse,3,712,712,72,72,0.08795457440462001,0.0007506386959132051

@@ -1,4 +1,4 @@
-# Component-2/3 Permutation-Equivariance Audit
+# S3.10 Sensitivity to Component Ordering
 
 This experiment tests whether the released PSMI checkpoint responds consistently
 when Components 2 and 3 are exchanged. It is a paired, post-hoc evaluation of
@@ -50,7 +50,7 @@ record and output component.
   78 complete systems. Tie lines from the same system are never resampled as
   independent observations.
 
-## Results
+## Table S15: predictive performance
 
 The original-ordering metrics reproduce the Figure 2a values to the precision
 reported in the manuscript.
@@ -61,6 +61,8 @@ reported in the manuscript.
 | Original ordering | Raffinate | 0.0318 | 0.0545 | 0.9784 |
 | Components 2/3 exchanged | Extract | 0.0356 | 0.0556 | 0.9682 |
 | Components 2/3 exchanged | Raffinate | 0.0312 | 0.0539 | 0.9788 |
+
+## Table S16: permutation consistency
 
 | Phase | Equivariance MAE | 95% system-bootstrap CI | RMSE | P95 absolute deviation | Maximum absolute deviation |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -102,8 +104,10 @@ and statistical analysis only.
 | `results/system_cluster_bootstrap_intervals.csv` | Point estimates and 95% system-level intervals, including paired metric differences |
 | `results/paired_predictions.csv` | All 803 records, exchanged molecular inputs and true labels, both prediction orderings, restored outputs, and componentwise deviations |
 | `results/experiment_manifest.json` | Checkpoint, input, runtime, split, and output provenance |
-| `figures/component_23_permutation_equivariance.pdf` | Vector publication figure |
-| `figures/component_23_permutation_equivariance.png` | 300 dpi raster figure |
+| `figures/component_23_permutation_equivariance.pdf` | Vector diagnostic figure generated from the paired predictions |
+| `figures/component_23_permutation_equivariance.png` | 300 dpi diagnostic figure generated from the paired predictions |
 
-The plotting code is part of the evaluation script so the numerical tables and
-figure are generated from the same paired predictions.
+The plotting code is part of the evaluation script, so the numerical tables
+and diagnostic figure are generated from the same paired predictions. Tables
+S15-S16 are the manuscript items; the diagnostic figure is an additional
+repository visualization rather than a numbered Supporting Information figure.

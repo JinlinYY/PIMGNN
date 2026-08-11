@@ -379,8 +379,8 @@ def overview_rows(prepared: PreparedDataset, min_points_per_group: int) -> list[
     return rows
 
 
-def manuscript_table_s15(overview: pd.DataFrame) -> pd.DataFrame:
-    """Map repository counting stages to the final manuscript Table S15."""
+def manuscript_table_s18(overview: pd.DataFrame) -> pd.DataFrame:
+    """Map repository counting stages to the final manuscript Table S18."""
     selections = [
         ("Curated IL-LLE", "Before filtering", "validated_pre_density"),
         ("Curated IL-LLE", "After filtering", "filtered_min6_no_aug"),
@@ -400,7 +400,7 @@ def manuscript_table_s15(overview: pd.DataFrame) -> pd.DataFrame:
         source = match.iloc[0]
         rows.append(
             {
-                "paper_item": "Table S15",
+                "paper_item": "Table S18",
                 "dataset_id": dataset_id,
                 "paper_stage": paper_stage,
                 "repository_stage": repository_stage,
@@ -904,7 +904,7 @@ def save_family_plot(family_distribution: pd.DataFrame, out_dir: Path) -> Path |
 def write_markdown_report(
     out_dir: Path,
     overview: pd.DataFrame,
-    table_s15: pd.DataFrame,
+    table_s18: pd.DataFrame,
     points_summary_df: pd.DataFrame,
     component_summary: pd.DataFrame,
     family_distribution: pd.DataFrame,
@@ -975,10 +975,10 @@ def write_markdown_report(
             ]
         ),
         "",
-        "## Manuscript Table S15",
+        "## Manuscript Table S18",
         "",
         markdown_table(
-            table_s15[
+            table_s18[
                 [
                     "dataset_id",
                     "paper_stage",
@@ -990,7 +990,7 @@ def write_markdown_report(
             ]
         ),
         "",
-        "The final manuscript's `Before filtering` row maps to `validated_pre_density` for the curated benchmark and to `raw_workbook` for the expanded literature dataset. This explicit mapping preserves the reported Table S15 values without conflating workbook ingestion with molecular-record validation.",
+        "The final manuscript's `Before filtering` row maps to `validated_pre_density` for the curated benchmark and to `raw_workbook` for the expanded literature dataset. This explicit mapping preserves the reported Table S18 values without conflating workbook ingestion with molecular-record validation.",
         "",
         "## Points Per System",
         "",
@@ -1097,14 +1097,15 @@ def main() -> None:
     prepared = [prepare_dataset(spec, args.min_points_per_group) for spec in DATASETS]
 
     overview = pd.DataFrame([row for item in prepared for row in overview_rows(item, args.min_points_per_group)])
-    table_s15 = manuscript_table_s15(overview)
+    table_s18 = manuscript_table_s18(overview)
     points_summary_df = pd.DataFrame([row for item in prepared for row in points_summary_rows(item)])
     points_counts = pd.DataFrame([row for item in prepared for row in points_count_rows(item)])
     component_summary = pd.DataFrame([row for item in prepared for row in component_summary_rows(item)])
     family_distribution = pd.DataFrame([row for item in prepared for row in family_distribution_rows(item)])
 
     overview.to_csv(results_dir / "dataset_overview.csv", index=False, encoding="utf-8-sig")
-    table_s15.to_csv(results_dir / "table_s15_counts.csv", index=False, encoding="utf-8-sig")
+    # Retain the historical filename as a compatibility alias after final SI renumbering.
+    table_s18.to_csv(results_dir / "table_s15_counts.csv", index=False, encoding="utf-8-sig")
     points_summary_df.to_csv(results_dir / "points_per_system_summary.csv", index=False, encoding="utf-8-sig")
     points_counts.to_csv(results_dir / "points_per_system_counts.csv", index=False, encoding="utf-8-sig")
     component_summary.to_csv(results_dir / "component_summary.csv", index=False, encoding="utf-8-sig")
@@ -1122,7 +1123,7 @@ def main() -> None:
     report_path = write_markdown_report(
         out_dir=results_dir,
         overview=overview,
-        table_s15=table_s15,
+        table_s18=table_s18,
         points_summary_df=points_summary_df,
         component_summary=component_summary,
         family_distribution=family_distribution,

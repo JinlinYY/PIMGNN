@@ -1,0 +1,36 @@
+{
+  "artifact": "best_model.pt",
+  "sha256": "b3cc6f5ee5bd5d7a533af938f856afc58920b81f9d3f3a034be4afded5c0fc52",
+  "model_state_preserved": true,
+  "metadata_sanitized_for_public_release": true,
+  "selected_epoch": 86,
+  "checkpoint_selection_partition": "background validation systems",
+  "test_evaluated_during_training": false,
+  "temperature_scaler": {
+    "mean_K": 302.4490661621094,
+    "std_K": 9.739729891286622
+  },
+  "pressure_scaler": {
+    "mean_kPa": 101.32499694824219,
+    "std_kPa": 1e-08
+  },
+  "paper_evaluation": {
+    "section": "SI Section S3.11",
+    "table": "Table S17",
+    "figure": "Figure S7",
+    "dataset": "datasets/processed/update-LLE-all-with-smiles.xlsx",
+    "dataset_sha256": "76812d7a9ba8c6e6660e1acbf15817ff0725664d7fcf69b0fb0a84e133529f06",
+    "split_manifest": "splits/split_manifest.json",
+    "split_manifest_sha256": "19634dd5fd6f882dcc5eb2b2315a90ef15bbf433943ffa99f946fec05d0b01ef",
+    "target_systems": 32,
+    "held_out_system_temperature_groups": 64,
+    "held_out_tie_lines": 623,
+    "synthetic_temperature_interpolation_rows": 0,
+    "target_systems_with_one_interior_temperature": 30
+  },
+  "embedded_metadata_audit": {
+    "status": "stale_global_default_removed",
+    "embedded_dataset_sha256": "24b54761e6509c2a4a28a3cb026c191f5f058127f908a90ab63a8751a4fce9da",
+    "explanation": "The source checkpoint contained a stale machine-local dataset reference to the expanded-dataset global default. That path and hash were removed from the public payload without changing any model-state tensor. The checkpoint scalers match the S3.11 benchmark training partition."
+  }
+}

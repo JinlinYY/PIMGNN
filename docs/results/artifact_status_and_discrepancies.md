@@ -24,18 +24,34 @@ therefore preserves each artifact and does not overwrite one set of metrics
 with another. The original run provenance should be confirmed before a future
 release labels one package as the sole Table 3 data-driven source.
 
+### Table S17 checkpoint dataset field
+
+The S3.11 result tables and split artifacts consistently describe 32 target
+systems, 64 held-out extreme-temperature groups, and 623 held-out tie lines.
+The selected checkpoint's temperature scaler also matches the reconstructed
+S3.11 training partition to printed precision. However, the source checkpoint
+contained an embedded dataset-path/hash field that identified the
+expanded-dataset global default rather than the benchmark workbook used by the
+S3.11 split.
+
+The stale machine-local reference was removed from the public payload while
+preserving every model-state tensor. The original embedded hash, sanitized
+checkpoint hash, and explanation are recorded in the adjacent
+`provenance.json`. The original job-level provenance should nevertheless be
+confirmed before treating the removed source field as authoritative.
+
 ## Resolved counting boundary
 
-### Table S15 before-filter counts
+### Table S18 before-filter counts
 
 The workbook-ingestion and molecular-validation stages are now reported
 separately. The curated workbook has 8,343 candidate rows; canonical-SMILES and
 required-field validation retains 7,953 records from 830 systems and 842
 system-temperature groups, exactly matching the curated `Before filtering`
-entry in Table S15. The density filter then retains 7,683 records from 765
+entry in Table S18. The density filter then retains 7,683 records from 765
 systems and 766 groups.
 
-The expanded Table S15 `Before filtering` entry uses the workbook count of
+The expanded Table S18 `Before filtering` entry uses the workbook count of
 7,134 rows, 830 systems, and 883 groups; its validated pre-density stage is
 7,125 records, 829 systems, and 882 groups. The manuscript-specific selection
 is encoded in [`table_s15_counts.csv`](../../experiments/supporting_information/s5_dataset_construction_and_distribution/results/table_s15_counts.csv),
@@ -54,7 +70,7 @@ conflict without deleting source rows or altering the model input pipeline.
 | Figure 3 | Scientific equilibrium panels 3c-3d and source data | Separate process-schematic panels 3a-3b and the assembled four-panel image |
 | Figure S4 | Sensitivity implementation | Archived final figure and numerical output package |
 | Table S5 | Split code and split manifests | Final aggregate performance table |
-| Figure S7 | Complete deployable Web application | Exact manuscript screenshot |
+| Figure S8 | Complete deployable Web application | Exact manuscript screenshot |
 
 ## Auxiliary results that must remain separate
 

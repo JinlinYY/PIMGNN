@@ -1,0 +1,23 @@
+{
+  "seed": 42,
+  "system_grouping_column": "chemical_system_id",
+  "validation_fraction": 0.1,
+  "minimum_temperatures_per_target_system": 3,
+  "n_target_systems": 32,
+  "n_target_test_groups": 64,
+  "n_train_systems": 547,
+  "n_validation_systems": 57,
+  "n_train_rows_original": 6397,
+  "n_validation_rows_original": 663,
+  "n_test_rows_original": 623,
+  "test_temperature_min_K": 278.15,
+  "test_temperature_max_K": 353.2,
+  "temperature_gap_min_K": 4.949999999999989,
+  "temperature_gap_median_K": 11.0,
+  "temperature_gap_max_K": 35.0,
+  "n_target_systems_with_multiple_interior_temperatures": 2,
+  "n_target_systems_with_one_interior_temperature": 30,
+  "temperature_merge_tolerance_K": 0.1,
+  "n_synthetic_temperature_interpolation_rows": 0,
+  "n_train_rows": 6397
+}

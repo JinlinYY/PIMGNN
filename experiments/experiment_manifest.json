@@ -220,20 +220,20 @@
                                          ]
                         },
                         {
-                            "path":  "supporting_information/s3_additional_evaluation_and_validation/s3_3_temperature_robustness/02_temperature_extrapolation",
-                            "title":  "Controlled Temperature Extrapolation",
+                            "path":  "supporting_information/s3_additional_evaluation_and_validation/s3_3_temperature_robustness/02_encoding_and_tail",
+                            "title":  "Temperature Encoding and Tail Robustness",
                             "paper_sections":  [
                                                    "SI Section S3.3.2",
                                                    "Tables S3-S4",
                                                    "Figure S5"
                                                ],
-                            "summary":  "System-disjoint interpolation/extrapolation predictions, three-seed mean/SD summaries, group-bootstrap intervals, and figures are available.",
+                            "summary":  "Encoding metrics, distance-binned metrics, multi-seed summaries, and figures are available.",
                             "code":  [
                                          "scripts/run_temperature_encoding_sensitivity.py",
                                          "scripts/plot_temperature_encoding_sensitivity.py"
                                      ],
                             "commands":  [
-                                             "python scripts/plot_temperature_encoding_sensitivity.py --results-root experiments/supporting_information/s3_additional_evaluation_and_validation/s3_3_temperature_robustness/02_temperature_extrapolation/results --completed-seeds 7 42 2024 --reference-seed 42"
+                                             "python scripts/plot_temperature_encoding_sensitivity.py --help"
                                          ]
                         },
                         {
@@ -307,7 +307,7 @@
                             "title":  "System-Level Generalization",
                             "paper_sections":  [
                                                    "SI Section S3.8",
-                                                   "Tables S11-S14 and S17"
+                                                   "Tables S11-S14"
                                                ],
                             "summary":  "System classifications, category summaries, and tolerance-sensitivity tables are available.",
                             "code":  [
@@ -334,16 +334,36 @@
                         },
                         {
                             "path":  "supporting_information/s3_additional_evaluation_and_validation/s3_10_component_permutation_equivariance",
-                            "title":  "Component-2/3 Permutation Equivariance",
+                            "title":  "Sensitivity to Component Ordering",
                             "paper_sections":  [
-                                                   "SI Section S3.10"
+                                                   "SI Section S3.10",
+                                                   "Tables S15-S16"
                                                ],
-                            "summary":  "Paired original/exchanged predictions, predictive and equivariance metrics, system-bootstrap intervals, provenance, and figures are available.",
+                            "summary":  "Paired original/exchanged predictions and system-bootstrap intervals quantify Component-2/3 permutation consistency.",
                             "code":  [
                                          "scripts/analysis/evaluate_component_permutation_equivariance.py"
                                      ],
                             "commands":  [
-                                             "python scripts/analysis/evaluate_component_permutation_equivariance.py --device cuda --bootstrap-resamples 10000 --bootstrap-seed 2026"
+                                             "python scripts/analysis/evaluate_component_permutation_equivariance.py --help"
+                                         ]
+                        },
+                        {
+                            "path":  "supporting_information/s3_additional_evaluation_and_validation/s3_11_conditional_same_system_temperature_extrapolation",
+                            "title":  "Conditional Same-System Temperature Extrapolation",
+                            "paper_sections":  [
+                                                   "SI Section S3.11",
+                                                   "Table S17",
+                                                   "Figure S7"
+                                               ],
+                            "summary":  "The fixed extreme-temperature split, selected checkpoint, pointwise predictions, source tables, and publication figure are available.",
+                            "code":  [
+                                         "scripts/experiments/run_same_system_temperature_extrapolation.py",
+                                         "scripts/visualization/plot_same_system_temperature_extrapolation.py",
+                                         "src/psmi/identity.py"
+                                     ],
+                            "commands":  [
+                                             "python scripts/experiments/run_same_system_temperature_extrapolation.py --split-only",
+                                             "python scripts/visualization/plot_same_system_temperature_extrapolation.py"
                                          ]
                         },
                         {
@@ -351,7 +371,7 @@
                             "title":  "PSMI-LLE Web Application",
                             "paper_sections":  [
                                                    "SI Section S4",
-                                                   "Figure S7"
+                                                   "Figure S8"
                                                ],
                             "summary":  "The FastAPI backend, Vue frontend, default checkpoint, and launch scripts are available.",
                             "code":  [
@@ -368,8 +388,8 @@
                             "paper_sections":  [
                                                    "Main text Section 2.1",
                                                    "SI Section S5",
-                                                   "Tables S15-S16",
-                                                   "Figure S8"
+                                                   "Tables S18-S19",
+                                                   "Figure S9"
                                                ],
                             "summary":  "Processed data, fixed split manifests, component summaries, and distribution figures are available.",
                             "code":  [
@@ -388,7 +408,7 @@
                             "title":  "Phase-Diagram System Classification",
                             "paper_sections":  [
                                                    "SI Section S6",
-                                                   "Table S17"
+                                                   "Table S20"
                                                ],
                             "summary":  "The classification implementation and result tables are stored with SI Section S3.8 to keep one authoritative system-level record.",
                             "code":  [

@@ -3,7 +3,7 @@
 ## Paper mapping
 
 - SI Section S6
-- Table S17
+- Table S20
 
 ## Scientific scope
 

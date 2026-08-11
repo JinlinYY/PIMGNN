@@ -9,7 +9,7 @@ numerical statement.
 | Document | Scope |
 | --- | --- |
 | [Main-text results](main_text_results.md) | Figure 2, Tables 1-3, and Figure 3 |
-| [Supporting Information results](supporting_information_results.md) | Figures S1-S8, Tables S2-S17, and the efficiency benchmark |
+| [Supporting Information results](supporting_information_results.md) | Figures S1-S9, Tables S2-S20, and the efficiency benchmark |
 | [Evaluation metrics](evaluation_metrics.md) | Mathematical definitions and aggregation conventions |
 | [Auxiliary multi-seed benchmarks](multiseed_benchmark.md) | Maintained sample-major runs that are not manuscript table values |
 | [Artifact status and discrepancies](artifact_status_and_discrepancies.md) | Missing composite assets, split provenance, and values requiring confirmation |
@@ -62,7 +62,7 @@ proximity alone does not establish manuscript provenance.
 
 ## Dataset-count alignment
 
-Table S15 is reproduced by
+Table S18 is reproduced by
 [`table_s15_counts.csv`](../../experiments/supporting_information/s5_dataset_construction_and_distribution/results/table_s15_counts.csv).
 The accompanying
 [`dataset_overview.csv`](../../experiments/supporting_information/s5_dataset_construction_and_distribution/results/dataset_overview.csv)

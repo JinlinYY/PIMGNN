@@ -4,8 +4,8 @@
 
 - Main text Section 2.1
 - SI Section S5
-- Tables S15-S16
-- Figure S8
+- Tables S18-S19
+- Figure S9
 
 ## Scientific scope
 
@@ -16,13 +16,14 @@ filter, and the final minimum-density dataset.
 
 ## Manuscript-aligned results
 
-- `results/table_s15_counts.csv` reproduces the four rows of Table S15 and
-  records which repository stage supplies each manuscript row.
+- `results/table_s15_counts.csv` reproduces the four rows of Table S18 and
+  records which repository stage supplies each manuscript row. The filename is
+  retained to avoid breaking existing links created before final SI renumbering.
 - `results/dataset_overview.csv` retains all three counting stages.
-- `results/component_summary.csv` supports Table S16.
-- `figures/dataset_distribution_combined.png` is the Figure S8 asset.
+- `results/component_summary.csv` supports Table S19.
+- `figures/dataset_distribution_combined.png` is the Figure S9 asset.
 
-The curated Table S15 `Before filtering` value is the validated pre-density
+The curated Table S18 `Before filtering` value is the validated pre-density
 stage (7,953 records, 830 systems, and 842 system-temperature groups), not the
 8,343-row workbook-ingestion count. The expanded `Before filtering` value uses
 the 7,134-row workbook count. This mapping is intentionally explicit.

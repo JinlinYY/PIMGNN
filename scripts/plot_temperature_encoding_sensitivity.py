@@ -13,14 +13,6 @@ import matplotlib.pyplot as plt
 
 
 ROOT = Path(__file__).resolve().parents[1]
-EXPERIMENT_ROOT = (
-    ROOT
-    / "experiments"
-    / "supporting_information"
-    / "s3_additional_evaluation_and_validation"
-    / "s3_3_temperature_robustness"
-    / "02_temperature_extrapolation"
-)
 TRUE = ["Ex1", "Ex2", "Ex3", "Rx1", "Rx2", "Rx3"]
 PRED = [f"pred_{name}" for name in TRUE]
 GROUP = ["system_id", "T"]
@@ -111,11 +103,10 @@ def reciprocal_quadratic_approximation(low_k: float, high_k: float) -> dict[str,
     }
 
 
-def load_predictions(seed_root: Path) -> dict[tuple[str, str], pd.DataFrame]:
-    """Load both encoding outputs from one completed seed directory."""
+def load_predictions(root: Path) -> dict[tuple[str, str], pd.DataFrame]:
     frames = {}
     for encoding in ENCODINGS:
-        run = seed_root / "encodings" / encoding
+        run = root / "runs" / "seed42" / encoding
         for subset, filename in [
             ("Interpolation", "interpolation_predictions.csv"),
             ("Extrapolation", "extrapolation_predictions.csv"),
@@ -229,9 +220,7 @@ def plot(
     ax_a, ax_b, ax_c, ax_d = axes.ravel()
 
     raw = pd.read_excel(dataset, usecols=["T/K"])
-    temperatures = pd.to_numeric(raw["T/K"], errors="coerce").dropna().to_numpy(float)
-    if not len(temperatures):
-        raise ValueError(f"No finite temperatures were found in {dataset}")
+    temperatures = raw["T/K"].to_numpy(float)
     bins = np.arange(np.floor(temperatures.min()) - 0.5, np.ceil(temperatures.max()) + 2.5, 2.5)
     ax_a.hist(temperatures, bins=bins, color="#999999", edgecolor="white", linewidth=0.35)
     ax_a.axvspan(293.15, 323.20, color="#56B4E9", alpha=0.25, label="Training interval")
@@ -247,18 +236,9 @@ def plot(
     x = np.arange(2)
     offsets = [-0.10, 0.10]
     for offset, encoding in zip(offsets, ENCODINGS):
-        part = (
-            overall[overall["encoding"] == encoding]
-            .set_index("subset")
-            .loc[["Interpolation", "Extrapolation"]]
-        )
+        part = overall[overall["encoding"] == encoding].set_index("subset").loc[["Interpolation", "Extrapolation"]]
         y = part["mae"].to_numpy()
-        err = np.vstack(
-            [
-                y - part["error_lower"].to_numpy(),
-                part["error_upper"].to_numpy() - y,
-            ]
-        )
+        err = np.vstack([y - part["ci_low"].to_numpy(), part["ci_high"].to_numpy() - y])
         ax_b.errorbar(x + offset, y, yerr=err, fmt="o", color=COLORS[encoding],
                       markersize=7.2, capsize=3.5, capthick=1.5, linewidth=1.9,
                       label=ENCODING_LABELS[encoding])
@@ -271,18 +251,9 @@ def plot(
 
     x = np.arange(len(DISTANCE_LABELS))
     for encoding, marker in zip(ENCODINGS, ["o", "s"]):
-        part = (
-            distance[distance["encoding"] == encoding]
-            .set_index("distance_bin")
-            .loc[DISTANCE_LABELS]
-        )
+        part = distance[distance["encoding"] == encoding].set_index("distance_bin").loc[DISTANCE_LABELS]
         y = part["mae"].to_numpy()
-        err = np.vstack(
-            [
-                y - part["error_lower"].to_numpy(),
-                part["error_upper"].to_numpy() - y,
-            ]
-        )
+        err = np.vstack([y - part["ci_low"].to_numpy(), part["ci_high"].to_numpy() - y])
         ax_c.errorbar(x, y, yerr=err, marker=marker, color=COLORS[encoding],
                       markersize=7.0, capsize=3.5, capthick=1.5, linewidth=1.9,
                       label=ENCODING_LABELS[encoding])
@@ -295,17 +266,13 @@ def plot(
     order = ["Interpolation", "Extrapolation", *DISTANCE_LABELS]
     part = paired.set_index("subset").loc[order]
     y = 1000.0 * part["inverse_minus_linear_quadratic_mae"].to_numpy()
-    low = 1000.0 * part["error_lower"].to_numpy()
-    high = 1000.0 * part["error_upper"].to_numpy()
+    low = 1000.0 * part["ci_low"].to_numpy()
+    high = 1000.0 * part["ci_high"].to_numpy()
     ax_d.axhline(0, color="#444444", linewidth=1.0)
     ax_d.errorbar(np.arange(len(order)), y, yerr=np.vstack([y - low, high - y]),
                   fmt="o", color="#009E73", markersize=7.0, capsize=3.5,
                   capthick=1.5, linewidth=1.9)
-    ax_d.set_xticks(
-        np.arange(len(order)),
-        ["Inside", "Outside", "0-5", "5-10", "10-20", ">20"],
-        rotation=20,
-    )
+    ax_d.set_xticks(np.arange(len(order)), ["Inside", "Outside", "0-5", "5-10", "10-20", ">20"], rotation=20)
     ax_d.set_ylabel(r"Paired MAE difference ($10^{-3}$)")
     ax_d.set_xlabel("Subset / distance from interval (K)")
     ax_d.set_title("D  Reciprocal minus polynomial", loc="left")
@@ -318,199 +285,83 @@ def plot(
         ax.set_axisbelow(True)
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_dir / "temperature_extrapolation_robustness.pdf")
-    fig.savefig(output_dir / "temperature_extrapolation_robustness.png", dpi=600)
+    fig.savefig(output_dir / "temperature_encoding_sensitivity.pdf")
+    fig.savefig(output_dir / "temperature_encoding_sensitivity.png", dpi=600)
     plt.close(fig)
 
 
 def aggregate_across_seeds(
-    roots: list[Path],
-) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Calculate means and sample SD values across completed training seeds."""
-    raw_overall_rows = []
+    roots: list[Path], reference_frames: dict[tuple[str, str], pd.DataFrame]
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    raw_rows = []
     raw_distance_rows = []
     for root in roots:
         manifest = json.loads((root / "experiment_manifest.json").read_text(encoding="utf-8"))
         seed = int(manifest["training"]["seed"])
-        frames = load_predictions(root)
-        for encoding in ENCODINGS:
-            for subset in ("Interpolation", "Extrapolation"):
-                frame = frames[(encoding, subset)]
-                raw_overall_rows.append({
-                    "seed": seed,
-                    "subset": subset,
-                    "encoding": encoding,
-                    "n_tielines": len(frame),
-                    "n_groups": frame.groupby(GROUP).ngroups,
-                    "mae": float(frame["row_mae"].mean()),
-                })
-            extrapolation = frames[(encoding, "Extrapolation")]
-            for label in DISTANCE_LABELS:
-                selected = extrapolation[extrapolation["distance_label"] == label]
-                raw_distance_rows.append({
-                    "seed": seed,
-                    "distance_bin": label,
-                    "encoding": encoding,
-                    "n_tielines": len(selected),
-                    "n_groups": selected.groupby(GROUP).ngroups,
-                    "mae": float(selected["row_mae"].mean()),
-                })
+        table = pd.read_csv(root / "encoding_metrics.csv")
+        for _, row in table.iterrows():
+            for subset, prefix in [("Interpolation", "interpolation"), ("Extrapolation", "extrapolation")]:
+                raw_rows.append({"seed": seed, "subset": subset, "encoding": row["encoding"],
+                                 "mae": row[f"{prefix}_mae"]})
+        distance_table = pd.read_csv(root / "distance_metrics.csv")
+        distance_table["distance_bin"] = distance_table["distance_bin"].astype(str).str.replace("\u2013", "-", regex=False)
+        for _, row in distance_table.iterrows():
+            raw_distance_rows.append({"seed": seed, "distance_bin": row["distance_bin"],
+                                      "encoding": row["encoding"], "mae": row["mae"]})
 
-    raw_overall = pd.DataFrame(raw_overall_rows)
+    raw = pd.DataFrame(raw_rows)
     raw_distance = pd.DataFrame(raw_distance_rows)
     overall_rows = []
     paired_rows = []
     for subset in ["Interpolation", "Extrapolation"]:
         for encoding in ENCODINGS:
-            values = raw_overall[
-                (raw_overall.subset == subset) & (raw_overall.encoding == encoding)
-            ]["mae"]
+            values = raw[(raw.subset == subset) & (raw.encoding == encoding)]["mae"]
+            frame = reference_frames[(encoding, subset)]
             mean, sd = float(values.mean()), float(values.std(ddof=1))
-            records = raw_overall[
-                (raw_overall.subset == subset) & (raw_overall.encoding == encoding)
-            ]
-            overall_rows.append({
-                "subset": subset,
-                "encoding": encoding,
-                "n_seeds": int(len(values)),
-                "n_tielines_min": int(records["n_tielines"].min()),
-                "n_tielines_max": int(records["n_tielines"].max()),
-                "n_groups_min": int(records["n_groups"].min()),
-                "n_groups_max": int(records["n_groups"].max()),
-                "mae_mean": mean,
-                "mae_sd": sd,
-            })
-        pivot = raw_overall[raw_overall.subset == subset].pivot(
-            index="seed", columns="encoding", values="mae"
-        )
+            overall_rows.append({"subset": subset, "encoding": encoding,
+                                 "n_tielines": len(frame), "n_groups": frame.groupby(GROUP).ngroups,
+                                 "mae": mean, "ci_low": mean - sd, "ci_high": mean + sd})
+        pivot = raw[raw.subset == subset].pivot(index="seed", columns="encoding", values="mae")
         delta = pivot["inverse"] - pivot["linear_quadratic"]
         mean, sd = float(delta.mean()), float(delta.std(ddof=1))
-        paired_rows.append({
-            "subset": subset,
-            "n_seeds": int(len(delta)),
-            "inverse_minus_linear_quadratic_mae_mean": mean,
-            "mae_difference_sd": sd,
-        })
+        paired_rows.append({"subset": subset, "inverse_minus_linear_quadratic_mae": mean,
+                            "ci_low": mean - sd, "ci_high": mean + sd})
 
     distance_rows = []
     for label in DISTANCE_LABELS:
         for encoding in ENCODINGS:
-            values = raw_distance[
-                (raw_distance.distance_bin == label)
-                & (raw_distance.encoding == encoding)
-            ]["mae"]
+            values = raw_distance[(raw_distance.distance_bin == label) & (raw_distance.encoding == encoding)]["mae"]
+            frame = reference_frames[(encoding, "Extrapolation")]
+            frame = frame[frame["distance_label"] == label]
             mean, sd = float(values.mean()), float(values.std(ddof=1))
-            records = raw_distance[
-                (raw_distance.distance_bin == label)
-                & (raw_distance.encoding == encoding)
-            ]
-            distance_rows.append({
-                "distance_bin": label,
-                "encoding": encoding,
-                "n_seeds": int(len(values)),
-                "n_tielines_min": int(records["n_tielines"].min()),
-                "n_tielines_max": int(records["n_tielines"].max()),
-                "n_groups_min": int(records["n_groups"].min()),
-                "n_groups_max": int(records["n_groups"].max()),
-                "mae_mean": mean,
-                "mae_sd": sd,
-            })
-        pivot = raw_distance[raw_distance.distance_bin == label].pivot(
-            index="seed", columns="encoding", values="mae"
-        )
+            distance_rows.append({"distance_bin": label, "encoding": encoding,
+                                  "n_tielines": len(frame), "n_groups": frame.groupby(GROUP).ngroups,
+                                  "mae": mean, "ci_low": mean - sd, "ci_high": mean + sd})
+        pivot = raw_distance[raw_distance.distance_bin == label].pivot(index="seed", columns="encoding", values="mae")
         delta = pivot["inverse"] - pivot["linear_quadratic"]
         mean, sd = float(delta.mean()), float(delta.std(ddof=1))
-        paired_rows.append({
-            "subset": label,
-            "n_seeds": int(len(delta)),
-            "inverse_minus_linear_quadratic_mae_mean": mean,
-            "mae_difference_sd": sd,
-        })
-    return (
-        pd.DataFrame(overall_rows),
-        pd.DataFrame(distance_rows),
-        pd.DataFrame(paired_rows),
-        raw_overall,
-        raw_distance,
+        paired_rows.append({"subset": label, "inverse_minus_linear_quadratic_mae": mean,
+                            "ci_low": mean - sd, "ci_high": mean + sd})
+    return pd.DataFrame(overall_rows), pd.DataFrame(distance_rows), pd.DataFrame(paired_rows), raw.merge(
+        raw_distance, on=["seed", "encoding"], how="outer", suffixes=("_overall", "_distance")
     )
 
 
-def _multiseed_plot_tables(
-    overall: pd.DataFrame,
-    distance: pd.DataFrame,
-    paired: pd.DataFrame,
-) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Adapt explicit mean/SD tables to the common plotting interface."""
-    overall_plot = overall.rename(columns={"mae_mean": "mae"}).copy()
-    overall_plot["error_lower"] = overall_plot["mae"] - overall_plot["mae_sd"]
-    overall_plot["error_upper"] = overall_plot["mae"] + overall_plot["mae_sd"]
-    distance_plot = distance.rename(columns={"mae_mean": "mae"}).copy()
-    distance_plot["error_lower"] = distance_plot["mae"] - distance_plot["mae_sd"]
-    distance_plot["error_upper"] = distance_plot["mae"] + distance_plot["mae_sd"]
-    paired_plot = paired.rename(
-        columns={
-            "inverse_minus_linear_quadratic_mae_mean": (
-                "inverse_minus_linear_quadratic_mae"
-            )
-        }
-    ).copy()
-    paired_plot["error_lower"] = (
-        paired_plot["inverse_minus_linear_quadratic_mae"]
-        - paired_plot["mae_difference_sd"]
-    )
-    paired_plot["error_upper"] = (
-        paired_plot["inverse_minus_linear_quadratic_mae"]
-        + paired_plot["mae_difference_sd"]
-    )
-    return overall_plot, distance_plot, paired_plot
-
-
-def _bootstrap_output_table(
-    table: pd.DataFrame,
-    *,
-    n_bootstrap: int,
-    bootstrap_seed: int,
-) -> pd.DataFrame:
-    """Attach the uncertainty convention to a system-temperature bootstrap table."""
-    output = table.rename(columns={"ci_low": "ci_lower", "ci_high": "ci_upper"}).copy()
-    output["confidence_level"] = 0.95
-    output["n_bootstrap"] = int(n_bootstrap)
-    output["bootstrap_seed"] = int(bootstrap_seed)
-    output["resampling_unit"] = "system_temperature_group"
-    return output
-
-
-def _portable_path(path: Path) -> str:
-    """Return a repository-relative path when possible."""
-    resolved = path.resolve()
-    try:
-        return resolved.relative_to(ROOT).as_posix()
-    except ValueError:
-        return str(resolved)
-
-
-def _partition_range(table: pd.DataFrame, subset: str) -> dict[str, list[int]]:
-    """Summarize partition-size ranges represented by an across-seed table."""
-    selected = table[table["subset"] == subset]
-    return {
-        "records": [
-            int(selected["n_tielines_min"].min()),
-            int(selected["n_tielines_max"].max()),
-        ],
-        "system_temperature_groups": [
-            int(selected["n_groups_min"].min()),
-            int(selected["n_groups_max"].max()),
-        ],
-    }
-
-
-def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    """Parse archived-result analysis and figure-output options."""
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--results-root",
+        "--experiment-root",
         type=Path,
-        default=EXPERIMENT_ROOT / "results",
+        default=(
+            ROOT
+            / "experiments"
+            / "supporting_information"
+            / "s3_additional_evaluation_and_validation"
+            / "s3_3_temperature_robustness"
+            / "02_encoding_and_tail"
+            / "results"
+            / "seed42_and_multiseed"
+        ),
     )
     parser.add_argument(
         "--dataset",
@@ -518,177 +369,45 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=ROOT / "datasets" / "processed" / "update-LLE-all-with-smiles.xlsx",
     )
     parser.add_argument(
-        "--analysis-output-dir",
+        "--output-dir",
         type=Path,
-        default=ROOT / "outputs" / "temperature_extrapolation" / "results",
+        default=ROOT / "outputs" / "figures" / "temperature_encoding_sensitivity",
     )
-    parser.add_argument(
-        "--figure-output-dir",
-        type=Path,
-        default=ROOT / "outputs" / "temperature_extrapolation" / "figures",
-    )
-    parser.add_argument("--reference-seed", type=int, default=42)
-    parser.add_argument("--completed-seeds", type=int, nargs="+", default=[7, 42, 2024])
     parser.add_argument("--bootstrap-replicates", type=int, default=10000)
-    parser.add_argument("--bootstrap-seed", type=int, default=20260806)
-    return parser.parse_args(argv)
+    parser.add_argument("--seed", type=int, default=20260806)
+    parser.add_argument("--additional-experiment-roots", type=Path, nargs="*", default=[])
+    args = parser.parse_args()
 
-
-def main() -> None:
-    args = parse_args()
-    args.results_root = args.results_root.resolve()
-    args.analysis_output_dir = args.analysis_output_dir.resolve()
-    args.figure_output_dir = args.figure_output_dir.resolve()
-    completed_seeds = list(dict.fromkeys(int(seed) for seed in args.completed_seeds))
-    if len(completed_seeds) < 2:
-        raise ValueError("At least two completed seeds are required for an SD summary")
-    if int(args.reference_seed) not in completed_seeds:
-        raise ValueError("reference-seed must be included in completed-seeds")
-    seed_roots = {
-        seed: args.results_root / "runs" / f"seed_{seed}" for seed in completed_seeds
-    }
-    missing = [str(path) for path in seed_roots.values() if not path.is_dir()]
-    if missing:
-        raise FileNotFoundError("Missing completed seed directories: " + ", ".join(missing))
-
-    reference_root = seed_roots[int(args.reference_seed)]
-    frames = load_predictions(reference_root)
-    overall, distance, paired = analyze(
-        frames,
-        args.bootstrap_replicates,
-        args.bootstrap_seed,
-    )
-    args.analysis_output_dir.mkdir(parents=True, exist_ok=True)
-    bootstrap_prefix = f"seed_{int(args.reference_seed)}_system_temperature_bootstrap"
-    _bootstrap_output_table(
-        overall,
-        n_bootstrap=args.bootstrap_replicates,
-        bootstrap_seed=args.bootstrap_seed,
-    ).to_csv(
-        args.analysis_output_dir / f"{bootstrap_prefix}_encoding_metrics.csv",
-        index=False,
-        encoding="utf-8",
-    )
-    _bootstrap_output_table(
-        distance,
-        n_bootstrap=args.bootstrap_replicates,
-        bootstrap_seed=args.bootstrap_seed,
-    ).to_csv(
-        args.analysis_output_dir / f"{bootstrap_prefix}_distance_metrics.csv",
-        index=False,
-        encoding="utf-8",
-    )
-    _bootstrap_output_table(
-        paired,
-        n_bootstrap=args.bootstrap_replicates,
-        bootstrap_seed=args.bootstrap_seed,
-    ).to_csv(
-        args.analysis_output_dir / f"{bootstrap_prefix}_paired_differences.csv",
-        index=False,
-        encoding="utf-8",
-    )
+    frames = load_predictions(args.experiment_root)
+    overall, distance, paired = analyze(frames, args.bootstrap_replicates, args.seed)
+    overall.to_csv(args.experiment_root / "encoding_metrics_with_ci.csv", index=False, encoding="utf-8-sig")
+    distance.to_csv(args.experiment_root / "distance_metrics_with_ci.csv", index=False, encoding="utf-8-sig")
+    paired.to_csv(args.experiment_root / "paired_differences_with_ci.csv", index=False, encoding="utf-8-sig")
     approximation = {
         "original_seed42_training_range": reciprocal_quadratic_approximation(283.15, 353.20),
         "controlled_central_training_range": reciprocal_quadratic_approximation(293.15, 323.20),
-        "interpretation": (
-            "Numerical approximation only; this does not make the learned "
-            "polynomial channel a thermodynamic law."
-        ),
+        "interpretation": "Numerical approximation only; this does not make the learned polynomial channel a thermodynamic law.",
     }
-    approximation_path = (
-        args.analysis_output_dir / "reciprocal_temperature_approximation.json"
-    )
-    approximation_path.write_text(
+    (args.experiment_root / "quadratic_approximation_of_inverse_temperature.json").write_text(
         json.dumps(approximation, indent=2), encoding="utf-8"
     )
-
-    (
-        multi_overall,
-        multi_distance,
-        multi_paired,
-        per_seed_overall,
-        per_seed_distance,
-    ) = aggregate_across_seeds(list(seed_roots.values()))
-    multi_overall.to_csv(
-        args.analysis_output_dir / "three_seed_encoding_metrics.csv",
-        index=False,
-        encoding="utf-8",
-    )
-    multi_distance.to_csv(
-        args.analysis_output_dir / "three_seed_distance_metrics.csv",
-        index=False,
-        encoding="utf-8",
-    )
-    multi_paired.to_csv(
-        args.analysis_output_dir / "three_seed_paired_differences.csv",
-        index=False,
-        encoding="utf-8",
-    )
-    per_seed_overall.to_csv(
-        args.analysis_output_dir / "per_seed_overall_metrics.csv",
-        index=False,
-        encoding="utf-8",
-    )
-    per_seed_distance.to_csv(
-        args.analysis_output_dir / "per_seed_distance_metrics.csv",
-        index=False,
-        encoding="utf-8",
-    )
-    plot_overall, plot_distance, plot_paired = _multiseed_plot_tables(
-        multi_overall,
-        multi_distance,
-        multi_paired,
-    )
-    plot(
-        plot_overall,
-        plot_distance,
-        plot_paired,
-        args.dataset,
-        args.figure_output_dir,
-        uncertainty_label=rf"Mean $\pm$ 1 SD across {len(completed_seeds)} seeds",
-    )
-
-    analysis_manifest = {
-        "schema_version": 1,
-        "experiment": "temperature_extrapolation_robustness",
-        "source": "archived_pointwise_predictions",
-        "results_root": _portable_path(args.results_root),
-        "completed_seeds": completed_seeds,
-        "reference_seed": int(args.reference_seed),
-        "controlled_training_interval_k": [293.15, 323.20],
-        "partition_ranges_across_completed_seeds": {
-            "interpolation": _partition_range(multi_overall, "Interpolation"),
-            "extrapolation": _partition_range(multi_overall, "Extrapolation"),
-        },
-        "system_temperature_bootstrap": {
-            "reference_seed": int(args.reference_seed),
-            "resampling_unit": "system_temperature_group",
-            "replicates": int(args.bootstrap_replicates),
-            "bootstrap_seed": int(args.bootstrap_seed),
-            "confidence_level": 0.95,
-        },
-        "across_seed_summary": {
-            "n_seeds": len(completed_seeds),
-            "dispersion": "sample_standard_deviation",
-            "ddof": 1,
-        },
-        "figure": {
-            "png": _portable_path(
-                args.figure_output_dir / "temperature_extrapolation_robustness.png"
-            ),
-            "pdf": _portable_path(
-                args.figure_output_dir / "temperature_extrapolation_robustness.pdf"
-            ),
-        },
-    }
-    (args.analysis_output_dir / "analysis_manifest.json").write_text(
-        json.dumps(analysis_manifest, indent=2) + "\n",
-        encoding="utf-8",
-    )
-    print("\nThree-seed mean and sample SD")
-    print(multi_overall.to_string(index=False))
-    print(multi_distance.to_string(index=False))
-    print(multi_paired.to_string(index=False))
+    plot(overall, distance, paired, args.dataset, args.output_dir)
+    if args.additional_experiment_roots:
+        roots = [args.experiment_root, *args.additional_experiment_roots]
+        multi_overall, multi_distance, multi_paired, multi_raw = aggregate_across_seeds(roots, frames)
+        multi_overall.to_csv(args.experiment_root / "multi_seed_encoding_metrics.csv", index=False, encoding="utf-8-sig")
+        multi_distance.to_csv(args.experiment_root / "multi_seed_distance_metrics.csv", index=False, encoding="utf-8-sig")
+        multi_paired.to_csv(args.experiment_root / "multi_seed_paired_differences.csv", index=False, encoding="utf-8-sig")
+        multi_raw.to_csv(args.experiment_root / "multi_seed_raw_metrics.csv", index=False, encoding="utf-8-sig")
+        plot(multi_overall, multi_distance, multi_paired, args.dataset, args.output_dir,
+             uncertainty_label=rf"Mean $\pm$ 1 SD across {len(roots)} seeds")
+        print("\nMulti-seed summary")
+        print(multi_overall.to_string(index=False))
+        print(multi_distance.to_string(index=False))
+        print(multi_paired.to_string(index=False))
+    print(overall.to_string(index=False))
+    print(distance.to_string(index=False))
+    print(paired.to_string(index=False))
 
 
 if __name__ == "__main__":

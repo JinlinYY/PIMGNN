@@ -10,31 +10,24 @@ sections are omitted unless they provide provenance for a reported result.
 | Figures S1-S3: prediction-error analysis | [`s3_1_prediction_error_analysis/figures`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_1_prediction_error_analysis/figures) and [`test_pointwise_predictions.csv`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_1_prediction_error_analysis/results/test_pointwise_predictions.csv) | Complete |
 | Section S3.2: baseline protocol | Main-text [`3_1_1_baseline_comparison`](../../experiments/section_3_results/3_1_lle_prediction/3_1_1_baseline_comparison) | Partial; same Table 1 boundary described in [main-text mapping](main_text_results.md#table-1-comparison-with-baseline-methods) |
 | Figure S4: local temperature perturbation and phase-path continuity | [`run_sensitivity_analysis.py`](../../scripts/analysis/run_sensitivity_analysis.py) and experiment [`README`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_3_temperature_robustness/01_local_perturbation/README.md) | Partial; exact archived Figure S4 output is absent |
-| Tables S3-S4 and Figure S5: controlled temperature extrapolation | [`02_temperature_extrapolation`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_3_temperature_robustness/02_temperature_extrapolation) | Complete; pointwise predictions, three-seed summaries, bootstrap intervals, and vector/raster figures are distributed |
+| Tables S3-S4 and Figure S5: temperature representation and tail robustness | [`02_encoding_and_tail`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_3_temperature_robustness/02_encoding_and_tail) | Complete |
 | Table S5: data-splitting strategies | [`s3_4_data_splitting`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_4_data_splitting) | Partial; code and split manifests exist, but the final aggregate metric table is absent |
 | Tables S6-S7 and Figure S6: tie-line density and phase-path location | [`s3_5_tieline_density_and_phase_path`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_5_tieline_density_and_phase_path) | Complete |
 | Table S8: excess-Gibbs-energy model sensitivity | [`results/summary.csv`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_6_excess_gibbs_energy_model_sensitivity/results/summary.csv) and per-seed records | Complete |
 | Tables S9-S10: thermodynamic-consistency audit | [`summary.json`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_7_thermodynamic_consistency_audit/results/summary.json), [`threshold_sensitivity.csv`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_7_thermodynamic_consistency_audit/results/threshold_sensitivity.csv), and per-prediction residuals | Complete |
-| Tables S11-S14 and S17: system-level reconstruction | [`s3_8_system_generalization/results`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_8_system_generalization/results) | Complete |
+| Tables S11-S14: system-level reconstruction | [`s3_8_system_generalization/results`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_8_system_generalization/results) | Complete |
 | Section S3.9: inference efficiency | [`psmi_rtx3090_ti`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_9_inference_efficiency/results/psmi_rtx3090_ti) | Complete |
-| Section S3.10: Component-2/3 permutation equivariance | [`s3_10_component_permutation_equivariance`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_10_component_permutation_equivariance) | Complete; paired predictions, system-bootstrap intervals, and vector/raster figures are distributed |
+| Tables S15-S16: sensitivity to component ordering | [`s3_10_component_permutation_equivariance`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_10_component_permutation_equivariance) | Complete; paired predictions and system-bootstrap intervals are distributed |
+| Table S17 and Figure S7: conditional same-system temperature extrapolation | [`s3_11_conditional_same_system_temperature_extrapolation`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_11_conditional_same_system_temperature_extrapolation) | Complete; fixed split, checkpoint, predictions, source tables, and publication figure are distributed |
 
 ### Tables S3-S4
 
-The manuscript uses random seeds 7, 42, and 2024. The cross-seed source and
-summary tables are:
+The manuscript uses random seeds 7, 42, and 2024. The multi-seed source tables
+are:
 
-- [`per_seed_overall_metrics.csv`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_3_temperature_robustness/02_temperature_extrapolation/results/aggregate/per_seed_overall_metrics.csv)
-- [`three_seed_encoding_metrics.csv`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_3_temperature_robustness/02_temperature_extrapolation/results/aggregate/three_seed_encoding_metrics.csv)
-- [`three_seed_distance_metrics.csv`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_3_temperature_robustness/02_temperature_extrapolation/results/aggregate/three_seed_distance_metrics.csv)
-- [`three_seed_paired_differences.csv`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_3_temperature_robustness/02_temperature_extrapolation/results/aggregate/three_seed_paired_differences.csv)
-
-These tables report arithmetic means and sample standard deviations across
-the three completed seeds. They do not label mean +/- SD as a confidence
-interval. The separately named
-[`seed_42_system_temperature_bootstrap_paired_differences.csv`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_3_temperature_robustness/02_temperature_extrapolation/results/aggregate/seed_42_system_temperature_bootstrap_paired_differences.csv)
-contains 95% percentile intervals from resampling complete
-system-temperature groups within seed 42.
+- [`multi_seed_encoding_metrics.csv`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_3_temperature_robustness/02_encoding_and_tail/results/seed42_and_multiseed/multi_seed_encoding_metrics.csv)
+- [`encoding_metrics_with_ci.csv`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_3_temperature_robustness/02_encoding_and_tail/results/seed42_and_multiseed/encoding_metrics_with_ci.csv)
+- [`distance_metrics_with_ci.csv`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_3_temperature_robustness/02_encoding_and_tail/results/seed42_and_multiseed/distance_metrics_with_ci.csv)
 
 These seeds are specific to the temperature-encoding experiment and are not
 the Table 1 five-seed protocol.
@@ -66,7 +59,7 @@ and 1.7358/2.5876 for the data-driven baseline. The threshold table records the
 exceedance fraction at every stated epsilon and must be interpreted as a
 post-hoc diagnostic, not as a hard equilibrium guarantee.
 
-### Tables S11-S14 and S17
+### Tables S11-S14
 
 The primary classification at composition RMSE tolerance 0.02 contains 4
 quantitatively consistent, 72 qualitatively consistent, and 2 failed systems.
@@ -75,24 +68,24 @@ and tolerance-sensitivity analysis used for these supplementary tables.
 
 ## SI Section S4: Web application
 
-### Figure S7
+### Figure S8
 
 Status: **Partial**
 
 The FastAPI backend, Vue frontend, default checkpoint contract, and deployment
 scripts are available under [`Web/PSMI-LLE-web`](../../Web/PSMI-LLE-web).
-The exact manuscript prototype screenshot used as Figure S7 is not distributed
+The exact manuscript prototype screenshot used as Figure S8 is not distributed
 as a standalone image.
 
 ## SI Section S5: dataset construction and distribution
 
 | Paper item | Public evidence | Status |
 | --- | --- | --- |
-| Table S15: records and systems before/after density filtering | [`table_s15_counts.csv`](../../experiments/supporting_information/s5_dataset_construction_and_distribution/results/table_s15_counts.csv) and the three-stage [`dataset_overview.csv`](../../experiments/supporting_information/s5_dataset_construction_and_distribution/results/dataset_overview.csv) | Complete; the manuscript-stage mapping is explicit |
-| Table S16: molecular-species coverage | [`component_summary.csv`](../../experiments/supporting_information/s5_dataset_construction_and_distribution/results/component_summary.csv) | Complete |
-| Figure S8: dataset distribution and molecular coverage | [`dataset_distribution_combined.png`](../../experiments/supporting_information/s5_dataset_construction_and_distribution/figures/dataset_distribution_combined.png) and component plots | Complete |
+| Table S18: records and systems before/after density filtering | [`table_s15_counts.csv`](../../experiments/supporting_information/s5_dataset_construction_and_distribution/results/table_s15_counts.csv) and the three-stage [`dataset_overview.csv`](../../experiments/supporting_information/s5_dataset_construction_and_distribution/results/dataset_overview.csv) | Complete; the manuscript-stage mapping is explicit; the retained repository filename predates final SI renumbering |
+| Table S19: molecular-species coverage | [`component_summary.csv`](../../experiments/supporting_information/s5_dataset_construction_and_distribution/results/component_summary.csv) | Complete |
+| Figure S9: dataset distribution and molecular coverage | [`dataset_distribution_combined.png`](../../experiments/supporting_information/s5_dataset_construction_and_distribution/figures/dataset_distribution_combined.png) and component plots | Complete |
 
-The exact Table S15 mapping is:
+The exact Table S18 mapping is:
 
 | Dataset | Manuscript stage | Repository counting stage | Records | Systems | System-temperature groups |
 | --- | --- | --- | ---: | ---: | ---: |
@@ -110,7 +103,7 @@ expanded `Before filtering` row; this selection is recorded explicitly instead
 of silently applying a different label. All counts refer to unaugmented
 experimental records.
 
-Table S16 is reproduced from the filtered rows using canonical SMILES:
+Table S19 is reproduced from the filtered rows using canonical SMILES:
 
 | Dataset | Component 1 | Component 2 | Component 3 | Union |
 | --- | ---: | ---: | ---: | ---: |
@@ -118,12 +111,12 @@ Table S16 is reproduced from the filtered rows using canonical SMILES:
 | Expanded literature LLE | 61 | 83 | 101 | 186 |
 
 The `unique_component_names` columns in `component_summary.csv` are auxiliary
-label-quality diagnostics; Table S16 uses `unique_smiles` and
+label-quality diagnostics; Table S19 uses `unique_smiles` and
 `union_unique_smiles_all_roles` only.
 
 ## SI Section S6: phase-diagram system classification
 
-Table S17 reuses the authoritative output from SI Section S3.8 rather than
+Table S20 reuses the authoritative output from SI Section S3.8 rather than
 duplicating it. Use
 [`system_classification.csv`](../../experiments/supporting_information/s3_additional_evaluation_and_validation/s3_8_system_generalization/results/system_classification.csv)
 for the complete 78-system record.

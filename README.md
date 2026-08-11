@@ -111,7 +111,7 @@ python scripts/train.py --config configs/experiments/expanded_lle_finetune.yaml
 
 ## Data contract
 
-The main workbook contains 8,343 candidate rows from 860 ternary systems. Molecular-record validation retains 7,953 records from 830 systems, matching the main benchmark's `Before filtering` entry in Table S15; the fixed minimum density of six records per `(system_id, temperature)` group then produces 7,683 modeling records from 765 systems. The expanded workbook contains 7,134 rows and 6,709 filtered records. The complete three-stage counting contract is given in the [dataset card](datasets/DATASET_CARD.md).
+The main workbook contains 8,343 candidate rows from 860 ternary systems. Molecular-record validation retains 7,953 records from 830 systems, matching the main benchmark's `Before filtering` entry in Table S18; the fixed minimum density of six records per `(system_id, temperature)` group then produces 7,683 modeling records from 765 systems. The expanded workbook contains 7,134 rows and 6,709 filtered records. The complete three-stage counting contract is given in the [dataset card](datasets/DATASET_CARD.md).
 
 Splits are disjoint at the `system_id` level. Component-permutation augmentation is applied only to training examples after splitting; it does not change the reported number of experimental records. File identities, exact partition counts, preprocessing rules, field aliases, and reuse guidance are documented in the [Dataset Card](datasets/DATASET_CARD.md).
 
