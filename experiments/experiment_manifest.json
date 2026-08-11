@@ -220,20 +220,20 @@
                                          ]
                         },
                         {
-                            "path":  "supporting_information/s3_additional_evaluation_and_validation/s3_3_temperature_robustness/02_encoding_and_tail",
-                            "title":  "Temperature Encoding and Tail Robustness",
+                            "path":  "supporting_information/s3_additional_evaluation_and_validation/s3_3_temperature_robustness/02_temperature_extrapolation",
+                            "title":  "Controlled Temperature Extrapolation",
                             "paper_sections":  [
                                                    "SI Section S3.3.2",
                                                    "Tables S3-S4",
                                                    "Figure S5"
                                                ],
-                            "summary":  "Encoding metrics, distance-binned metrics, multi-seed summaries, and figures are available.",
+                            "summary":  "System-disjoint interpolation/extrapolation predictions, three-seed mean/SD summaries, group-bootstrap intervals, and figures are available.",
                             "code":  [
                                          "scripts/run_temperature_encoding_sensitivity.py",
                                          "scripts/plot_temperature_encoding_sensitivity.py"
                                      ],
                             "commands":  [
-                                             "python scripts/plot_temperature_encoding_sensitivity.py --help"
+                                             "python scripts/plot_temperature_encoding_sensitivity.py --results-root experiments/supporting_information/s3_additional_evaluation_and_validation/s3_3_temperature_robustness/02_temperature_extrapolation/results --completed-seeds 7 42 2024 --reference-seed 42"
                                          ]
                         },
                         {
@@ -330,6 +330,20 @@
                                      ],
                             "commands":  [
                                              "python scripts/summarize_efficiency_benchmarks.py --help"
+                                         ]
+                        },
+                        {
+                            "path":  "supporting_information/s3_additional_evaluation_and_validation/s3_10_component_permutation_equivariance",
+                            "title":  "Component-2/3 Permutation Equivariance",
+                            "paper_sections":  [
+                                                   "SI Section S3.10"
+                                               ],
+                            "summary":  "Paired original/exchanged predictions, predictive and equivariance metrics, system-bootstrap intervals, provenance, and figures are available.",
+                            "code":  [
+                                         "scripts/analysis/evaluate_component_permutation_equivariance.py"
+                                     ],
+                            "commands":  [
+                                             "python scripts/analysis/evaluate_component_permutation_equivariance.py --device cuda --bootstrap-resamples 10000 --bootstrap-seed 2026"
                                          ]
                         },
                         {
