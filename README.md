@@ -1,4 +1,4 @@
-# PSMI: Physics-Informed Prediction of Ternary Liquid-Liquid Equilibria
+# Physics-informed site-specific molecular interaction learning framework for liquid-liquid phase diagram reconstruction and extraction process design
 
 PSMI predicts tie-line compositions for ternary liquid-liquid equilibrium (LLE) systems from molecular graphs and operating conditions. This repository provides the model implementation, thermodynamic regularization, curated datasets, fixed system-level splits, trained checkpoints, baseline comparisons, paper-aligned experiments, reference results, and a browser-based prediction interface.
 
