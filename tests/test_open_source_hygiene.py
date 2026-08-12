@@ -37,13 +37,20 @@ def _public_text_files() -> list[Path]:
 
 def test_open_source_policy_files_are_present() -> None:
     """A public research repository must declare reuse and contribution terms."""
-    for name in (
-        "LICENSE",
-        "CITATION.cff",
-        "CONTRIBUTING.md",
-        "THIRD_PARTY_NOTICES.md",
-    ):
-        assert (PROJECT_ROOT / name).is_file(), name
+    required_paths = (
+        Path("LICENSE"),
+        Path("CITATION.cff"),
+        Path("docs/development/CONTRIBUTING.md"),
+        Path("docs/legal/THIRD_PARTY_NOTICES.md"),
+    )
+    for relative_path in required_paths:
+        assert (PROJECT_ROOT / relative_path).is_file(), relative_path
+
+
+def test_readme_is_the_only_root_markdown_file() -> None:
+    """Keep the repository landing directory focused on the main README."""
+    root_markdown_files = sorted(path.name for path in PROJECT_ROOT.glob("*.md"))
+    assert root_markdown_files == ["README.md"]
 
 
 def test_public_paths_use_scientific_names() -> None:

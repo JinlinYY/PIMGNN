@@ -140,6 +140,6 @@ After startup, open `http://localhost:3000`; the FastAPI schema is available at 
 
 ## Citation and license
 
-Citation metadata are provided in [`CITATION.cff`](CITATION.cff). Please cite the PSMI article and the original experimental sources when reusing the datasets. Baseline-method references and dependency notices are listed in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+Citation metadata are provided in [`CITATION.cff`](CITATION.cff). Please cite the PSMI article and the original experimental sources when reusing the datasets. Baseline-method references and dependency notices are listed in the [`third-party notices`](docs/legal/THIRD_PARTY_NOTICES.md).
 
-Original PSMI source code is released under the [MIT License](LICENSE). Dataset measurements and third-party components retain their respective attribution and reuse requirements. Contributions are welcome; see [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Original PSMI source code is released under the [MIT License](LICENSE). Dataset measurements and third-party components retain their respective attribution and reuse requirements. Contributions are welcome; see the [`contribution guide`](docs/development/CONTRIBUTING.md).

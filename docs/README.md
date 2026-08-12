@@ -66,6 +66,6 @@ adaptation. The distinction is explained in the
 
 - [Main project README](../README.md)
 - [Command-line entry points](../scripts/README.md)
-- [Contribution guide](../CONTRIBUTING.md)
-- [Third-party notices](../THIRD_PARTY_NOTICES.md)
+- [Contribution guide](development/CONTRIBUTING.md)
+- [Third-party notices](legal/THIRD_PARTY_NOTICES.md)
 - [Web deployment guide](../Web/PSMI-LLE-web/README.md)
